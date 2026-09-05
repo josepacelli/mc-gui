@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 8,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,42 @@
       ],
       "created": "2026-09-05T21:53:29Z",
       "last_seen": "2026-09-05T21:53:29Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::axaml structural order tests must anchor all 5 top level headers in relative sequence left first right last text window split on first left lets a left file swap pass",
+      "text": "Axaml structural order tests must anchor ALL 5 top-level headers in relative sequence (Left first, Right last); text-window split on first _Left lets a Left<->File swap pass.",
+      "signal": "surviving_mutant",
+      "scope": "MainWindow.axaml tests",
+      "status": "candidate",
+      "features": [
+        "mc-menubar"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/McGui.App.Tests/McMenuDefinitionsTests.cs:161 (MainWindow.axaml tests)"
+      ],
+      "created": "2026-09-05T22:17:05Z",
+      "last_seen": "2026-09-05T22:17:05Z"
+    },
+    {
+      "id": "L-007",
+      "key": "surviving_mutant::containment of node tests need real nesting item before options closing tag not a substring window bounded by the next menu header top level theme placed between options and right evades the check",
+      "text": "Containment-of-node tests need real nesting (item before Options' closing tag), not a substring window bounded by the NEXT menu header; top-level Theme placed between Options and Right evades the check.",
+      "signal": "surviving_mutant",
+      "scope": "MainWindow.axaml tests",
+      "status": "candidate",
+      "features": [
+        "mc-menubar"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/McGui.App.Tests/McMenuDefinitionsTests.cs:175 (MainWindow.axaml tests)"
+      ],
+      "created": "2026-09-05T22:17:05Z",
+      "last_seen": "2026-09-05T22:17:05Z"
     }
   ]
 }

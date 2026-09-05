@@ -162,24 +162,33 @@ public class MainWindowMenuBarStructureTests
     public void MenuBar_HasFiveTopLevelMenusInOrder()
     {
         var content = File.ReadAllText(MainWindowAxaml);
-        var menuBlock = content.Split("<MenuItem Header=\"_Left\">", 2)[1].Split("</Menu>", 2)[0];
+        var headers = new[] { "_Left", "_File", "_Command", "_Options", "_Right" };
+        var positions = headers.Select(h => content.IndexOf($"Header=\"{h}\"", StringComparison.Ordinal)).ToArray();
 
-        Assert.Contains("Header=\"_Left\"", content);
-        Assert.Contains("Header=\"_Right\"", content);
-        Assert.True(menuBlock.IndexOf("Header=\"_File\"", StringComparison.Ordinal)
-                     < menuBlock.IndexOf("Header=\"_Command\"", StringComparison.Ordinal));
-        Assert.True(menuBlock.IndexOf("Header=\"_Command\"", StringComparison.Ordinal)
-                     < menuBlock.IndexOf("Header=\"_Options\"", StringComparison.Ordinal));
+        Assert.All(positions, p => Assert.True(p >= 0, "missing header"));
+        for (var i = 0; i < positions.Length - 1; i++)
+        {
+            Assert.True(positions[i] < positions[i + 1], $"header {headers[i]} must precede {headers[i + 1]}");
+        }
     }
 
     [Fact]
     public void Theme_MenuLivesInsideOptions_NotTopLevel()
     {
         var content = File.ReadAllText(MainWindowAxaml);
-        var optionsBlock = content.Split("<MenuItem Header=\"_Options\">", 2)[1].Split("<MenuItem Header=\"_Right\">", 2)[0];
+        var optionsStart = content.IndexOf("<MenuItem Header=\"_Options\">", StringComparison.Ordinal);
+        var rightStart = content.IndexOf("<MenuItem Header=\"_Right\">", StringComparison.Ordinal);
+        Assert.True(optionsStart >= 0 && rightStart > optionsStart);
 
-        Assert.Contains("Header=\"_Theme\"", optionsBlock);
-        Assert.DoesNotContain("<MenuItem Header=\"_Theme\"", content.Split("<MenuItem Header=\"_Left\">", 2)[0]);
+        var optionsBody = content[optionsStart..rightStart];
+        var themeLine = optionsBody
+            .Split('\n')
+            .FirstOrDefault(l => l.Contains("Header=\"_Theme\"", StringComparison.Ordinal));
+        Assert.NotNull(themeLine);
+        Assert.StartsWith("        <MenuItem Header=\"_Theme\"", themeLine, StringComparison.Ordinal);
+
+        var topLevelRegion = content[..optionsStart];
+        Assert.DoesNotContain("Header=\"_Theme\"", topLevelRegion);
     }
 
     [Fact]

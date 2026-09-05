@@ -44,6 +44,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: PII-15: spec.md size AC 2 (spec coverage)
 - last seen: 2026-09-05T21:53:29Z
 
+### L-006 - Axaml structural order tests must anchor ALL 5 top-level headers in relative sequence (Left first, Right last); text-window split on first _Left lets a Left<->File swap pass.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `MainWindow.axaml tests` · harmful: 0
+- features: mc-menubar
+- evidence: tests/McGui.App.Tests/McMenuDefinitionsTests.cs:161 (MainWindow.axaml tests)
+- last seen: 2026-09-05T22:17:05Z
+
+### L-007 - Containment-of-node tests need real nesting (item before Options' closing tag), not a substring window bounded by the NEXT menu header; top-level Theme placed between Options and Right evades the check.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `MainWindow.axaml tests` · harmful: 0
+- features: mc-menubar
+- evidence: tests/McGui.App.Tests/McMenuDefinitionsTests.cs:175 (MainWindow.axaml tests)
+- last seen: 2026-09-05T22:17:05Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

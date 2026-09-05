@@ -113,23 +113,23 @@ Explicitamente excluído desta fatia.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| MB-01 | P1: Menubar completa | Design | Pending |
-| MB-02 | P1: Menubar completa | Design | Pending |
-| MB-03 | P1: Menubar completa | Design | Pending |
-| MB-04 | P1: Menubar completa | Design | Pending |
-| MB-05 | P1: Itens hab/des | Design | Pending |
-| MB-06 | P1: Itens hab/des | Design | Pending |
-| MB-07 | P1: Itens hab/des | Design | Pending |
-| MB-08 | P1: Itens hab/des | Design | Pending |
-| MB-09 | P1: Itens hab/des | Design | Pending |
-| MB-10 | P1: Mnemônicos+F9 | Design | Pending |
-| MB-11 | P1: Mnemônicos+F9 | Design | Pending |
-| MB-12 | P1: Mnemônicos+F9 | Design | Pending |
+| MB-01 | P1: Menubar completa | Design | Verified |
+| MB-02 | P1: Menubar completa | Design | Verified |
+| MB-03 | P1: Menubar completa | Design | Verified |
+| MB-04 | P1: Menubar completa | Design | Verified |
+| MB-05 | P1: Itens hab/des | Design | Verified |
+| MB-06 | P1: Itens hab/des | Design | Verified |
+| MB-07 | P1: Itens hab/des | Design | Verified |
+| MB-08 | P1: Itens hab/des | Design | Verified |
+| MB-09 | P1: Itens hab/des | Design | Verified |
+| MB-10 | P1: Mnemônicos+F9 | Design | Verified |
+| MB-11 | P1: Mnemônicos+F9 | Design | Verified |
+| MB-12 | P1: Mnemônicos+F9 | Design | Verified |
 
 **ID format:** `MB-N` (Menu Bar)
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️
+**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
 
 ---
 
