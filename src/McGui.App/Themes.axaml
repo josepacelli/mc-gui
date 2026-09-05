@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="PanelBorderBrush" Color="#B0B0B0" />
+      <SolidColorBrush x:Key="PanelBorderActiveBrush" Color="#0066CC" />
+      <SolidColorBrush x:Key="OverlayLoadingBackgroundBrush" Color="#CCF5F5F5" />
+      <SolidColorBrush x:Key="OverlayLoadingForegroundBrush" Color="#333333" />
+      <SolidColorBrush x:Key="OverlayErrorBackgroundBrush" Color="#E6FCE8E8" />
+      <SolidColorBrush x:Key="OverlayErrorForegroundBrush" Color="#B00020" />
+      <SolidColorBrush x:Key="TextErrorBrush" Color="#B00020" />
+      <SolidColorBrush x:Key="TextWarningBrush" Color="#C2410C" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="PanelBorderBrush" Color="#4D4D4D" />
+      <SolidColorBrush x:Key="PanelBorderActiveBrush" Color="#4CB3FF" />
+      <SolidColorBrush x:Key="OverlayLoadingBackgroundBrush" Color="#CC000000" />
+      <SolidColorBrush x:Key="OverlayLoadingForegroundBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="OverlayErrorBackgroundBrush" Color="#CC5C2B2B" />
+      <SolidColorBrush x:Key="OverlayErrorForegroundBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="TextErrorBrush" Color="#FF8A80" />
+      <SolidColorBrush x:Key="TextWarningBrush" Color="#FFB74D" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>
