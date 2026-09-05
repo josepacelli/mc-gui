@@ -34,7 +34,7 @@ O `mc-gui` hoje roda apenas via `dotnet run`/publish manual — não há um arte
 | Arquitetura | `osx-arm64`, self-contained, `UseAppHost=true` | Decisão; publish RID arm64 validado no ambiente | y |
 | Bundle id | `mcgui.jpmo.dev.br` | Decisão do usuário | y |
 | Versão | `0.1.0` (`CFBundleShortVersionString`/`CFBundleVersion`), default no script; CI usa versão de tag quando presente | Decisão | y |
-| Nome | Executável `mc-gui`, nome exibido `mc-gui` | Coerente com binário `McGui.App` | y |
+| Nome | Bundle `Midnight Commander GUI.app`; executável interno `mc-gui` (`CFBundleExecutable`); `CFBundleName=MC GUI` (≤15 chars) e `CFBundleDisplayName=Midnight Commander GUI`; título da janela `Midnight Commander GUI` | Nome exibido pedido pelo usuário; CFBundleName limitado a 15 chars pelo macOS | y |
 | Ícone | `.icns` gerado a partir de PNG 1024 programático (`packaging/icon/icon-source.png`) via `iconutil`; sem asset externo | Decisão "incluir .icns próprio"; reproducible | y |
 | OutputType | Mantém `WinExe` atual (não altera csproj app); apphost forçado por `-p:UseAppHost=true` | Validado: publish gera Mach-O arm64 executável | y |
 | Estrutura .app | `mc-gui.app/Contents/{MacOS (publish), Resources (mc-gui.icns), Info.plist}` | Doc oficial Avalonia macOS | y |

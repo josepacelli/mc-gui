@@ -99,12 +99,12 @@ T3 -> T4
 - [x] DMG `mc-gui-0.1.0-arm64.dmg` criado e monta com app + link Applications
 - [x] App abre do volume (janela mc-gui confirmada); DMG desmonta
 - [x] Regressão suíte ok (nenhum código runtime alterado)
-- [ ] UAT visual do usuário: nome/ícone/versão no Finder
+- [x] UAT visual do usuário: "Tudo ok"
 
 **Tests**: auto-check hdiutil + UAT
 **Gate**: full (parcial: sem xunit; executa build + teste)
 
-**Status**: ⚠️ Complete (UAT visual do Finder pendente de confirmação do usuário)
+**Status**: ✅ Complete
 
 ---
 

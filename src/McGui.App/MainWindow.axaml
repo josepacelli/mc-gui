@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
         x:Class="McGui.App.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="mc-gui">
+        Title="Midnight Commander GUI">
   <Grid RowDefinitions="Auto,*,Auto">
     <Menu Grid.Row="0" x:Name="MainMenu">
       <MenuItem Header="_Left">
