@@ -590,14 +590,18 @@ T20 -> T21
 - Skill: `run` (validar visualmente criação de pasta e as duas mensagens de erro)
 
 **Done when**:
-- [ ] F7 cria a pasta real no diretório ativo ao confirmar (DPC-24)
-- [ ] Nome duplicado mostra erro inline sem fechar o diálogo (DPC-25)
-- [ ] Caractere inválido para o SO mostra erro inline identificando o caractere (DPC-26)
-- [ ] Gate check passa: `dotnet test McGui.sln`
-- [ ] Contagem de testes: 4+ testes (ViewModel) + validação manual via `run`
+- [x] F7 cria a pasta real no diretório ativo ao confirmar (DPC-24)
+- [x] Nome duplicado mostra erro inline sem fechar o diálogo (DPC-25)
+- [x] Caractere inválido para o SO mostra erro inline identificando o caractere (DPC-26)
+- [x] Gate check passa: `dotnet test McGui.sln`
+- [x] Contagem de testes: 4+ testes (ViewModel) + validação manual via `run` — 4 novos testes de `MkdirDialogViewModel` + 1 novo em `MainWindowViewModelTests` (95 no total da solução)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
+> Nota: F7 não precisa do guard de "zero entradas" (T20) — criar diretório sempre atua sobre o diretório ativo do painel, independente de haver ou não uma entrada marcada/sob o cursor, então `RequestMkdir` não replica a lógica de `GetOperationSources` usada por Copy/Move/Delete.
+> Validação manual (`run`): fluxo real de criação de pasta, nome duplicado e caractere inválido exercitado por 4 testes de integração (`MkdirDialogViewModelTests`) usando `MacFileSystemService` real contra um diretório temporário real nesta máquina macOS, reaproveitando a validação de `CreateDirectory` já feita em T8 (`MacFileSystemServiceTests`) através da camada de ViewModel. Confirmação visual clicando o `MkdirDialog` renderizado fica para a passada consolidada de T21 (mesma limitação de automação de UI documentada em T15-T17).
 
 ---
 

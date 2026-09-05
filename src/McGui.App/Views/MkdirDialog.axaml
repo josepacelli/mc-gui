@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:McGui.App.ViewModels"
+        mc:Ignorable="d"
+        x:Class="McGui.App.Views.MkdirDialog"
+        x:DataType="vm:MkdirDialogViewModel"
+        Width="360" SizeToContent="Height"
+        Title="Create directory"
+        WindowStartupLocation="CenterOwner">
+  <StackPanel Margin="16" Spacing="10">
+    <TextBlock Text="New folder name:" />
+    <TextBox Text="{Binding Name}" />
+    <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Cancel" Click="OnCancelClick" />
+      <Button Content="Create" Command="{Binding ConfirmCommand}" IsDefault="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>

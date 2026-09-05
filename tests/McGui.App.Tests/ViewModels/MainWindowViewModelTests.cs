@@ -158,4 +158,18 @@ public class MainWindowViewModelTests
 
         Assert.False(raised);
     }
+
+    [Fact]
+    public void RequestMkdir_RaisesMkdirRequestedForActivePanelDirectory()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+        MkdirDialogViewModel? requested = null;
+        vm.MkdirRequested += (_, dialog) => requested = dialog;
+
+        vm.RequestMkdir();
+
+        Assert.NotNull(requested);
+        Assert.Equal("/left", requested!.ParentDirectory);
+    }
 }

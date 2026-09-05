@@ -21,7 +21,7 @@
       <Button Content="F4 Edit" IsEnabled="False" />
       <Button Content="F5 Copy" Command="{Binding RequestCopyCommand}" />
       <Button Content="F6 Move" Command="{Binding RequestMoveCommand}" />
-      <Button Content="F7 Mkdir" IsEnabled="True" />
+      <Button Content="F7 Mkdir" Command="{Binding RequestMkdirCommand}" />
       <Button Content="F8 Delete" Command="{Binding RequestDeleteCommand}" />
       <Button Content="F9 PullDn" IsEnabled="True" />
       <Button Content="F10 Quit" IsEnabled="True" />

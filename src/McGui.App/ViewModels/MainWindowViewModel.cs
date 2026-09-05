@@ -42,6 +42,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public event EventHandler<DeleteConfirmDialogViewModel>? DeleteRequested;
 
+    public event EventHandler<MkdirDialogViewModel>? MkdirRequested;
+
     [RelayCommand]
     public void SwitchActivePanel()
     {
@@ -93,6 +95,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         var dialogViewModel = new DeleteConfirmDialogViewModel(_trashService, sources);
         DeleteRequested?.Invoke(this, dialogViewModel);
+    }
+
+    [RelayCommand]
+    public void RequestMkdir()
+    {
+        var dialogViewModel = new MkdirDialogViewModel(_fileSystemService, ActivePanel.CurrentDirectory);
+        MkdirRequested?.Invoke(this, dialogViewModel);
     }
 
     private static IReadOnlyList<FileEntry> GetOperationSources(PanelViewModel panel)

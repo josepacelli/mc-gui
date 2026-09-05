@@ -28,6 +28,26 @@ public partial class MainWindow : Window
         viewModel.ConflictPrompt = new WindowConflictPrompt(this);
         viewModel.CopyMoveRequested += async (_, dialogViewModel) => await ShowCopyMoveDialogAsync(dialogViewModel);
         viewModel.DeleteRequested += async (_, dialogViewModel) => await ShowDeleteConfirmDialogAsync(dialogViewModel);
+        viewModel.MkdirRequested += async (_, dialogViewModel) => await ShowMkdirDialogAsync(dialogViewModel);
+    }
+
+    private async Task ShowMkdirDialogAsync(MkdirDialogViewModel dialogViewModel)
+    {
+        var dialog = new MkdirDialog { DataContext = dialogViewModel };
+        dialogViewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(MkdirDialogViewModel.IsCompleted) && dialogViewModel.IsCompleted)
+            {
+                dialog.Close();
+            }
+        };
+
+        await dialog.ShowDialog(this);
+
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            await viewModel.ActivePanel.NavigateToAsync(viewModel.ActivePanel.CurrentDirectory);
+        }
     }
 
     private async Task ShowDeleteConfirmDialogAsync(DeleteConfirmDialogViewModel dialogViewModel)
@@ -135,6 +155,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.Delete:
                 viewModel.RequestDeleteCommand.Execute(null);
+                break;
+            case GestureAction.MakeDirectory:
+                viewModel.RequestMkdirCommand.Execute(null);
                 break;
             default:
                 return;
