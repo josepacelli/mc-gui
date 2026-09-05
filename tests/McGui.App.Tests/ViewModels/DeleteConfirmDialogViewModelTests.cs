@@ -53,7 +53,7 @@ public class DeleteConfirmDialogViewModelTests : IDisposable
     }
 
     [Fact]
-    public void Confirm_MovesEntryToTrashAndExposesResult()
+    public async Task Confirm_MovesEntryToTrashAndExposesResult()
     {
         var source = NewSubdir("trash-src");
         var filePath = WriteFile(source, "doomed.txt");
@@ -61,7 +61,7 @@ public class DeleteConfirmDialogViewModelTests : IDisposable
         var trashService = new MacTrashService(trashRootForPath: _ => trashDir);
         var vm = new DeleteConfirmDialogViewModel(trashService, [ToEntry(filePath)]);
 
-        vm.ConfirmCommand.Execute(null);
+        await vm.ConfirmCommand.ExecuteAsync(null);
 
         Assert.True(vm.IsCompleted);
         Assert.False(vm.Permanent);
@@ -72,7 +72,7 @@ public class DeleteConfirmDialogViewModelTests : IDisposable
     }
 
     [Fact]
-    public void ConfirmPermanent_DeletesEntryWithoutUsingTrash()
+    public async Task ConfirmPermanent_DeletesEntryWithoutUsingTrash()
     {
         var source = NewSubdir("permanent-src");
         var filePath = WriteFile(source, "gone.txt");
@@ -80,7 +80,7 @@ public class DeleteConfirmDialogViewModelTests : IDisposable
         var trashService = new MacTrashService(trashRootForPath: _ => trashDir);
         var vm = new DeleteConfirmDialogViewModel(trashService, [ToEntry(filePath)]);
 
-        vm.ConfirmPermanentCommand.Execute(null);
+        await vm.ConfirmPermanentCommand.ExecuteAsync(null);
 
         Assert.True(vm.IsCompleted);
         Assert.True(vm.Permanent);

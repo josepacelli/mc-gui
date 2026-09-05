@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using McGui.Core.Interfaces;
@@ -32,15 +33,15 @@ public sealed partial class DeleteConfirmDialogViewModel : ObservableObject, ICo
     public OperationResult? Result { get; private set; }
 
     [RelayCommand]
-    private void Confirm() => Execute(permanent: false);
+    private Task Confirm() => ExecuteAsync(permanent: false);
 
     [RelayCommand]
-    private void ConfirmPermanent() => Execute(permanent: true);
+    private Task ConfirmPermanent() => ExecuteAsync(permanent: true);
 
-    private void Execute(bool permanent)
+    private async Task ExecuteAsync(bool permanent)
     {
         Permanent = permanent;
-        Result = _trashService.Delete(Entries, permanent);
+        Result = await Task.Run(() => _trashService.Delete(Entries, permanent));
         IsCompleted = true;
     }
 }
