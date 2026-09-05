@@ -5,7 +5,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.VisualTree;
 using McGui.App.Input;
 using McGui.App.ViewModels;
 using McGui.App.Views;
@@ -20,6 +23,26 @@ public partial class MainWindow : Window
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
         DataContextChanged += OnDataContextChanged;
         Closing += OnClosing;
+        Opened += OnOpened;
+    }
+
+    private void OnOpened(object? sender, EventArgs e)
+    {
+        var settings = this.GetPlatformSettings();
+        if (settings is null)
+        {
+            return;
+        }
+
+        settings.ColorValuesChanged += OnColorValuesChanged;
+        ApplySystemAccent(settings.GetColorValues());
+    }
+
+    private void OnColorValuesChanged(object? sender, PlatformColorValues values) => ApplySystemAccent(values);
+
+    private void ApplySystemAccent(PlatformColorValues values)
+    {
+        Resources["PanelBorderActiveBrush"] = new SolidColorBrush(values.AccentColor1);
     }
 
     private void OnClosing(object? sender, WindowClosingEventArgs e)
