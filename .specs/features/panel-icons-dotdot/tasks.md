@@ -223,14 +223,14 @@ T7 -> T8
 **Requirement**: todas (fechamento)
 
 **Done when**:
-- [ ] Full gate verde
-- [ ] UAT confirma ícones, `..`, cursor origem, raiz, tamanhos formatados
-- [ ] Registro no tasks.md
+- [x] Full gate verde (format + build -warnaserror + 148 testes: 17+31+100)
+- [ ] UAT confirma ícones, `..`, cursor origem, raiz, tamanhos formatados (app GUI não abre remotamente - erro Avalonia.Native -6661; requer sessão gráfica do usuário)
+- [x] Registro no tasks.md
 
 **Tests**: full suite + UAT
 **Gate**: full
 
-**Status**: ⬜ Pending
+**Status**: ⚠️ Complete (lógica testada; UAT visual pendente de confirmação do usuário)
 
 ---
 
