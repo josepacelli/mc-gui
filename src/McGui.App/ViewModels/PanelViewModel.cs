@@ -163,6 +163,9 @@ public sealed partial class PanelViewModel : ObservableObject
     [RelayCommand]
     public void MoveCursorDown() => CursorIndex = Entries.Count == 0 ? 0 : Math.Min(Entries.Count - 1, CursorIndex + 1);
 
+    public void MoveCursorTo(int index) =>
+        CursorIndex = Entries.Count == 0 ? 0 : Math.Clamp(index, 0, Entries.Count - 1);
+
     [RelayCommand]
     public async Task RefreshAsync() => await TryLoadDirectoryAsync(CurrentDirectory);
 

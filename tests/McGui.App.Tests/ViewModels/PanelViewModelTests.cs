@@ -110,6 +110,45 @@ public class PanelViewModelTests
     }
 
     [Fact]
+    public void MoveCursorTo_ValidIndex_MovesCursor()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        vm.MoveCursorTo(1);
+
+        Assert.Equal(1, vm.CursorIndex);
+    }
+
+    [Fact]
+    public void MoveCursorTo_IndexAboveLastEntry_ClampsToLastEntry()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        vm.MoveCursorTo(99);
+
+        Assert.Equal(1, vm.CursorIndex);
+    }
+
+    [Fact]
+    public void MoveCursorTo_NegativeIndex_ClampsToZero()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        vm.MoveCursorTo(-3);
+
+        Assert.Equal(0, vm.CursorIndex);
+    }
+
+    [Fact]
     public async Task NavigateToAsync_SlowListing_ShowsLoadingIndicatorWhilePending()
     {
         var fs = new FakeFileSystemService();

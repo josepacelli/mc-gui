@@ -24,6 +24,8 @@
       <Grid Grid.Row="1">
         <ListBox ItemsSource="{Binding DisplayEntries}"
                  SelectedIndex="{Binding CursorIndex, Mode=OneWay}"
+                 SelectionChanged="OnListSelectionChanged"
+                 DoubleTapped="OnListDoubleTapped"
                  Focusable="False">
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:PanelEntryRow">
