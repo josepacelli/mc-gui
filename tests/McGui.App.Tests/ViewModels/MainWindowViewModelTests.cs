@@ -6,22 +6,21 @@ namespace McGui.App.Tests.ViewModels;
 
 public class MainWindowViewModelTests
 {
-    private static FileEntry File(string name, string parent) =>
-        new(name, Path.Combine(parent, name), IsDirectory: false, SizeBytes: 10, DateTimeOffset.UnixEpoch, IsSymlink: false, IsHidden: false);
-
-    private static MainWindowViewModel CreateViewModel()
+    private static (FakeFileSystemService FileSystem, FakePathHistoryStore History) BuildDependencies()
     {
         var fs = new FakeFileSystemService();
-        fs.AddDirectory("/left", File("a.txt", "/left"));
-        fs.AddDirectory("/right", File("b.txt", "/right"));
+        fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        return new MainWindowViewModel(fs, history);
+        return (fs, history);
     }
 
     [Fact]
-    public void Constructor_StartsWithLeftPanelActive()
+    public void Constructor_LeftPanelIsActiveByDefault()
     {
-        var vm = CreateViewModel();
+        var (fs, history) = BuildDependencies();
+
+        var vm = new MainWindowViewModel(fs, history);
 
         Assert.Same(vm.LeftPanel, vm.ActivePanel);
         Assert.True(vm.LeftPanel.IsActive);
@@ -29,9 +28,10 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void SwitchActivePanel_FromLeft_MovesFocusAndHighlightToRightPanel()
+    public void SwitchActivePanel_TogglesFromLeftToRight()
     {
-        var vm = CreateViewModel();
+        var (fs, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, history);
 
         vm.SwitchActivePanel();
 
@@ -41,9 +41,10 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void SwitchActivePanel_CalledTwice_ReturnsFocusToLeftPanel()
+    public void SwitchActivePanel_CalledTwice_ReturnsToLeftPanel()
     {
-        var vm = CreateViewModel();
+        var (fs, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, history);
 
         vm.SwitchActivePanel();
         vm.SwitchActivePanel();
