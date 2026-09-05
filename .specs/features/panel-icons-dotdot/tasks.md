@@ -121,14 +121,14 @@ T7 -> T8
 **Requirement**: PII-14, PII-15, PII-16, PII-17; edge (0 B)
 
 **Done when**:
-- [ ] Formatador cobre B/kB/MB/GB/TB com base 1024 e ≤1 casa decimal
-- [ ] `SizeText` vazio para diretório/`..`; formatado para arquivo
-- [ ] Testes passam
+- [x] Formatador cobre B/kB/MB/GB/TB com base 1024 e ≤1 casa decimal
+- [x] `SizeText` vazio para diretório/`..`; formatado para arquivo (propriedade a consumir em T4/T6)
+- [x] Testes passam (13)
 
 **Tests**: unit (formatação)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
