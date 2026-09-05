@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using McGui.Core.Interfaces;
 using McGui.Core.Models;
+using McGui.Core.Services;
 
 namespace McGui.App.ViewModels;
 
@@ -60,6 +62,48 @@ public sealed partial class PanelViewModel : ObservableObject
             _state.CursorIndex = value;
             OnPropertyChanged();
         }
+    }
+
+    public IReadOnlySet<string> MarkedPaths => _state.MarkedPaths;
+
+    public int MarkedCount => _state.MarkedPaths.Count;
+
+    public long MarkedSizeBytes => _state.Entries.Where(e => _state.MarkedPaths.Contains(e.FullPath)).Sum(e => e.SizeBytes);
+
+    [RelayCommand]
+    public void ToggleMark(int index)
+    {
+        SelectionService.Toggle(_state, index);
+        NotifySelectionChanged();
+        OnPropertyChanged(nameof(CursorIndex));
+    }
+
+    [RelayCommand]
+    public void MarkByPattern(string pattern)
+    {
+        SelectionService.MarkByPattern(_state, pattern);
+        NotifySelectionChanged();
+    }
+
+    [RelayCommand]
+    public void UnmarkByPattern(string pattern)
+    {
+        SelectionService.UnmarkByPattern(_state, pattern);
+        NotifySelectionChanged();
+    }
+
+    [RelayCommand]
+    public void InvertMarks()
+    {
+        SelectionService.Invert(_state);
+        NotifySelectionChanged();
+    }
+
+    private void NotifySelectionChanged()
+    {
+        OnPropertyChanged(nameof(MarkedPaths));
+        OnPropertyChanged(nameof(MarkedCount));
+        OnPropertyChanged(nameof(MarkedSizeBytes));
     }
 
     public async Task NavigateToAsync(string path)

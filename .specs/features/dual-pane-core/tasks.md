@@ -440,14 +440,18 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] Comandos de marcar/desmarcar/padrão/inverter delegam para `SelectionService` e atualizam a UI-bound `PanelState` (DPC-09..12)
-- [ ] Status line expõe contagem/tamanho de marcados reativamente (DPC-13)
-- [ ] `MainWindowViewModel` alterna qual painel está ativo ao comando de Tab (DPC-02)
-- [ ] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
-- [ ] Contagem de testes: 6+ testes passando
+- [x] Comandos de marcar/desmarcar/padrão/inverter delegam para `SelectionService` e atualizam a UI-bound `PanelState` (DPC-09..12)
+- [x] Status line expõe contagem/tamanho de marcados reativamente (DPC-13)
+- [x] `MainWindowViewModel` alterna qual painel está ativo ao comando de Tab (DPC-02)
+- [x] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] Contagem de testes: 6+ testes passando — 7 novos (18 no total do projeto)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
+> Spec-precision gap: `MarkedSizeBytes` é calculado por projeção sobre `_state.Entries` filtrando por `MarkedPaths` (em vez de um campo persistido em `PanelState`) para evitar duplicar a soma toda vez que `MarkedPaths` muda — ela é recomputada sob demanda e republicada via `NotifySelectionChanged` após cada comando, mantendo `PanelState` (Core) livre de lógica de apresentação.
+> Nota: `ToggleMark`, `MarkByPattern`, `UnmarkByPattern` e `InvertMarks` são `[RelayCommand]` pois aparecem como gestos diretos (Insert/Space, `+`, `-`, `*`) no `KeyGestureMap` de T14; `SwitchActivePanel` em `MainWindowViewModel` também é `[RelayCommand]` pelo mesmo motivo (gesto Tab).
 
 ---
 

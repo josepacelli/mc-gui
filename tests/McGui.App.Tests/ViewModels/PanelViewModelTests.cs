@@ -153,6 +153,76 @@ public class PanelViewModelTests
     }
 
     [Fact]
+    public void ToggleMark_MarksEntryAndAdvancesCursor()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        vm.ToggleMark(0);
+
+        Assert.Contains("/root/a.txt", vm.MarkedPaths);
+        Assert.Equal(1, vm.CursorIndex);
+    }
+
+    [Fact]
+    public void MarkByPattern_ThenUnmarkByPattern_UpdatesMarkedSetAccordingly()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("report.txt", "/root"), File("notes.txt", "/root"), File("image.png", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        vm.MarkByPattern("*.txt");
+
+        Assert.Contains("/root/report.txt", vm.MarkedPaths);
+        Assert.Contains("/root/notes.txt", vm.MarkedPaths);
+        Assert.DoesNotContain("/root/image.png", vm.MarkedPaths);
+
+        vm.UnmarkByPattern("*.txt");
+
+        Assert.Empty(vm.MarkedPaths);
+    }
+
+    [Fact]
+    public void InvertMarks_FlipsMarkedStateOfEveryEntry()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        vm.ToggleMark(0);
+
+        vm.InvertMarks();
+
+        Assert.DoesNotContain("/root/a.txt", vm.MarkedPaths);
+        Assert.Contains("/root/b.txt", vm.MarkedPaths);
+    }
+
+    [Fact]
+    public void MarkByPattern_UpdatesMarkedCountAndSizeReactively()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory(
+            "/root",
+            new FileEntry("a.txt", "/root/a.txt", false, 100, DateTimeOffset.UnixEpoch, false, false),
+            new FileEntry("b.txt", "/root/b.txt", false, 250, DateTimeOffset.UnixEpoch, false, false),
+            new FileEntry("c.png", "/root/c.png", false, 10, DateTimeOffset.UnixEpoch, false, false));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        var raisedProperties = new List<string?>();
+        vm.PropertyChanged += (_, e) => raisedProperties.Add(e.PropertyName);
+
+        vm.MarkByPattern("*.txt");
+
+        Assert.Equal(2, vm.MarkedCount);
+        Assert.Equal(350, vm.MarkedSizeBytes);
+        Assert.Contains(nameof(PanelViewModel.MarkedCount), raisedProperties);
+        Assert.Contains(nameof(PanelViewModel.MarkedSizeBytes), raisedProperties);
+    }
+
+    [Fact]
     public void PersistCurrentDirectory_SavesCurrentPathForItsSideOnly()
     {
         var fs = new FakeFileSystemService();
