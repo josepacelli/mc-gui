@@ -27,7 +27,9 @@ jobs:
       - name: Build DMG
         env:
           VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.1.0' }}
-        run: ./packaging/build-macos.sh "$VERSION"
+        run: |
+          VERSION="${VERSION#v}"
+          ./packaging/build-macos.sh "$VERSION"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
