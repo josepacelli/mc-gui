@@ -3,11 +3,6 @@ using McGui.Core.Models;
 
 namespace McGui.Core.Tests.Fakes;
 
-/// <summary>
-/// In-memory <see cref="IFileSystemService"/> test double. Only <see cref="ListDirectory"/>
-/// is exercised by <see cref="McGui.Core.Services.CopyMovePlanner"/> tests; the write
-/// operations are not needed there and intentionally throw if ever called.
-/// </summary>
 public sealed class FakeFileSystemService : IFileSystemService
 {
     private readonly Dictionary<string, IReadOnlyList<FileEntry>> _directories = new();

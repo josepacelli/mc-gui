@@ -243,6 +243,7 @@ T20 -> T21
 **Gate**: quick
 
 **Status**: ✅ Complete
+> Spec-precision gap: spec.md não define sensibilidade a maiúsculas/minúsculas para os padrões glob de `+`/`-` (DPC-10/11) — ao contrário do filtro case-insensitive de DPC-33. Implementado como case-sensitive (default mais simples); revisar com o usuário se o comportamento esperado for outro.
 
 ---
 

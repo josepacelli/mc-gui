@@ -3,23 +3,10 @@ using McGui.Core.Models;
 
 namespace McGui.Core.Services;
 
-/// <summary>
-/// Builds a <see cref="CopyMovePlan"/> from marked entries: expands directories
-/// recursively via the injected <see cref="IFileSystemService"/> and rejects
-/// circular copy/move and moving the other panel's current directory
-/// (DPC-18, DPC-22, DPC-23) before anything is written.
-/// </summary>
 public sealed class CopyMovePlanner(IFileSystemService fileSystemService)
 {
     private readonly IFileSystemService _fileSystemService = fileSystemService;
 
-    /// <param name="otherPanelCurrentDir">
-    /// Current directory shown in the opposite panel, used to enforce DPC-23. Null when
-    /// the caller has no opposite panel to check against (e.g. a single-panel context).
-    /// SPEC_DEVIATION: design.md's Components section lists Build(sources, destinationDir, mode)
-    /// without this parameter; tasks.md's T7 breakdown requires it to implement DPC-23, so the
-    /// task definition (later and more concrete) is followed here.
-    /// </param>
     public CopyMovePlan Build(
         IReadOnlyList<FileEntry> sources,
         string destinationDir,
@@ -37,7 +24,6 @@ public sealed class CopyMovePlanner(IFileSystemService fileSystemService)
 
             var normalizedSource = NormalizePath(source.FullPath);
 
-            // DPC-18 (Copy) / DPC-22 (Move): destination is the source itself or one of its subdirectories.
             if (IsSameOrSubdirectory(normalizedDestination, normalizedSource))
             {
                 var verb = mode == OperationMode.Copy ? "copy" : "move";
@@ -46,7 +32,6 @@ public sealed class CopyMovePlanner(IFileSystemService fileSystemService)
                     $"(circular {verb}): destination '{destinationDir}' is inside the source.");
             }
 
-            // DPC-23 (Move): the entry being moved is the current directory shown in the other panel.
             if (mode == OperationMode.Move
                 && otherPanelCurrentDir is not null
                 && string.Equals(NormalizePath(otherPanelCurrentDir), normalizedSource, StringComparison.Ordinal))

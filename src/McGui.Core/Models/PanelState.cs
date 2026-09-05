@@ -1,9 +1,5 @@
 namespace McGui.Core.Models;
 
-/// <summary>
-/// Mutable state of a single dual-pane panel: current directory, listing, cursor,
-/// selection and display options.
-/// </summary>
 public sealed class PanelState
 {
     public string CurrentDirectory { get; set; } = "";

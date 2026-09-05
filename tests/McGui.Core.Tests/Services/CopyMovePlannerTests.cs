@@ -12,8 +12,6 @@ public class CopyMovePlannerTests
     private static FileEntry Dir(string path) =>
         new(Path.GetFileName(path), path, IsDirectory: true, SizeBytes: 0, ModifiedUtc: DateTimeOffset.UnixEpoch, IsSymlink: false, IsHidden: false);
 
-    // Happy path: a single file with no directories involved produces a plan with
-    // exactly that entry and the requested destination/mode, no expansion needed.
     [Fact]
     public void Build_HappyPath_SingleFile_ReturnsPlanUnchanged()
     {
@@ -28,8 +26,6 @@ public class CopyMovePlannerTests
         Assert.Equal(OperationMode.Copy, plan.Mode);
     }
 
-    // Directories are expanded recursively via IFileSystemService: every nested file
-    // and subdirectory ends up in the plan's Sources.
     [Fact]
     public void Build_DirectorySource_ExpandsRecursively()
     {
@@ -51,8 +47,6 @@ public class CopyMovePlannerTests
         Assert.Contains(file2, plan.Sources);
     }
 
-    // DPC-18: copying into the source path itself or a subdirectory of it is rejected
-    // before anything is written, with an error message identifying the circular copy.
     [Fact]
     public void Build_Copy_DestinationIsSubdirectoryOfSource_ThrowsCircularCopyError()
     {
@@ -66,7 +60,6 @@ public class CopyMovePlannerTests
         Assert.Contains("circular", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // DPC-22: moving a directory into itself is rejected with an error message.
     [Fact]
     public void Build_Move_DestinationIsSourceItself_ThrowsCircularMoveError()
     {
@@ -80,8 +73,6 @@ public class CopyMovePlannerTests
         Assert.Contains("circular", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // DPC-23: moving the entry that is the current directory shown in the other panel
-    // is blocked with an explanation, before the operation starts.
     [Fact]
     public void Build_Move_SourceIsOtherPanelCurrentDirectory_ThrowsBlockedError()
     {
