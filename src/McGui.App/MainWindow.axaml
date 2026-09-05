@@ -22,17 +22,29 @@
       <views:PanelView Grid.Column="1" DataContext="{Binding RightPanel}" />
     </Grid>
 
-    <UniformGrid Grid.Row="2" Columns="10" Rows="1">
-      <Button Content="F1 Help" IsEnabled="True" />
-      <Button Content="F2 Menu" IsEnabled="True" />
-      <Button Content="F3 View" IsEnabled="False" />
-      <Button Content="F4 Edit" IsEnabled="False" />
-      <Button Content="F5 Copy" Command="{Binding RequestCopyCommand}" />
-      <Button Content="F6 Move" Command="{Binding RequestMoveCommand}" />
-      <Button Content="F7 Mkdir" Command="{Binding RequestMkdirCommand}" />
-      <Button Content="F8 Delete" Command="{Binding RequestDeleteCommand}" />
-      <Button Content="F9 PullDn" IsEnabled="True" />
-      <Button Content="F10 Quit" IsEnabled="True" />
-    </UniformGrid>
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Button Grid.Column="0" Content="F1 Help" IsEnabled="True" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="1" Content="F2 Menu" IsEnabled="True" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="2" Content="F3 View" IsEnabled="False" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="3" Content="F4 Edit" IsEnabled="False" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="4" Content="F5 Copy" Command="{Binding RequestCopyCommand}" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="5" Content="F6 Move" Command="{Binding RequestMoveCommand}" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="6" Content="F7 Mkdir" Command="{Binding RequestMkdirCommand}" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="7" Content="F8 Delete" Command="{Binding RequestDeleteCommand}" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="8" Content="F9 PullDn" IsEnabled="True" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="9" Content="F10 Quit" IsEnabled="True" HorizontalAlignment="Stretch" />
+    </Grid>
   </Grid>
 </Window>
