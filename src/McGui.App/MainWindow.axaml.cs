@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -14,6 +15,38 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.ConflictPrompt = new WindowConflictPrompt(this);
+        viewModel.CopyMoveRequested += async (_, dialogViewModel) => await ShowCopyMoveDialogAsync(dialogViewModel);
+    }
+
+    private async Task ShowCopyMoveDialogAsync(CopyMoveDialogViewModel dialogViewModel)
+    {
+        var dialog = new CopyMoveDialog { DataContext = dialogViewModel };
+        dialogViewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(CopyMoveDialogViewModel.IsCompleted) && dialogViewModel.IsCompleted)
+            {
+                dialog.Close();
+            }
+        };
+
+        await dialog.ShowDialog(this);
+
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            await viewModel.LeftPanel.NavigateToAsync(viewModel.LeftPanel.CurrentDirectory);
+            await viewModel.RightPanel.NavigateToAsync(viewModel.RightPanel.CurrentDirectory);
+        }
     }
 
     private async void OnKeyDown(object? sender, KeyEventArgs e)
@@ -72,6 +105,12 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.UnmarkByPattern:
                 await PromptAndApplyPatternAsync(activePanel, unmark: true);
+                break;
+            case GestureAction.Copy:
+                viewModel.RequestCopyCommand.Execute(null);
+                break;
+            case GestureAction.Move:
+                viewModel.RequestMoveCommand.Execute(null);
                 break;
             default:
                 return;

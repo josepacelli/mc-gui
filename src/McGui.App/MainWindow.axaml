@@ -19,8 +19,8 @@
       <Button Content="F2 Menu" IsEnabled="True" />
       <Button Content="F3 View" IsEnabled="False" />
       <Button Content="F4 Edit" IsEnabled="False" />
-      <Button Content="F5 Copy" IsEnabled="True" />
-      <Button Content="F6 Move" IsEnabled="True" />
+      <Button Content="F5 Copy" Command="{Binding RequestCopyCommand}" />
+      <Button Content="F6 Move" Command="{Binding RequestMoveCommand}" />
       <Button Content="F7 Mkdir" IsEnabled="True" />
       <Button Content="F8 Delete" IsEnabled="True" />
       <Button Content="F9 PullDn" IsEnabled="True" />

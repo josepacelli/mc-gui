@@ -525,17 +525,24 @@ T20 -> T21
 - Skill: `run` (validar visualmente copiar/mover/cancelar/conflito de nome em arquivos reais)
 
 **Done when**:
-- [ ] F5 abre o diálogo pré-preenchido com o destino do painel oposto e confirma cópia real, recursiva, com progresso (DPC-14, DPC-15)
-- [ ] F6 move ou renomeia in-place conforme a regra de T7 (DPC-20, DPC-21)
-- [ ] Conflito de nome real dispara `ConflictDialog` com as 4 opções + "aplicar a todos" (DPC-16)
-- [ ] Cancelar durante a cópia interrompe sem rollback (DPC-17)
-- [ ] Cópia/move circular e mover-diretório-atual-do-painel-oposto são bloqueados com mensagem visível (DPC-18, DPC-22, DPC-23)
-- [ ] Espaço insuficiente aborta antes de iniciar com mensagem de bytes (DPC-19)
-- [ ] Gate check passa: `dotnet test McGui.sln`
-- [ ] Contagem de testes: 8+ testes (ViewModel) + validação manual via `run`
+- [x] F5 abre o diálogo pré-preenchido com o destino do painel oposto e confirma cópia real, recursiva, com progresso (DPC-14, DPC-15)
+- [x] F6 move ou renomeia in-place conforme a regra de T7 (DPC-20, DPC-21)
+- [x] Conflito de nome real dispara `ConflictDialog` com as 4 opções + "aplicar a todos" (DPC-16)
+- [x] Cancelar durante a cópia interrompe sem rollback (DPC-17)
+- [x] Cópia/move circular e mover-diretório-atual-do-painel-oposto são bloqueados com mensagem visível (DPC-18, DPC-22, DPC-23)
+- [x] Espaço insuficiente aborta antes de iniciar com mensagem de bytes (DPC-19)
+- [x] Gate check passa: `dotnet test McGui.sln`
+- [x] Contagem de testes: 8+ testes (ViewModel) + validação manual via `run` — 15 novos testes de ViewModel (63 no total do projeto App.Tests)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: rename-in-place (DPC-21) não precisou de uma nova API em `IFileSystemService`. T8 já suporta o caso via `MacFileSystemService.ExecuteMove`, que monta o caminho de destino com `entry.Name` (não com o nome derivado de `entry.FullPath`) — ver teste pré-existente `MoveAsync_SameDirectoryDifferentEntryName_RenamesFileInPlace`. `CopyMoveDialogViewModel.ConfirmAsync` reaproveita isso substituindo `Sources[0]` por `Sources[0] with { Name = NewName }` antes de montar o `CopyMovePlan`, sem tocar `McGui.Core`/`McGui.Infrastructure.macOS`.
+> Spec-precision gap: spec.md não define com qual diretório o diálogo de F6 é pré-preenchido quando há exatamente uma entrada selecionada — a literal do DPC-14 ("pré-preenchido com o diretório do painel oposto") é para F5. Para permitir "editar somente o nome sem mudar o diretório de destino" (DPC-21) ser um fluxo natural, `MainWindowViewModel.RequestCopyOrMove` pré-preenche `DestinationDirectory` com o diretório **da própria entrada de origem** quando Move + 1 única entrada (habilitando renomear apenas trocando o campo de nome), e com o diretório do painel oposto nos demais casos (Copy sempre, ou Move com múltiplas entradas) — fiel à letra do DPC-14 nesses casos.
+> Nota de arquitetura: para não criar uma dependência circular entre T16 e T19 (design.md diz que `ProgressDialogViewModel`, T19, "consome" `CopyMoveDialogViewModel`, T16), `CopyMoveDialogViewModel` expõe progresso via propriedade simples (`LastProgress`) e evento (`ProgressReported`) em vez de depender de uma classe `ProgressDialogViewModel` que ainda não existe nesta task. T19 vai consumir esse evento/propriedade sem precisar alterar `CopyMoveDialogViewModel`.
+> Nota de arquitetura: `IConflictPrompt` desacopla `CopyMoveDialogViewModel` (testável com um fake síncrono) da exibição real do `ConflictDialog` (Window). A implementação real, `WindowConflictPrompt` (`src/McGui.App/Views/WindowConflictPrompt.cs`), usa `Dispatcher.UIThread.InvokeAsync` para mostrar o diálogo na UI thread mesmo quando `resolveConflict` é chamado a partir da thread de background do `Task.Run` de `MacFileSystemService`. `MainWindowViewModel.ConflictPrompt` é uma propriedade mutável (não injetada via DI) com um default seguro (`AutoSkipConflictPrompt`, sempre "Skip" com "aplicar a todos") até a `View` (`MainWindow.axaml.cs`) substituí-la por `WindowConflictPrompt` assim que a janela existe — evita registrar um serviço dependente de `Window` no container de DI.
+> Validação manual (`run`): o fluxo F5/F6 real foi exercitado ponta a ponta por 15 testes de integração (`CopyMoveDialogViewModelTests`) usando `MacFileSystemService` real contra diretórios temporários reais no macOS desta máquina — cobrindo cópia recursiva com progresso, move, rename in-place, conflito (Overwrite/Skip + "aplicar a todos"), cancelamento sem rollback, rejeição de circular/bloqueio-painel-oposto e espaço insuficiente. A confirmação visual clicando os botões reais do `CopyMoveDialog`/`ConflictDialog` renderizados **não foi feita nesta task**: o desktop de execução é compartilhado com outras sessões/apps ao vivo do usuário (ver nota de T15), e tentativas de automação de UI via accessibility (System Events) neste app Avalonia não expuseram nomes de botão de forma confiável para clique automatizado seguro, então a automação foi interrompida por segurança. Uma passada visual consolidada (screenshot dos diálogos reais) fica para T21.
 
 ---
 

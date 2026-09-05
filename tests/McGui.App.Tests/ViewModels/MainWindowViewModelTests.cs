@@ -53,4 +53,78 @@ public class MainWindowViewModelTests
         Assert.True(vm.LeftPanel.IsActive);
         Assert.False(vm.RightPanel.IsActive);
     }
+
+    [Fact]
+    public void RequestCopy_WithCursorEntry_PrefillsOppositePanelAsDestination()
+    {
+        var (fs, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, history);
+        CopyMoveDialogViewModel? requested = null;
+        vm.CopyMoveRequested += (_, dialog) => requested = dialog;
+
+        vm.RequestCopy();
+
+        Assert.NotNull(requested);
+        Assert.Equal(OperationMode.Copy, requested!.Mode);
+        Assert.Equal("/right", requested.DestinationDirectory);
+        Assert.Single(requested.Sources);
+        Assert.Equal("/left/a.txt", requested.Sources[0].FullPath);
+    }
+
+    [Fact]
+    public void RequestMove_SingleMarkedEntry_PrefillsSourceOwnDirectoryToEnableRename()
+    {
+        var (fs, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, history);
+        vm.ActivePanel.ToggleMark(0);
+        CopyMoveDialogViewModel? requested = null;
+        vm.CopyMoveRequested += (_, dialog) => requested = dialog;
+
+        vm.RequestMove();
+
+        Assert.NotNull(requested);
+        Assert.Equal(OperationMode.Move, requested!.Mode);
+        Assert.Equal("/left", requested.DestinationDirectory);
+        Assert.True(requested.CanRename);
+    }
+
+    [Fact]
+    public void RequestMove_MultipleMarkedEntries_PrefillsOppositePanelAsDestination()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory(
+            "/left",
+            new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false),
+            new FileEntry("b.txt", "/left/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        fs.AddDirectory("/right", new FileEntry("c.txt", "/right/c.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, history);
+        vm.ActivePanel.ToggleMark(0);
+        vm.ActivePanel.ToggleMark(1);
+        CopyMoveDialogViewModel? requested = null;
+        vm.CopyMoveRequested += (_, dialog) => requested = dialog;
+
+        vm.RequestMove();
+
+        Assert.NotNull(requested);
+        Assert.Equal(2, requested!.Sources.Count);
+        Assert.Equal("/right", requested.DestinationDirectory);
+        Assert.False(requested.CanRename);
+    }
+
+    [Fact]
+    public void RequestCopy_NoMarkedEntriesAndNoCursorEntry_DoesNotRaiseCopyMoveRequested()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left");
+        fs.AddDirectory("/right");
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, history);
+        var raised = false;
+        vm.CopyMoveRequested += (_, _) => raised = true;
+
+        vm.RequestCopy();
+
+        Assert.False(raised);
+    }
 }

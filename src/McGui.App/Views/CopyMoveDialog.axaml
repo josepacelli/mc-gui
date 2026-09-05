@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:McGui.App.ViewModels"
+        mc:Ignorable="d"
+        x:Class="McGui.App.Views.CopyMoveDialog"
+        x:DataType="vm:CopyMoveDialogViewModel"
+        Width="480" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner">
+  <StackPanel Margin="16" Spacing="10">
+    <TextBlock Text="{Binding Mode, StringFormat='{}{0} to:'}" FontWeight="Bold" />
+    <TextBox Text="{Binding DestinationDirectory}" />
+
+    <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding CanRename}">
+      <TextBlock Text="New name:" VerticalAlignment="Center" />
+      <TextBox Text="{Binding NewName}" Width="260" />
+    </StackPanel>
+
+    <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+
+    <StackPanel Spacing="4" IsVisible="{Binding HasProgress}">
+      <TextBlock Text="{Binding ProgressFileName, StringFormat='Copying: {0}'}" />
+      <TextBlock Text="{Binding ProgressFilesDone, StringFormat='Files done: {0}'}" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Cancel" Command="{Binding CancelCommand}" />
+      <Button Content="Confirm" Command="{Binding ConfirmCommand}" IsDefault="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>
