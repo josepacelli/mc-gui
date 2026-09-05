@@ -56,12 +56,12 @@ Sistema de tema em duas camadas: **recursos declarativos** (paleta Avalonia por 
 
 **Por quê**: `Application.Current` exige runtime Avalonia; aplicar em código-behind (não em VM) preserva testabilidade. Glue é 5 linhas, validada por UAT.
 
-### D5. MenuBar
+### D5. Menu (top-level da v12)
 
-- `MainWindow.axaml`: `Grid` ganha linha `Auto` no topo → `MenuBar` com `MenuItem Header="Theme"` e 3 `MenuItem` (`Light`/`Dark`/`System`) com `Command="{Binding SetThemeCommand}" CommandParameter="{x:Static ...}"` + `IsChecked` via propriedade da VM.
-- Estilo MC: MenuBar fica sempre visível, acima dos painéis.
+- `MainWindow.axaml`: `Grid` ganha linha `Auto` no topo → `Menu` (controle top-level horizontal; `MenuBar` não existe no Avalonia 12) com `MenuItem Header="Theme"` e 3 `MenuItem` (`Light`/`Dark`/`System`) com `Command="{Binding SetThemeCommand}" CommandParameter="{x:Static ...}"` + `IsChecked` via propriedade da VM.
+- Estilo MC: Menu fica sempre visível, acima dos painéis.
 
-**Por quê**: Avalonia `MenuBar` nativo é a forma acordada com o usuário.
+**Por quê**: Avalonia `Menu` nativo é a forma acordada com o usuário (MenuBar foi removido na v12).
 
 ### D6. Tecla F12
 
@@ -103,7 +103,7 @@ Persistência de tema, skins externas, ThemeVariantScope por painel — ver Out 
 
 - `src/McGui.App/Themes.axaml` (novo)
 - `src/McGui.App/App.axaml`
-- `src/McGui.App/MainWindow.axaml` (+ MenuBar)
+- `src/McGui.App/MainWindow.axaml` (+ Menu)
 - `src/McGui.App/MainWindow.axaml.cs` (+ glue tema, + case F12)
 - `src/McGui.App/Views/PanelView.axaml`
 - `src/McGui.App/Views/CopyMoveDialog.axaml`, `MkdirDialog.axaml`, `DeleteConfirmDialog.axaml`
