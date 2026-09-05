@@ -281,6 +281,33 @@ public class MacFileSystemServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task MoveAsync_DirectoryTree_ReportsSubtreeBytesInProgress()
+    {
+        var source = _temp.NewSubdir("move-tree-src");
+        var subDir = Directory.CreateDirectory(Path.Combine(source, "sub")).FullName;
+        var filePath = WriteFile(subDir, "nested.txt", "nested-content");
+        var expectedBytes = new FileInfo(filePath).Length;
+        var destination = _temp.NewSubdir("move-tree-dst");
+        var plan = new CopyMovePlan(
+            [ToEntry(source, isDirectory: true), ToEntry(subDir, isDirectory: true), ToEntry(filePath, isDirectory: false)],
+            destination,
+            OperationMode.Move);
+        var reports = new List<OperationProgress>();
+        var progress = new SynchronousProgress(reports.Add);
+
+        var result = await _sut.MoveAsync(plan, progress, AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.False(Directory.Exists(source));
+        Assert.True(File.Exists(Path.Combine(destination, Path.GetFileName(source), "sub", "nested.txt")));
+        var last = Assert.Single(reports);
+        Assert.Equal(1, last.FilesDone);
+        Assert.Equal(1, last.FilesTotal);
+        Assert.Equal(expectedBytes, last.BytesDone);
+        Assert.Equal(expectedBytes, last.BytesTotal);
+    }
+
+    [Fact]
     public async Task MoveAsync_SameDirectoryDifferentEntryName_RenamesFileInPlace()
     {
         var source = _temp.NewSubdir("rename-src");
