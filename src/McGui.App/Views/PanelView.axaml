@@ -8,11 +8,11 @@
              x:DataType="vm:PanelViewModel">
   <UserControl.Styles>
     <Style Selector="Border.panelRoot">
-      <Setter Property="BorderBrush" Value="Gray" />
+      <Setter Property="BorderBrush" Value="{DynamicResource PanelBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Border.panelRoot.active">
-      <Setter Property="BorderBrush" Value="DodgerBlue" />
+      <Setter Property="BorderBrush" Value="{DynamicResource PanelBorderActiveBrush}" />
       <Setter Property="BorderThickness" Value="2" />
     </Style>
   </UserControl.Styles>
@@ -36,13 +36,13 @@
           </ListBox.ItemTemplate>
         </ListBox>
 
-        <Border Background="#AA000000" IsVisible="{Binding IsLoading}">
-          <TextBlock Text="Loading..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Border Background="{DynamicResource OverlayLoadingBackgroundBrush}" IsVisible="{Binding IsLoading}">
+          <TextBlock Text="Loading..." Foreground="{DynamicResource OverlayLoadingForegroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
 
-        <Border Background="#DD400000" IsVisible="{Binding IsDirectoryInaccessible}">
+        <Border Background="{DynamicResource OverlayErrorBackgroundBrush}" IsVisible="{Binding IsDirectoryInaccessible}">
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-            <TextBlock Text="{Binding DirectoryErrorMessage}" Foreground="White" HorizontalAlignment="Center" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding DirectoryErrorMessage}" Foreground="{DynamicResource OverlayErrorForegroundBrush}" HorizontalAlignment="Center" TextWrapping="Wrap" />
             <Button Content="Go to home directory" Command="{Binding GoToHomeCommand}" HorizontalAlignment="Center" />
           </StackPanel>
         </Border>

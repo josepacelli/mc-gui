@@ -100,14 +100,14 @@ T7 -> T8
 **Reuses**: N/A
 **Requirement**: THM-03, THM-04, THM-05, THM-07
 **Done when**:
-- [ ] Nenhuma cor literal (hex ou nome) resta em `PanelView.axaml` (incluindo os dois `<Style>` de borda)
-- [ ] Overlays de loading e erro usam tokens de fundo e de texto por variante
-- [ ] `dotnet build McGui.sln -warnaserror` passa
+- [x] Nenhuma cor literal (hex ou nome) resta em `PanelView.axaml` (incluindo os dois `<Style>` de borda)
+- [x] Overlays de loading e erro usam tokens de fundo e de texto por variante
+- [x] `dotnet build McGui.sln -warnaserror` passa
 
 **Tests**: none (varredura em T8 cobre)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
