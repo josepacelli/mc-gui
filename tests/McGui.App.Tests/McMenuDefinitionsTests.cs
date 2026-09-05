@@ -1,3 +1,4 @@
+using System.IO;
 using McGui.App;
 
 namespace McGui.App.Tests;
@@ -133,5 +134,70 @@ public class McMenuDefinitionsTests
         Assert.Equal('C', McMenuDefinitions.ForMenu("File").First(i => i.Text == "Copy").Mnemonic);
         Assert.Equal('x', McMenuDefinitions.ForMenu("File").First(i => i.Text == "Exit").Mnemonic);
         Assert.Equal('T', McMenuDefinitions.ForMenu("Options").First(i => i.Text == "Theme").Mnemonic);
+    }
+}
+
+public class MainWindowMenuBarStructureTests
+{
+    private static string MainWindowAxaml
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null)
+            {
+                if (File.Exists(Path.Combine(dir.FullName, "McGui.sln")))
+                {
+                    return Path.Combine(dir.FullName, "src", "McGui.App", "MainWindow.axaml");
+                }
+
+                dir = dir.Parent;
+            }
+
+            throw new InvalidOperationException("Could not locate repo root from " + AppContext.BaseDirectory);
+        }
+    }
+
+    [Fact]
+    public void MenuBar_HasFiveTopLevelMenusInOrder()
+    {
+        var content = File.ReadAllText(MainWindowAxaml);
+        var menuBlock = content.Split("<MenuItem Header=\"_Left\">", 2)[1].Split("</Menu>", 2)[0];
+
+        Assert.Contains("Header=\"_Left\"", content);
+        Assert.Contains("Header=\"_Right\"", content);
+        Assert.True(menuBlock.IndexOf("Header=\"_File\"", StringComparison.Ordinal)
+                     < menuBlock.IndexOf("Header=\"_Command\"", StringComparison.Ordinal));
+        Assert.True(menuBlock.IndexOf("Header=\"_Command\"", StringComparison.Ordinal)
+                     < menuBlock.IndexOf("Header=\"_Options\"", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Theme_MenuLivesInsideOptions_NotTopLevel()
+    {
+        var content = File.ReadAllText(MainWindowAxaml);
+        var optionsBlock = content.Split("<MenuItem Header=\"_Options\">", 2)[1].Split("<MenuItem Header=\"_Right\">", 2)[0];
+
+        Assert.Contains("Header=\"_Theme\"", optionsBlock);
+        Assert.DoesNotContain("<MenuItem Header=\"_Theme\"", content.Split("<MenuItem Header=\"_Left\">", 2)[0]);
+    }
+
+    [Fact]
+    public void DisabledMenuItems_HaveIsEnabledFalse()
+    {
+        var content = File.ReadAllText(MainWindowAxaml);
+        Assert.Contains("<MenuItem Header=\"View\" IsEnabled=\"False\"", content);
+        Assert.Contains("<MenuItem Header=\"Edit\" IsEnabled=\"False\"", content);
+        Assert.Contains("<MenuItem Header=\"Find file\" IsEnabled=\"False\"", content);
+        Assert.Contains("<MenuItem Header=\"Configuration...\" IsEnabled=\"False\"", content);
+    }
+
+    [Fact]
+    public void EnabledMenuItems_HaveCommands()
+    {
+        var content = File.ReadAllText(MainWindowAxaml);
+        Assert.Contains("<MenuItem Header=\"Copy\" Command=\"{Binding RequestCopyCommand}\"", content);
+        Assert.Contains("<MenuItem Header=\"Rescan\" Command=\"{Binding RescanActivePanelCommand}\"", content);
+        Assert.Contains("<MenuItem Header=\"Exit\" Click=\"OnExitClick\"", content);
     }
 }

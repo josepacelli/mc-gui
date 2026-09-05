@@ -97,13 +97,13 @@ T3 -> T4
 **Requirement**: MB-01, MB-03, MB-05, MB-09; regressão theming
 
 **Done when**:
-- [ ] Teste estrutural passa (headers, Theme sob Options)
-- [ ] Full App tests verdes (incl. theming VM tests)
+- [x] Teste estrutural passa (headers, Theme sob Options)
+- [x] Full App tests verdes (incl. theming VM tests)
 
 **Tests**: unit/structural + regression
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
