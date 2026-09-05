@@ -123,11 +123,7 @@ public sealed partial class PanelViewModel : ObservableObject
 
         try
         {
-            var entries = await Task.Run(() => _fileSystemService.ListDirectory(path));
-            ApplyLoadedState(path, entries);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
+            await TryLoadDirectoryAsync(path);
         }
         finally
         {
@@ -168,21 +164,7 @@ public sealed partial class PanelViewModel : ObservableObject
     public void MoveCursorDown() => CursorIndex = Entries.Count == 0 ? 0 : Math.Min(Entries.Count - 1, CursorIndex + 1);
 
     [RelayCommand]
-    public async Task RefreshAsync()
-    {
-        try
-        {
-            var entries = await Task.Run(() => _fileSystemService.ListDirectory(CurrentDirectory));
-            ApplyLoadedState(CurrentDirectory, entries);
-            IsDirectoryInaccessible = false;
-            DirectoryErrorMessage = null;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            IsDirectoryInaccessible = true;
-            DirectoryErrorMessage = ex.Message;
-        }
-    }
+    public async Task RefreshAsync() => await TryLoadDirectoryAsync(CurrentDirectory);
 
     [RelayCommand]
     public async Task GoToHomeAsync()
@@ -199,6 +181,24 @@ public sealed partial class PanelViewModel : ObservableObject
             ? existing with { LeftPanelPath = CurrentDirectory }
             : existing with { RightPanelPath = CurrentDirectory };
         _pathHistoryStore.Save(updated);
+    }
+
+    private async Task<bool> TryLoadDirectoryAsync(string path)
+    {
+        try
+        {
+            var entries = await Task.Run(() => _fileSystemService.ListDirectory(path));
+            IsDirectoryInaccessible = false;
+            DirectoryErrorMessage = null;
+            ApplyLoadedState(path, entries);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            IsDirectoryInaccessible = true;
+            DirectoryErrorMessage = ex.Message;
+            return false;
+        }
     }
 
     private void LoadDirectorySync(string path, bool allowHomeFallback)

@@ -223,6 +223,23 @@ public class PanelViewModelTests
     }
 
     [Fact]
+    public async Task NavigateToAsync_InaccessibleDirectory_ShowsInlineErrorStateWithoutNavigating()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", Dir("sub", "/root"));
+        fs.AddDirectory("/root/sub", File("nested.txt", "/root/sub"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        fs.RemoveDirectory("/root/sub");
+
+        await vm.NavigateToAsync("/root/sub");
+
+        Assert.True(vm.IsDirectoryInaccessible);
+        Assert.NotNull(vm.DirectoryErrorMessage);
+        Assert.Equal("/root", vm.CurrentDirectory);
+    }
+
+    [Fact]
     public async Task RefreshAsync_CurrentDirectoryNoLongerExists_ShowsInlineErrorState()
     {
         var fs = new FakeFileSystemService();
