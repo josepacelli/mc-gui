@@ -468,13 +468,18 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] Todas as teclas listadas no design têm uma entrada no mapa, incluindo F3/F4 como desabilitadas
-- [ ] Teste confirma que o mapa cobre 100% das teclas exigidas pelo spec (nenhuma faltando)
-- [ ] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
-- [ ] Contagem de testes: 2+ testes passando (cobertura do mapa + F3/F4 desabilitadas)
+- [x] Todas as teclas listadas no design têm uma entrada no mapa, incluindo F3/F4 como desabilitadas
+- [x] Teste confirma que o mapa cobre 100% das teclas exigidas pelo spec (nenhuma faltando)
+- [x] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] Contagem de testes: 2+ testes passando (cobertura do mapa + F3/F4 desabilitadas) — 3 novos (21 no total do projeto)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: `KeyGestureMap` mapeia teclas para um enum `GestureAction` (não para instâncias de `ICommand`) porque F5-F8 (Copy/Move/Mkdir/Delete) ainda não têm ViewModel/Command implementado (T16-T18) e F1/F2/F9/F10 (Help/UserMenu/PullDownMenu/Quit) estão fora de escopo desta feature (Out of Scope, spec.md). O enum desacopla a tabela estática das Views/Commands concretos; a wiring real de KeyDown → Command (via `GestureAction`) é feita em T15, quando todas as ViewModels-alvo já existirem.
+> Spec-precision gap (pesquisa via Context7, docs oficiais Avalonia): no macOS, o mecanismo padrão de casamento de gestos do Avalonia (`KeyGesture.Matches`/`KeyBinding.Gesture`) remapeia automaticamente `KeyModifiers.Control` para a tecla Cmd física, por convenção cross-platform (ver "Common Hotkey Patterns", avalonia-docs). `KeyGestureMap` registra Ctrl+R/Ctrl+H com `KeyModifiers.Control` seguindo a letra do AC (DPC do grupo P2), mas se a View em T15 usar o matching automático do Avalonia em vez de comparar `Key`/`KeyModifiers` brutos do `KeyEventArgs`, o atalho efetivo no teclado físico de um Mac será Cmd+R/Cmd+H, não Control+R/H — decisão de wiring adiada para T15, documentada aqui para não ser perdida.
+> Nota: a pesquisa via Context7 não encontrou documentação oficial confirmando ou negando interceptação de F1-F10 pelo macOS (Mission Control/teclas de mídia) dentro de uma janela Avalonia; o risco de design.md permanece aberto e só pode ser resolvido com teste manual em janela real (`run`), fora do escopo unitário/quick desta task — a barra de F-keys clicável (T15) continua sendo o fallback mitigador já planejado.
 
 ---
 
