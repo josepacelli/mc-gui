@@ -27,6 +27,27 @@ public partial class MainWindow : Window
 
         viewModel.ConflictPrompt = new WindowConflictPrompt(this);
         viewModel.CopyMoveRequested += async (_, dialogViewModel) => await ShowCopyMoveDialogAsync(dialogViewModel);
+        viewModel.DeleteRequested += async (_, dialogViewModel) => await ShowDeleteConfirmDialogAsync(dialogViewModel);
+    }
+
+    private async Task ShowDeleteConfirmDialogAsync(DeleteConfirmDialogViewModel dialogViewModel)
+    {
+        var dialog = new DeleteConfirmDialog { DataContext = dialogViewModel };
+        dialogViewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(DeleteConfirmDialogViewModel.IsCompleted) && dialogViewModel.IsCompleted)
+            {
+                dialog.Close();
+            }
+        };
+
+        await dialog.ShowDialog(this);
+
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            await viewModel.LeftPanel.NavigateToAsync(viewModel.LeftPanel.CurrentDirectory);
+            await viewModel.RightPanel.NavigateToAsync(viewModel.RightPanel.CurrentDirectory);
+        }
     }
 
     private async Task ShowCopyMoveDialogAsync(CopyMoveDialogViewModel dialogViewModel)
@@ -111,6 +132,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.Move:
                 viewModel.RequestMoveCommand.Execute(null);
+                break;
+            case GestureAction.Delete:
+                viewModel.RequestDeleteCommand.Execute(null);
                 break;
             default:
                 return;

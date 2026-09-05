@@ -6,21 +6,21 @@ namespace McGui.App.Tests.ViewModels;
 
 public class MainWindowViewModelTests
 {
-    private static (FakeFileSystemService FileSystem, FakePathHistoryStore History) BuildDependencies()
+    private static (FakeFileSystemService FileSystem, FakeTrashService Trash, FakePathHistoryStore History) BuildDependencies()
     {
         var fs = new FakeFileSystemService();
         fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        return (fs, history);
+        return (fs, new FakeTrashService(), history);
     }
 
     [Fact]
     public void Constructor_LeftPanelIsActiveByDefault()
     {
-        var (fs, history) = BuildDependencies();
+        var (fs, trash, history) = BuildDependencies();
 
-        var vm = new MainWindowViewModel(fs, history);
+        var vm = new MainWindowViewModel(fs, trash, history);
 
         Assert.Same(vm.LeftPanel, vm.ActivePanel);
         Assert.True(vm.LeftPanel.IsActive);
@@ -30,8 +30,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void SwitchActivePanel_TogglesFromLeftToRight()
     {
-        var (fs, history) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, history);
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
 
         vm.SwitchActivePanel();
 
@@ -43,8 +43,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void SwitchActivePanel_CalledTwice_ReturnsToLeftPanel()
     {
-        var (fs, history) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, history);
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
 
         vm.SwitchActivePanel();
         vm.SwitchActivePanel();
@@ -57,8 +57,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void RequestCopy_WithCursorEntry_PrefillsOppositePanelAsDestination()
     {
-        var (fs, history) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, history);
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
         CopyMoveDialogViewModel? requested = null;
         vm.CopyMoveRequested += (_, dialog) => requested = dialog;
 
@@ -74,8 +74,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void RequestMove_SingleMarkedEntry_PrefillsSourceOwnDirectoryToEnableRename()
     {
-        var (fs, history) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, history);
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
         vm.ActivePanel.ToggleMark(0);
         CopyMoveDialogViewModel? requested = null;
         vm.CopyMoveRequested += (_, dialog) => requested = dialog;
@@ -98,7 +98,7 @@ public class MainWindowViewModelTests
             new FileEntry("b.txt", "/left/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         fs.AddDirectory("/right", new FileEntry("c.txt", "/right/c.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, history);
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
         vm.ActivePanel.ToggleMark(0);
         vm.ActivePanel.ToggleMark(1);
         CopyMoveDialogViewModel? requested = null;
@@ -119,11 +119,42 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/left");
         fs.AddDirectory("/right");
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, history);
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
         var raised = false;
         vm.CopyMoveRequested += (_, _) => raised = true;
 
         vm.RequestCopy();
+
+        Assert.False(raised);
+    }
+
+    [Fact]
+    public void RequestDelete_WithCursorEntry_RaisesDeleteRequestedWithSelectedEntries()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+        DeleteConfirmDialogViewModel? requested = null;
+        vm.DeleteRequested += (_, dialog) => requested = dialog;
+
+        vm.RequestDelete();
+
+        Assert.NotNull(requested);
+        Assert.Single(requested!.Entries);
+        Assert.Equal("/left/a.txt", requested.Entries[0].FullPath);
+    }
+
+    [Fact]
+    public void RequestDelete_NoMarkedEntriesAndNoCursorEntry_DoesNotRaiseDeleteRequested()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left");
+        fs.AddDirectory("/right");
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
+        var raised = false;
+        vm.DeleteRequested += (_, _) => raised = true;
+
+        vm.RequestDelete();
 
         Assert.False(raised);
     }

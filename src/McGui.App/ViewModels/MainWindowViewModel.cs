@@ -14,14 +14,16 @@ namespace McGui.App.ViewModels;
 public sealed partial class MainWindowViewModel : ObservableObject
 {
     private readonly IFileSystemService _fileSystemService;
+    private readonly ITrashService _trashService;
     private readonly CopyMovePlanner _planner;
 
     [ObservableProperty]
     private PanelViewModel activePanel;
 
-    public MainWindowViewModel(IFileSystemService fileSystemService, IPathHistoryStore pathHistoryStore)
+    public MainWindowViewModel(IFileSystemService fileSystemService, ITrashService trashService, IPathHistoryStore pathHistoryStore)
     {
         _fileSystemService = fileSystemService;
+        _trashService = trashService;
         _planner = new CopyMovePlanner(fileSystemService);
         ConflictPrompt = new AutoSkipConflictPrompt();
         LeftPanel = new PanelViewModel(fileSystemService, pathHistoryStore, PanelSide.Left);
@@ -37,6 +39,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public IConflictPrompt ConflictPrompt { get; set; }
 
     public event EventHandler<CopyMoveDialogViewModel>? CopyMoveRequested;
+
+    public event EventHandler<DeleteConfirmDialogViewModel>? DeleteRequested;
 
     [RelayCommand]
     public void SwitchActivePanel()
@@ -76,6 +80,19 @@ public sealed partial class MainWindowViewModel : ObservableObject
             otherPanel.CurrentDirectory);
 
         CopyMoveRequested?.Invoke(this, dialogViewModel);
+    }
+
+    [RelayCommand]
+    public void RequestDelete()
+    {
+        var sources = GetOperationSources(ActivePanel);
+        if (sources.Count == 0)
+        {
+            return;
+        }
+
+        var dialogViewModel = new DeleteConfirmDialogViewModel(_trashService, sources);
+        DeleteRequested?.Invoke(this, dialogViewModel);
     }
 
     private static IReadOnlyList<FileEntry> GetOperationSources(PanelViewModel panel)

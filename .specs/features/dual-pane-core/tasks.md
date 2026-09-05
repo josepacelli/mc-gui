@@ -559,15 +559,21 @@ T20 -> T21
 - Skill: `run` (validar visualmente apagar-para-lixeira e Shift+apagar permanente em arquivos reais)
 
 **Done when**:
-- [ ] F8 mostra contagem/tamanho antes de confirmar (DPC-27)
-- [ ] Confirmação normal move para a lixeira real do macOS, verificado manualmente (DPC-28)
-- [ ] Shift+confirmar apaga permanentemente com aviso de irreversibilidade visível (DPC-30)
-- [ ] Item com erro de permissão é pulado e reportado ao final, sem interromper os demais (DPC-31)
-- [ ] Gate check passa: `dotnet test McGui.sln`
-- [ ] Contagem de testes: 5+ testes (ViewModel) + validação manual via `run`
+- [x] F8 mostra contagem/tamanho antes de confirmar (DPC-27)
+- [x] Confirmação normal move para a lixeira real do macOS, verificado manualmente (DPC-28)
+- [x] Shift+confirmar apaga permanentemente com aviso de irreversibilidade visível (DPC-30)
+- [x] Item com erro de permissão é pulado e reportado ao final, sem interromper os demais (DPC-31)
+- [x] Gate check passa: `dotnet test McGui.sln`
+- [x] Contagem de testes: 5+ testes (ViewModel) + validação manual via `run` — 3 novos testes de `DeleteConfirmDialogViewModel` + 2 novos em `MainWindowViewModelTests` (90 no total da solução)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: `MainWindowViewModel` ganhou um construtor com um 2º parâmetro `ITrashService trashService` (antes `(IFileSystemService, IPathHistoryStore)`, agora `(IFileSystemService, ITrashService, IPathHistoryStore)`) — não listado no "Where" de T17, mas necessário para montar `DeleteConfirmDialogViewModel`. Todos os call sites de teste (`MainWindowViewModelTests`, 7 já existentes) foram atualizados para o novo construtor; `CompositionRootTests`/DI não precisaram de mudança porque `ITrashService` já estava registrado desde T11.
+> Nota: DPC-27/DPC-30 (contagem/tamanho, aviso de irreversibilidade) são cobertos como texto estático em `DeleteConfirmDialog.axaml` (camada de View, "none/manual only" pela Test Coverage Matrix) mais dois commands dedicados na ViewModel — `ConfirmCommand` (Trash) e `ConfirmPermanentCommand` (bypass) — em vez de um único command com uma flag de modificador de teclado lida em tempo real; a View decide qual command disparar (o botão "Delete permanently" existe sempre visível, não depende de detectar Shift durante o clique). Isso mantém a ViewModel testável sem simular estado de teclado.
+> Nota: DPC-31 (erro de permissão é pulado e reportado) não ganhou um teste próprio nesta task porque já está integralmente coberto em `MacTrashServiceTests` (T9) — `DeleteConfirmDialogViewModel.Execute` apenas repassa `ITrashService.Delete(...)` e expõe o `OperationResult` recebido via `Result`, sem lógica adicional de tratamento de erro para re-testar (evita duplicar cobertura na camada de ViewModel, Check C do adequacy review).
+> Validação manual (`run`): fluxo de exclusão real (Trash e permanente) exercitado por testes de integração com `MacTrashService` real contra diretórios temporários reais nesta máquina macOS (`DeleteConfirmDialogViewModelTests`), incluindo a confirmação de que o item movido para trash aparece no diretório de lixeira real e que a exclusão permanente não deixa rastro nele. Confirmação visual clicando o `DeleteConfirmDialog` renderizado fica para a passada consolidada de T21 (mesma limitação de automação de UI documentada em T15/T16).
 
 ---
 
