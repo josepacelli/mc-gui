@@ -8,11 +8,19 @@ namespace McGui.Infrastructure.macOS;
 public sealed class MacTrashService : ITrashService
 {
     private readonly Func<string, string?> _trashRootForPath;
+    private readonly string _homeDirectory;
 
     public MacTrashService(string? homeDirectory = null, Func<string, string?>? trashRootForPath = null)
     {
-        var effectiveHome = homeDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        _trashRootForPath = trashRootForPath ?? (path => DefaultTrashRootForPath(effectiveHome, path));
+        _homeDirectory = homeDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (trashRootForPath is not null)
+        {
+            _trashRootForPath = trashRootForPath;
+            return;
+        }
+
+        var homeRoot = VolumeLocator.FindDrive(_homeDirectory).RootDirectory.FullName;
+        _trashRootForPath = path => DefaultTrashRootForPath(path, homeRoot);
     }
 
     public OperationResult Delete(IReadOnlyList<FileEntry> entries, bool permanent)
@@ -73,13 +81,12 @@ public sealed class MacTrashService : ITrashService
         }
     }
 
-    private static string DefaultTrashRootForPath(string homeDirectory, string entryPath)
+    private string DefaultTrashRootForPath(string entryPath, string homeRoot)
     {
-        var homeRoot = VolumeLocator.FindDrive(homeDirectory).RootDirectory.FullName;
         var entryRoot = VolumeLocator.FindDrive(entryPath).RootDirectory.FullName;
         if (string.Equals(homeRoot, entryRoot, StringComparison.Ordinal))
         {
-            return Path.Combine(homeDirectory, ".Trash");
+            return Path.Combine(_homeDirectory, ".Trash");
         }
 
         return Path.Combine(entryRoot, ".Trashes", GetCurrentUserId().ToString(CultureInfo.InvariantCulture));
