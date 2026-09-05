@@ -140,10 +140,12 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] `dotnet test McGui.sln` executa os 3 projetos de teste (0 testes ainda, sem falha)
+- [x] `dotnet test McGui.sln` executa os 3 projetos de teste (0 testes ainda, sem falha)
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
 
 ---
 
