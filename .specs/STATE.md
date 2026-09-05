@@ -12,12 +12,12 @@
 
 ## Handoff
 
-- **Features**: `panel-icons-dotdot` (**DONE**, Verifier PASS 17/17) e `mc-menubar` (**DONE**, Verifier PASS 12/12) — detalhes abaixo.
-- **panel-icons-dotdot** (`.specs/features/panel-icons-dotdot/`): T1-T7 + fix gap ícone + Verifier PASS (`ee3613b`). `..` virtual no topo (exceto raiz), não-marcável, navega origem; ícones `PathIcon` pasta/arquivo; tamanhos B/kB/MB/GB/TB base 1024.
-- **mc-menubar** (`.specs/features/mc-menubar/`): T1-T4 (`b89f24f`..`b3002f5`) + Verifier FAIL→Fix G1/G2 (testes estruturais) → re-verify PASS (`68d0315`). Menubar Left/File/Command/Options/Right replicando `../mc/src/filemanager/filemanager.c`; Theme movido p/ Options; F9 abre 1º menu; itens inexistentes desabilitados; novos commands de VM: `RescanActivePanel`, `SelectAll`, `UnselectAll`, `InvertSelection`.
-- **Completed**: 180 testes (17 Core + 31 Infra + 132 App). Working tree limpo, branch `main`.
-- **UAT notes**: app GUI às vezes falha com `Avalonia.Native -6661` (RenderTimer) ao abrir remoto via `dotnet run` — requer sessão gráfica; matar processos (`pkill -9 -f McGui`) e relançar. Usuário confirmou visualmente: feature A painéis ok, feature B menubar ok.
-- **Next step**: aguardando próxima feature do usuário. Backlog MC não-implementado (desabilitado na menubar): viewer F3, editor F4, chmod/chown, links, VFS/FTP, hotlist, find-file, tree, panelize, usermenu F2, quick cd. Fluxo: `tlc-spec-driven`.
+- **Feature**: `macos-installer` (`.specs/features/macos-installer/`) — **DONE**.
+- **Execute**: T1-T4 + Verifier independente **PASS** (13/13, sensor 3/3) — `dbfe690`..`7d9b625`. Release `v0.1.0` criada no GitHub com asset `mc-gui-0.1.0-arm64.dmg`.
+- **Completed**: 180 testes (17 Core + 31 Infra + 132 App). Working tree limpo, branch `main`; origin atualizado (push + tag v0.1.0 feitos c/ go-ahead).
+- **Entregue**: `packaging/build-macos.sh` (publish self-contained osx-arm64 → bundle `Midnight Commander GUI.app` → DMG drag-to-install), `packaging/Info.plist` (id `mcgui.jpmo.dev.br`, CFBundleName `MC GUI` ≤15, CFBundleDisplayName `Midnight Commander GUI`, versão por arg), `packaging/make-icon.sh` (icns de PNG commitado em `packaging/icon-asset/`, sem PIL p/ CI), `.github/workflows/build-macos.yml` (macos-14; DMG artifact + release em tag `v*`, prefixo `v` removido). Título da janela → "Midnight Commander GUI".
+- **Decisões**: sem assinatura/notarização (dev; Gatekeeper pede clique-direito+Abrir); só arm64; ícone commitado (PIL removido — spec atualizado); DMG 0.1.0 padrão, versão por `$1`.
+- **Next step**: aguardando próxima feature do usuário. Backlog MC: viewer F3, editor F4, chmod/chown, links, VFS/FTP, hotlist, usermenu F2; refinamento do ícone (design); assinatura/notarização p/ distribuição pública; installers Win/Linux.
 - **Blockers**: none
 - **Uncommitted files**: este `STATE.md` (handoff atual).
-- **Branch**: main (origin/main em `568d20e`; commits locais desde `9a97be4` NÃO pushados — requer go-ahead explícito).
+- **Branch**: main (origin/main sincronizado; tag v0.1.0 no origin).
