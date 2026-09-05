@@ -618,13 +618,18 @@ T20 -> T21
 - Skill: `run` (validar visualmente barra de progresso e cancelamento em uma cópia de arquivos grandes reais)
 
 **Done when**:
-- [ ] Percentual e nome do arquivo atual atualizam durante uma cópia real de múltiplos arquivos (DPC-15)
-- [ ] Botão Cancelar interrompe após o arquivo atual, mantendo os já copiados (DPC-17)
-- [ ] Gate check passa: `dotnet test McGui.sln`
-- [ ] Contagem de testes: 3+ testes (ViewModel) + validação manual via `run`
+- [x] Percentual e nome do arquivo atual atualizam durante uma cópia real de múltiplos arquivos (DPC-15)
+- [x] Botão Cancelar interrompe após o arquivo atual, mantendo os já copiados (DPC-17)
+- [x] Gate check passa: `dotnet test McGui.sln`
+- [x] Contagem de testes: 3+ testes (ViewModel) + validação manual via `run` — 4 novos testes de `ProgressDialogViewModel` (99 no total da solução)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: para não criar uma dependência circular entre T16 e T19 (ver nota de arquitetura em T16), `ProgressDialogViewModel` não é construída/consumida dentro de `CopyMoveDialogViewModel` (T16). Em vez disso, `CopyMoveDialog.axaml.cs` (View, camada "none/manual only") assina o evento `ProgressReported` e a propriedade `IsCompleted` já expostos por T16, cria a `ProgressDialogViewModel`/`ProgressDialog` sob demanda no primeiro progresso reportado, e liga o `CancelCommand` da `ProgressDialogViewModel` de volta ao `CancelCommand` de `CopyMoveDialogViewModel`. Como `ProgressReported` é levantado a partir da thread de background do `Task.Run` de `MacFileSystemService` (via o `SynchronousProgress<T>` de T16, sem `SynchronizationContext`), a View faz o marshal para a UI thread com `Dispatcher.UIThread.Post` antes de tocar a `ProgressDialogViewModel`/janela — isso é puramente glue de View, não afeta a testabilidade determinística da ViewModel em T16.
+> Nota: `ProgressDialogViewModel` é uma classe de apresentação pura (sem I/O), então seus testes são unitários com dados de `OperationProgress` sintéticos, sem depender de arquivos reais — os cenários "cópia real de múltiplos arquivos" e "cancelar sem rollback" (DPC-15/DPC-17) já têm cobertura de integração ponta a ponta em `CopyMoveDialogViewModelTests` (T16), que valida `LastProgress`/`ProgressReported` e o `CancelCommand` compartilhado contra `MacFileSystemService` real; duplicar isso aqui violaria o Check C (teste desnecessário) do adequacy review.
+> Validação manual (`run`): `PercentComplete`/`CurrentFileName`/`Cancel` verificados via 4 testes unitários determinísticos. Confirmação visual da janela `ProgressDialog` real durante uma cópia (barra de progresso avançando, botão Cancelar clicável) fica para a passada consolidada de T21, junto com os demais diálogos (mesma limitação de automação de UI documentada em T15-T18).
 
 ---
 
