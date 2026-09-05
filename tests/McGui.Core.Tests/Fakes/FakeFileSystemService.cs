@@ -14,9 +14,17 @@ public sealed class FakeFileSystemService : IFileSystemService
 
     public void CreateDirectory(string parentPath, string name) => throw new NotSupportedException();
 
-    public Task<OperationResult> CopyAsync(CopyMovePlan plan, IProgress<OperationProgress> progress, CancellationToken ct) =>
+    public Task<OperationResult> CopyAsync(
+        CopyMovePlan plan,
+        IProgress<OperationProgress> progress,
+        Func<string, FileConflictResolution> resolveConflict,
+        CancellationToken ct) =>
         throw new NotSupportedException();
 
-    public Task<OperationResult> MoveAsync(CopyMovePlan plan, IProgress<OperationProgress> progress, CancellationToken ct) =>
+    public Task<OperationResult> MoveAsync(
+        CopyMovePlan plan,
+        IProgress<OperationProgress> progress,
+        Func<string, FileConflictResolution> resolveConflict,
+        CancellationToken ct) =>
         throw new NotSupportedException();
 }

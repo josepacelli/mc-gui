@@ -288,16 +288,24 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] `ListDirectory` retorna `FileEntry` corretos para um diretório temporário de teste (nome, tamanho, símlink, oculto)
-- [ ] `CreateDirectory` cria pasta e rejeita nome duplicado/caractere inválido com erro inline (DPC-24, DPC-25, DPC-26)
-- [ ] `CopyAsync` copia recursivamente, reporta progresso, respeita cancelamento sem rollback (DPC-15, DPC-17), aplica Overwrite/Skip/Rename/Abort com "aplicar a todos" (DPC-16), aborta antes de iniciar se não houver espaço (DPC-19)
-- [ ] `MoveAsync` reutiliza as mesmas regras de conflito/espaço de `CopyAsync` (DPC-20) e faz rename in-place quando aplicável (DPC-21)
-- [ ] Falha de permissão ou de escrita a meio da operação pula o item, continua os demais, e é reportada no `OperationResult` (ver Error Handling Strategy)
-- [ ] Gate check passa: `dotnet test tests/McGui.Infrastructure.macOS.Tests/McGui.Infrastructure.macOS.Tests.csproj`
-- [ ] Contagem de testes: 10+ testes passando (um por comportamento acima, usando diretórios temporários reais)
+- [x] `ListDirectory` retorna `FileEntry` corretos para um diretório temporário de teste (nome, tamanho, símlink, oculto)
+- [x] `CreateDirectory` cria pasta e rejeita nome duplicado/caractere inválido com erro inline (DPC-24, DPC-25, DPC-26)
+- [x] `CopyAsync` copia recursivamente, reporta progresso, respeita cancelamento sem rollback (DPC-15, DPC-17), aplica Overwrite/Skip/Rename/Abort com "aplicar a todos" (DPC-16), aborta antes de iniciar se não houver espaço (DPC-19)
+- [x] `MoveAsync` reutiliza as mesmas regras de conflito/espaço de `CopyAsync` (DPC-20) e faz rename in-place quando aplicável (DPC-21)
+- [x] Falha de permissão ou de escrita a meio da operação pula o item, continua os demais, e é reportada no `OperationResult` (ver Error Handling Strategy)
+- [x] Gate check passa: `dotnet test tests/McGui.Infrastructure.macOS.Tests/McGui.Infrastructure.macOS.Tests.csproj`
+- [x] Contagem de testes: 10+ testes passando (um por comportamento acima, usando diretórios temporários reais) — 18 passaram
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: `IFileSystemService.CopyAsync`/`MoveAsync` (T5) ganharam um novo parâmetro `Func<string, FileConflictResolution> resolveConflict` (com `FileConflictResolution` novo em `McGui.Core.Models`), ausente na assinatura original de design.md/T5. Reason: sem esse callback não havia como o serviço aplicar Overwrite/Skip/Rename/Abort por conflito (DPC-16), exigido pelo "Done when" desta task; a decisão "aplicar a todos" fica a cargo de quem fornece o delegate (T16, futuro), que pode simplesmente devolver sempre a mesma resolução. `FakeFileSystemService` (T7) foi ajustado mecanicamente para a nova assinatura.
+> SPEC_DEVIATION: falha de espaço insuficiente (DPC-19) é sinalizada via nova exceção `InsufficientDiskSpaceException(requiredBytes, availableBytes)` (`McGui.Infrastructure.macOS`), já que `OperationResult` (design.md) não tem campo para os bytes necessários/disponíveis — mesmo padrão de `CopyMovePlanValidationException` (T7). Checagem de espaço é injetável via `Func<string,long>` no construtor de `MacFileSystemService`, necessário para tornar DPC-19 testável sem depender do disco real ter pouco espaço livre.
+> Spec-precision gap: "Rename" na resolução de conflito gera automaticamente um nome não colidente no padrão Finder (`arquivo 2.txt`) em vez de pedir um nome ao usuário — a UI de texto livre por conflito é escopo de T16 (futuro), fora desta task de infraestrutura.
+> Spec-precision gap: `OperationResult.Succeeded` não tem semântica definida em spec.md para cancelamento vs. Abort explícito. Implementado como `Succeeded=true` para cancelamento via `CancellationToken` (parada graciosa, sem erro) e `Succeeded=false` para "Abort" explícito no diálogo de conflito (operação encerrada por decisão explícita). Revisar com o usuário se a semântica esperada for outra.
+> Spec-precision gap: colisão diretório-com-diretório no destino do Copy é tratada como merge silencioso (`Directory.CreateDirectory` idempotente), sem disparar o diálogo de conflito — spec.md não cobre esse caso explicitamente; segue convenção usual de Finder/`cp -r`.
+> Nota de ambiente: a validação manual de UI mencionada nas outras tasks não se aplica a T8 (sem Tools/Skill `run` listado); toda a cobertura desta task é via testes de integração com diretórios temporários reais (18 testes).
 
 ---
 
