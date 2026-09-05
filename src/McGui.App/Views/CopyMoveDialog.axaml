@@ -21,7 +21,8 @@
 
     <StackPanel Spacing="4" IsVisible="{Binding HasProgress}">
       <TextBlock Text="{Binding ProgressFileName, StringFormat='Copying: {0}'}" />
-      <TextBlock Text="{Binding ProgressFilesDone, StringFormat='Files done: {0}'}" />
+      <ProgressBar Minimum="0" Maximum="100" Value="{Binding PercentComplete}" />
+      <TextBlock Text="{Binding ProgressSummary}" />
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">

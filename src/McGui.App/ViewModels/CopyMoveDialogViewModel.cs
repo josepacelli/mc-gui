@@ -69,18 +69,51 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject, IComplet
 
     public int ProgressFilesDone => LastProgress?.FilesDone ?? 0;
 
+    public int ProgressFilesTotal => LastProgress?.FilesTotal ?? 0;
+
+    public string ProgressSummary =>
+        LastProgress is { } progress
+            ? $"Files done: {progress.FilesDone} of {progress.FilesTotal}"
+            : string.Empty;
+
+    public double PercentComplete
+    {
+        get
+        {
+            var progress = LastProgress;
+            if (progress is null)
+            {
+                return 0;
+            }
+
+            if (progress.BytesTotal > 0)
+            {
+                return (double)progress.BytesDone / progress.BytesTotal * 100;
+            }
+
+            return progress.FilesTotal > 0 ? (double)progress.FilesDone / progress.FilesTotal * 100 : 0;
+        }
+    }
+
     public OperationResult? LastResult { get; private set; }
 
     public event EventHandler<OperationProgress>? ProgressReported;
 
     partial void OnErrorMessageChanged(string? value) => OnPropertyChanged(nameof(HasError));
 
-    partial void OnLastProgressChanged(OperationProgress? value)
+    partial void OnLastProgressChanged(OperationProgress? value) => NotifyProgressChanged();
+
+    private void NotifyProgressChanged()
     {
         OnPropertyChanged(nameof(HasProgress));
         OnPropertyChanged(nameof(ProgressFileName));
         OnPropertyChanged(nameof(ProgressFilesDone));
+        OnPropertyChanged(nameof(ProgressFilesTotal));
+        OnPropertyChanged(nameof(PercentComplete));
+        OnPropertyChanged(nameof(ProgressSummary));
     }
+
+    public void RaiseProgressChangedOnUiThread() => NotifyProgressChanged();
 
     [RelayCommand]
     private async Task ConfirmAsync()

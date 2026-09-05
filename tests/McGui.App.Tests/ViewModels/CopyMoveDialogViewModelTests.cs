@@ -71,6 +71,30 @@ public class CopyMoveDialogViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task ConfirmAsync_Copy_MultipleFiles_ReportsPercentCompleteFromBytes()
+    {
+        var source = NewSubdir("multi-src");
+        WriteFile(source, "a.txt", new string('x', 40));
+        WriteFile(source, "b.txt", new string('y', 40));
+        var destination = NewSubdir("multi-dst");
+        var vm = BuildViewModel(
+            [ToEntry(Path.Combine(source, "a.txt"), false), ToEntry(Path.Combine(source, "b.txt"), false)],
+            destination,
+            OperationMode.Copy);
+
+        await vm.ConfirmCommand.ExecuteAsync(null);
+
+        Assert.True(vm.IsCompleted);
+        Assert.NotNull(vm.LastProgress);
+        Assert.Equal(2, vm.LastProgress!.FilesDone);
+        Assert.Equal(2, vm.LastProgress!.FilesTotal);
+        Assert.Equal(80, vm.LastProgress!.BytesDone);
+        Assert.Equal(80, vm.LastProgress!.BytesTotal);
+        Assert.Equal(100, vm.PercentComplete);
+        Assert.Equal("Files done: 2 of 2", vm.ProgressSummary);
+    }
+
+    [Fact]
     public async Task ConfirmAsync_Move_MovesFileToDestination()
     {
         var source = NewSubdir("move-src");
