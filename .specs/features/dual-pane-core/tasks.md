@@ -409,16 +409,21 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] Estado inicial lista o diretório persistido ou o home do usuário como fallback (DPC-01, DPC-08)
-- [ ] Navegar para subdiretório e para o pai atualiza `CurrentDirectory`/`Entries` (DPC-04, DPC-05)
-- [ ] Mover cursor para cima/baixo respeita os limites (não dá wrap) (DPC-03)
-- [ ] Indicador de carregamento fica ativo quando a listagem simulada demora mais que 500ms (DPC-06, com fake `IFileSystemService` controlando o delay)
-- [ ] Fechar persiste o diretório atual via `IPathHistoryStore.Save` (DPC-07)
-- [ ] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
-- [ ] Contagem de testes: 8+ testes passando
+- [x] Estado inicial lista o diretório persistido ou o home do usuário como fallback (DPC-01, DPC-08)
+- [x] Navegar para subdiretório e para o pai atualiza `CurrentDirectory`/`Entries` (DPC-04, DPC-05)
+- [x] Mover cursor para cima/baixo respeita os limites (não dá wrap) (DPC-03)
+- [x] Indicador de carregamento fica ativo quando a listagem simulada demora mais que 500ms (DPC-06, com fake `IFileSystemService` controlando o delay)
+- [x] Fechar persiste o diretório atual via `IPathHistoryStore.Save` (DPC-07)
+- [x] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] Contagem de testes: 8+ testes passando — 10 novos (11 no total do projeto)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
+> Spec-precision gap: o limiar de 500ms de DPC-06 é injetável via `loadingIndicatorDelay` no construtor (padrão 500ms em produção) para permitir testes determinísticos e rápidos sem `Thread.Sleep(500)` real; o comportamento (indicador só aparece após o limiar, nunca antes) é o mesmo exigido pelo AC.
+> Spec-precision gap: DPC-08 no nível de ViewModel valida o caminho persistido tentando `IFileSystemService.ListDirectory` (capturando `IOException`/`UnauthorizedAccessException`, incluindo `DirectoryNotFoundException`) em vez de checar existência diretamente — mantém toda a E/S atrás da abstração já usada pelo ViewModel (nenhuma chamada direta a `System.IO` em `McGui.App`), reforçando a fronteira de plataforma do AD-001. Navegação explícita (Enter/Backspace) para um diretório que falhar nessa mesma checagem apenas mantém o estado atual sem navegar; o tratamento de erro inline completo é escopo de T20.
+> Nota: `NavigateToAsync(string)` e `PersistCurrentDirectory()` não são `[RelayCommand]` porque não aparecem como gestos diretos em `KeyGestureMap` (T14) — `NavigateToAsync` é usado por double-click/Enter via `ActivateCursorEntryCommand`, e `PersistCurrentDirectory` é chamado pelo host da aplicação ao fechar (fora do escopo de teclado).
 
 ---
 

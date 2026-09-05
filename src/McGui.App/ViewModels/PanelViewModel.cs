@@ -1,0 +1,164 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using McGui.Core.Interfaces;
+using McGui.Core.Models;
+
+namespace McGui.App.ViewModels;
+
+public sealed partial class PanelViewModel : ObservableObject
+{
+    private readonly IFileSystemService _fileSystemService;
+    private readonly IPathHistoryStore _pathHistoryStore;
+    private readonly PanelSide _side;
+    private readonly string _fallbackHomeDirectory;
+    private readonly TimeSpan _loadingIndicatorDelay;
+    private readonly PanelState _state = new();
+
+    [ObservableProperty]
+    private bool isLoading;
+
+    [ObservableProperty]
+    private bool isActive;
+
+    public PanelViewModel(
+        IFileSystemService fileSystemService,
+        IPathHistoryStore pathHistoryStore,
+        PanelSide side,
+        string? fallbackHomeDirectory = null,
+        TimeSpan? loadingIndicatorDelay = null)
+    {
+        _fileSystemService = fileSystemService;
+        _pathHistoryStore = pathHistoryStore;
+        _side = side;
+        _fallbackHomeDirectory = fallbackHomeDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        _loadingIndicatorDelay = loadingIndicatorDelay ?? TimeSpan.FromMilliseconds(500);
+
+        var history = _pathHistoryStore.Load();
+        var initialDirectory = _side == PanelSide.Left ? history.LeftPanelPath : history.RightPanelPath;
+        LoadDirectorySync(initialDirectory, allowHomeFallback: true);
+    }
+
+    public string CurrentDirectory => _state.CurrentDirectory;
+
+    public IReadOnlyList<FileEntry> Entries => _state.Entries;
+
+    public int CursorIndex
+    {
+        get => _state.CursorIndex;
+        private set
+        {
+            if (_state.CursorIndex == value)
+            {
+                return;
+            }
+
+            _state.CursorIndex = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public async Task NavigateToAsync(string path)
+    {
+        using var indicatorCts = new CancellationTokenSource();
+        _ = ShowLoadingIndicatorAfterDelayAsync(indicatorCts.Token);
+
+        try
+        {
+            var entries = await Task.Run(() => _fileSystemService.ListDirectory(path));
+            ApplyLoadedState(path, entries);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+        }
+        finally
+        {
+            indicatorCts.Cancel();
+            IsLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    public async Task NavigateToParentAsync()
+    {
+        var parent = Path.GetDirectoryName(CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar));
+        if (!string.IsNullOrEmpty(parent))
+        {
+            await NavigateToAsync(parent);
+        }
+    }
+
+    [RelayCommand]
+    public async Task ActivateCursorEntryAsync()
+    {
+        if (CursorIndex < 0 || CursorIndex >= Entries.Count)
+        {
+            return;
+        }
+
+        var entry = Entries[CursorIndex];
+        if (entry.IsDirectory)
+        {
+            await NavigateToAsync(entry.FullPath);
+        }
+    }
+
+    [RelayCommand]
+    public void MoveCursorUp() => CursorIndex = Math.Max(0, CursorIndex - 1);
+
+    [RelayCommand]
+    public void MoveCursorDown() => CursorIndex = Entries.Count == 0 ? 0 : Math.Min(Entries.Count - 1, CursorIndex + 1);
+
+    public void PersistCurrentDirectory()
+    {
+        var existing = _pathHistoryStore.Load();
+        var updated = _side == PanelSide.Left
+            ? existing with { LeftPanelPath = CurrentDirectory }
+            : existing with { RightPanelPath = CurrentDirectory };
+        _pathHistoryStore.Save(updated);
+    }
+
+    private void LoadDirectorySync(string path, bool allowHomeFallback)
+    {
+        try
+        {
+            var entries = _fileSystemService.ListDirectory(path);
+            ApplyLoadedState(path, entries);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            if (!allowHomeFallback || string.Equals(path, _fallbackHomeDirectory, StringComparison.Ordinal))
+            {
+                throw;
+            }
+
+            LoadDirectorySync(_fallbackHomeDirectory, allowHomeFallback: true);
+        }
+    }
+
+    private void ApplyLoadedState(string path, IReadOnlyList<FileEntry> entries)
+    {
+        _state.CurrentDirectory = path;
+        _state.Entries = entries;
+        _state.CursorIndex = 0;
+        OnPropertyChanged(nameof(CurrentDirectory));
+        OnPropertyChanged(nameof(Entries));
+        OnPropertyChanged(nameof(CursorIndex));
+    }
+
+    private async Task ShowLoadingIndicatorAfterDelayAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(_loadingIndicatorDelay, ct);
+            IsLoading = true;
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+}
