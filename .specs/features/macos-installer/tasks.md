@@ -117,14 +117,15 @@ T3 -> T4
 **Requirement**: PKG-12, PKG-13, PKG-14
 
 **Done when**:
-- [x] Workflow YAML válido (YAML ok, `gh` autenticado), reusa build-macos.sh
-- [x] Full gate verde local (180 testes: 17+31+132)
-- [x] UAT CI: push + tag v0.1.0 disparados pelo usuário p/ validar release com DMG (em andamento)
+- [x] Workflow YAML válido, reusa build-macos.sh
+- [x] Full gate verde local (180 testes)
+- [x] UAT CI validado: push + tag v0.1.0 → release `https://github.com/josepacelli/mc-gui/releases/tag/v0.1.0` com asset `mc-gui-0.1.0-arm64.dmg`
+- [x] Fixes CI aplicados: ícone via PNG commitado (sem PIL), versão de tag sem prefixo `v`
 
 **Tests**: YAML review + gate
 **Gate**: full
 
-**Status**: ⚠️ Complete (validação da Release CI em andamento pós-push)
+**Status**: ✅ Complete
 
 ---
 
