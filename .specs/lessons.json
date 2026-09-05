@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 4,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::theme structural tests must assert light and dark token values differ not only that the key exists in each variant",
+      "text": "Theme structural tests must assert Light and Dark token values differ, not only that the key exists in each variant.",
+      "signal": "surviving_mutant",
+      "scope": "src/McGui.App/Themes.axaml",
+      "status": "candidate",
+      "features": [
+        "theming"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/McGui.App.Tests/Theming/ThemeResourcesTests.cs:99 (src/McGui.App/Themes.axaml)"
+      ],
+      "created": "2026-09-05T20:20:53Z",
+      "last_seen": "2026-09-05T20:20:53Z"
+    },
+    {
+      "id": "L-002",
+      "key": "spec_precision_gap::do not spec a xaml color literal as a build failure avalonia compiles literals assert the structural scan rejects them",
+      "text": "Do not spec a XAML color literal as a build failure - Avalonia compiles literals; assert the structural scan rejects them.",
+      "signal": "spec_precision_gap",
+      "scope": "Avalonia",
+      "status": "candidate",
+      "features": [
+        "theming"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/theming/spec.md:97 (Avalonia)"
+      ],
+      "created": "2026-09-05T20:20:56Z",
+      "last_seen": "2026-09-05T20:20:56Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_deviation::avalonia 12 removed the menubar control use the top level menu control for a menu bar",
+      "text": "Avalonia 12 removed the MenuBar control; use the top-level Menu control for a menu bar.",
+      "signal": "spec_deviation",
+      "scope": "Avalonia",
+      "status": "candidate",
+      "features": [
+        "theming"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/theming/tasks.md:191 (Avalonia)"
+      ],
+      "created": "2026-09-05T20:20:58Z",
+      "last_seen": "2026-09-05T20:20:58Z"
+    }
+  ]
+}

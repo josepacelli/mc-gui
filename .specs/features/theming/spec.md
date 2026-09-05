@@ -94,7 +94,7 @@ Tokens semânticos definidos nas variantes `Light` e `Dark`:
 **Acceptance Criteria**:
 
 1. IF a view `.axaml` under `src/McGui.App/Views` or `src/McGui.App/MainWindow.axaml` sets `Background`, `Foreground`, or `BorderBrush` THEN the value SHALL be a `{DynamicResource ...}` reference or a transparent/non-color value (`Transparent`, `{x:Null}`). <!-- unwanted-behavior -->
-2. IF a view uses a color literal (named color such as `Red`, or hex such as `#RRGGBB`) for a visual property THEN the app build SHALL fail. <!-- unwanted-behavior -->
+2. IF a view uses a color literal (named color such as `Red`, or hex such as `#RRGGBB`) for a visual property THEN the structural scan test SHALL fail. <!-- unwanted-behavior -->
 3. The `Styles` in `PanelView.axaml` (borda ativa/inativa) SHALL reference `PanelBorderActiveBrush` and `PanelBorderBrush` instead of literal colors. <!-- ubiquitous -->
 
 **Independent Test**: Varredura estrutural dos `.axaml` não encontra cor literal (hex ou nome) em propriedade visual; build passa.
@@ -169,34 +169,34 @@ Tokens semânticos definidos nas variantes `Light` e `Dark`:
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| THM-01 | P1: Paleta central | Design | Pending |
-| THM-02 | P1: Paleta central | Design | Pending |
-| THM-03 | P1: Paleta central | Design | Pending |
-| THM-04 | P1: Paleta central | Design | Pending |
-| THM-05 | P1: Views sem cores hardcoded | Design | Pending |
-| THM-06 | P1: Views sem cores hardcoded | Design | Pending |
-| THM-07 | P1: Views sem cores hardcoded | Design | Pending |
-| THM-08 | P1: Seguir o sistema por padrão | Design | Pending |
-| THM-09 | P1: Seguir o sistema por padrão | Design | Pending |
-| THM-10 | P1: Seguir o sistema por padrão | Design | Pending |
-| THM-11 | P1: Override via MenuBar | Design | Pending |
-| THM-12 | P1: Override via MenuBar | Design | Pending |
-| THM-13 | P1: Override via MenuBar | Design | Pending |
-| THM-14 | P1: Override via MenuBar | Design | Pending |
-| THM-15 | P1: Override via MenuBar | Design | Pending |
-| THM-16 | P1: Override via MenuBar | Design | Pending |
-| THM-17 | P1: Override via MenuBar | Design | Pending |
-| THM-18 | P1: Override via MenuBar | Design | Pending |
-| THM-19 | P1: Ciclo rápido (F12) | Design | Pending |
-| THM-20 | P1: Ciclo rápido (F12) | Design | Pending |
-| THM-21 | P1: Ciclo rápido (F12) | Design | Pending |
-| THM-22 | P1: Ciclo rápido (F12) | Design | Pending |
-| THM-23 | P1: Ciclo rápido (F12) | Design | Pending |
+| THM-01 | P1: Paleta central | Design | Verified |
+| THM-02 | P1: Paleta central | Design | Verified |
+| THM-03 | P1: Paleta central | Design | Verified |
+| THM-04 | P1: Paleta central | Design | Verified |
+| THM-05 | P1: Views sem cores hardcoded | Design | Verified |
+| THM-06 | P1: Views sem cores hardcoded | Design | Verified |
+| THM-07 | P1: Views sem cores hardcoded | Design | Verified |
+| THM-08 | P1: Seguir o sistema por padrão | Design | Verified |
+| THM-09 | P1: Seguir o sistema por padrão | Design | Verified |
+| THM-10 | P1: Seguir o sistema por padrão | Design | Verified |
+| THM-11 | P1: Override via MenuBar | Design | Verified |
+| THM-12 | P1: Override via MenuBar | Design | Verified |
+| THM-13 | P1: Override via MenuBar | Design | Verified |
+| THM-14 | P1: Override via MenuBar | Design | Verified |
+| THM-15 | P1: Override via MenuBar | Design | Verified |
+| THM-16 | P1: Override via MenuBar | Design | Verified |
+| THM-17 | P1: Override via MenuBar | Design | Verified |
+| THM-18 | P1: Override via MenuBar | Design | Verified |
+| THM-19 | P1: Ciclo rápido (F12) | Design | Verified |
+| THM-20 | P1: Ciclo rápido (F12) | Design | Verified |
+| THM-21 | P1: Ciclo rápido (F12) | Design | Verified |
+| THM-22 | P1: Ciclo rápido (F12) | Design | Verified |
+| THM-23 | P1: Ciclo rápido (F12) | Design | Verified |
 
 **ID format:** `THM-N`
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 23 total, 0 mapped to tasks, 23 unmapped ⚠️
+**Coverage:** 23 total, 23 mapped to tasks, 0 unmapped
 
 ---
 

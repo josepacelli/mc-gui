@@ -102,6 +102,38 @@ public class ThemeResourcesTests
     }
 
     [Fact]
+    public void ThemeFile_EveryTokenHasDistinctValuePerVariant()
+    {
+        var content = File.ReadAllText(ThemeFile);
+        var lightSection = content.Split("x:Key=\"Light\"", 2)[1].Split("</ResourceDictionary>", 2)[0];
+        var darkSection = content.Split("x:Key=\"Dark\"", 2)[1].Split("</ResourceDictionary>", 2)[0];
+        var tokenColor = new Regex($@"<SolidColorBrush x:Key=""([A-Za-z]+)"" Color=""([^""]+)""", RegexOptions.Compiled);
+
+        var lightValues = ValuesByToken(lightSection);
+        var darkValues = ValuesByToken(darkSection);
+
+        foreach (var token in ExpectedTokens)
+        {
+            var light = lightValues[token];
+            var dark = darkValues[token];
+            Assert.False(
+                string.Equals(light, dark, StringComparison.OrdinalIgnoreCase),
+                $"Token {token} has the same value ({light}) in Light and Dark; variants must differ (THM-01)");
+        }
+
+        Dictionary<string, string> ValuesByToken(string section)
+        {
+            var values = new Dictionary<string, string>();
+            foreach (Match match in tokenColor.Matches(section))
+            {
+                values[match.Groups[1].Value] = match.Groups[2].Value;
+            }
+
+            return values;
+        }
+    }
+
+    [Fact]
     public void EveryTokenUsedByViews_IsDefinedInThePalette()
     {
         var palette = File.ReadAllText(ThemeFile);
