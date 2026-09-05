@@ -132,12 +132,15 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         if (panel.MarkedPaths.Count > 0)
         {
-            return panel.Entries.Where(e => panel.MarkedPaths.Contains(e.FullPath)).ToList();
+            return panel.Entries
+                .Where(e => panel.MarkedPaths.Contains(e.FullPath) && e.Name != "..")
+                .ToList();
         }
 
         if (panel.CursorIndex >= 0 && panel.CursorIndex < panel.Entries.Count)
         {
-            return new[] { panel.Entries[panel.CursorIndex] };
+            var cursor = panel.Entries[panel.CursorIndex];
+            return cursor.Name == ".." ? Array.Empty<FileEntry>() : new[] { cursor };
         }
 
         return Array.Empty<FileEntry>();

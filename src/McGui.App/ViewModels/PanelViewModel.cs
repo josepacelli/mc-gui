@@ -123,7 +123,7 @@ public sealed partial class PanelViewModel : ObservableObject
 
         try
         {
-            await TryLoadDirectoryAsync(path);
+            await TryLoadDirectoryAsync(path, landOnEntryName: null);
         }
         finally
         {
@@ -135,10 +135,28 @@ public sealed partial class PanelViewModel : ObservableObject
     [RelayCommand]
     public async Task NavigateToParentAsync()
     {
-        var parent = Path.GetDirectoryName(CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar));
-        if (!string.IsNullOrEmpty(parent))
+        var originName = Path.GetFileName(CurrentDirectory.TrimEnd(Path.DirectorySeparatorChar));
+        if (string.IsNullOrEmpty(originName) || !TryGetParentDirectory(CurrentDirectory, out var parent))
         {
-            await NavigateToAsync(parent);
+            return;
+        }
+
+        await NavigateToAsync(parent, landOnEntryName: originName);
+    }
+
+    private async Task NavigateToAsync(string path, string? landOnEntryName)
+    {
+        using var indicatorCts = new CancellationTokenSource();
+        _ = ShowLoadingIndicatorAfterDelayAsync(indicatorCts.Token);
+
+        try
+        {
+            await TryLoadDirectoryAsync(path, landOnEntryName);
+        }
+        finally
+        {
+            indicatorCts.Cancel();
+            IsLoading = false;
         }
     }
 
@@ -151,7 +169,11 @@ public sealed partial class PanelViewModel : ObservableObject
         }
 
         var entry = Entries[CursorIndex];
-        if (entry.IsDirectory)
+        if (entry.Name == DotDot)
+        {
+            await NavigateToParentAsync();
+        }
+        else if (entry.IsDirectory)
         {
             await NavigateToAsync(entry.FullPath);
         }
@@ -167,7 +189,7 @@ public sealed partial class PanelViewModel : ObservableObject
         CursorIndex = Entries.Count == 0 ? 0 : Math.Clamp(index, 0, Entries.Count - 1);
 
     [RelayCommand]
-    public async Task RefreshAsync() => await TryLoadDirectoryAsync(CurrentDirectory);
+    public async Task RefreshAsync() => await TryLoadDirectoryAsync(CurrentDirectory, landOnEntryName: null);
 
     [RelayCommand]
     public async Task GoToHomeAsync()
@@ -186,14 +208,16 @@ public sealed partial class PanelViewModel : ObservableObject
         _pathHistoryStore.Save(updated);
     }
 
-    private async Task<bool> TryLoadDirectoryAsync(string path)
+    private const string DotDot = "..";
+
+    private async Task<bool> TryLoadDirectoryAsync(string path, string? landOnEntryName)
     {
         try
         {
             var entries = await Task.Run(() => _fileSystemService.ListDirectory(path));
             IsDirectoryInaccessible = false;
             DirectoryErrorMessage = null;
-            ApplyLoadedState(path, entries);
+            ApplyLoadedState(path, entries, landOnEntryName);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -209,7 +233,7 @@ public sealed partial class PanelViewModel : ObservableObject
         try
         {
             var entries = _fileSystemService.ListDirectory(path);
-            ApplyLoadedState(path, entries);
+            ApplyLoadedState(path, entries, landOnEntryName: null);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -222,15 +246,67 @@ public sealed partial class PanelViewModel : ObservableObject
         }
     }
 
-    private void ApplyLoadedState(string path, IReadOnlyList<FileEntry> entries)
+    private void ApplyLoadedState(string path, IReadOnlyList<FileEntry> entries, string? landOnEntryName)
     {
         _state.CurrentDirectory = path;
-        _state.Entries = entries;
-        _state.CursorIndex = 0;
+        _state.Entries = WithDotDotEntry(path, entries);
+        _state.CursorIndex = ResolveCursorIndex(landOnEntryName);
         OnPropertyChanged(nameof(CurrentDirectory));
         OnPropertyChanged(nameof(Entries));
         OnPropertyChanged(nameof(DisplayEntries));
         OnPropertyChanged(nameof(CursorIndex));
+    }
+
+    private static bool TryGetParentDirectory(string path, out string parent)
+    {
+        var trimmed = path.TrimEnd(Path.DirectorySeparatorChar);
+        if (trimmed.Length == 0)
+        {
+            parent = string.Empty;
+            return false;
+        }
+
+        parent = Path.GetDirectoryName(trimmed) ?? string.Empty;
+        return !string.IsNullOrEmpty(parent);
+    }
+
+    private static IReadOnlyList<FileEntry> WithDotDotEntry(string currentPath, IReadOnlyList<FileEntry> entries)
+    {
+        if (!TryGetParentDirectory(currentPath, out var parent))
+        {
+            return entries;
+        }
+
+        var list = new List<FileEntry>(entries.Count + 1)
+        {
+            new FileEntry(DotDot, parent, IsDirectory: true, SizeBytes: 0, ModifiedUtc: DateTimeOffset.UnixEpoch, IsSymlink: false, IsHidden: false),
+        };
+        list.AddRange(entries);
+        return list;
+    }
+
+    private int ResolveCursorIndex(string? landOnEntryName)
+    {
+        var firstRealIndex = 0;
+        while (firstRealIndex < _state.Entries.Count && _state.Entries[firstRealIndex].Name == DotDot)
+        {
+            firstRealIndex++;
+        }
+
+        if (landOnEntryName is null || firstRealIndex >= _state.Entries.Count)
+        {
+            return firstRealIndex < _state.Entries.Count ? firstRealIndex : 0;
+        }
+
+        for (var i = firstRealIndex; i < _state.Entries.Count; i++)
+        {
+            if (_state.Entries[i].Name == landOnEntryName)
+            {
+                return i;
+            }
+        }
+
+        return firstRealIndex < _state.Entries.Count ? firstRealIndex : 0;
     }
 
     private async Task ShowLoadingIndicatorAfterDelayAsync(CancellationToken ct)

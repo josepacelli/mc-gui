@@ -22,7 +22,10 @@ public class PanelViewModelTests
         var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
 
         Assert.Equal("/left", vm.CurrentDirectory);
-        Assert.Single(vm.Entries);
+        Assert.Equal(2, vm.Entries.Count);
+        Assert.Equal("..", vm.Entries[0].Name);
+        Assert.Equal("a.txt", vm.Entries[1].Name);
+        Assert.Equal(1, vm.CursorIndex);
     }
 
     [Fact]
@@ -49,8 +52,9 @@ public class PanelViewModelTests
         await vm.NavigateToAsync("/root/sub");
 
         Assert.Equal("/root/sub", vm.CurrentDirectory);
-        Assert.Single(vm.Entries);
-        Assert.Equal("nested.txt", vm.Entries[0].Name);
+        Assert.Equal(2, vm.Entries.Count);
+        Assert.Equal("..", vm.Entries[0].Name);
+        Assert.Equal("nested.txt", vm.Entries[1].Name);
     }
 
     [Fact]
@@ -68,6 +72,21 @@ public class PanelViewModelTests
     }
 
     [Fact]
+    public async Task NavigateToParentAsync_LandsCursorOnDirectoryItCameFrom()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", Dir("sub", "/root"), File("a.txt", "/root"));
+        fs.AddDirectory("/root/sub", File("nested.txt", "/root/sub"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root/sub", "/root/sub") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        await vm.NavigateToParentAsync();
+
+        Assert.Equal("/root", vm.CurrentDirectory);
+        Assert.Equal("sub", vm.Entries[vm.CursorIndex].Name);
+    }
+
+    [Fact]
     public async Task ActivateCursorEntryAsync_OnDirectoryEntry_NavigatesIntoIt()
     {
         var fs = new FakeFileSystemService();
@@ -76,9 +95,26 @@ public class PanelViewModelTests
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
         var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
 
+        await vm.NavigateToAsync("/root");
         await vm.ActivateCursorEntryAsync();
 
         Assert.Equal("/root/sub", vm.CurrentDirectory);
+    }
+
+    [Fact]
+    public async Task ActivateCursorEntryAsync_OnDotDot_NavigatesToParentAndLandsOnOrigin()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), Dir("sub", "/root"));
+        fs.AddDirectory("/root/sub", File("nested.txt", "/root/sub"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root/sub", "/root/sub") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        vm.MoveCursorTo(0);
+        await vm.ActivateCursorEntryAsync();
+
+        Assert.Equal("/root", vm.CurrentDirectory);
+        Assert.Equal("sub", vm.Entries[vm.CursorIndex].Name);
     }
 
     [Fact]
@@ -93,7 +129,7 @@ public class PanelViewModelTests
         vm.MoveCursorDown();
         vm.MoveCursorDown();
 
-        Assert.Equal(1, vm.CursorIndex);
+        Assert.Equal(2, vm.CursorIndex);
     }
 
     [Fact]
@@ -132,7 +168,7 @@ public class PanelViewModelTests
 
         vm.MoveCursorTo(99);
 
-        Assert.Equal(1, vm.CursorIndex);
+        Assert.Equal(2, vm.CursorIndex);
     }
 
     [Fact]
@@ -199,10 +235,10 @@ public class PanelViewModelTests
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
         var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
 
-        vm.ToggleMark(0);
+        vm.ToggleMark(1);
 
         Assert.Contains("/root/a.txt", vm.MarkedPaths);
-        Assert.Equal(1, vm.CursorIndex);
+        Assert.Equal(2, vm.CursorIndex);
     }
 
     [Fact]
@@ -231,12 +267,13 @@ public class PanelViewModelTests
         fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
         var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
-        vm.ToggleMark(0);
+        vm.ToggleMark(1);
 
         vm.InvertMarks();
 
         Assert.DoesNotContain("/root/a.txt", vm.MarkedPaths);
         Assert.Contains("/root/b.txt", vm.MarkedPaths);
+        Assert.Equal(1, vm.MarkedCount);
     }
 
     [Fact]
@@ -324,7 +361,9 @@ public class PanelViewModelTests
         await vm.RefreshAsync();
 
         Assert.False(vm.IsDirectoryInaccessible);
-        Assert.Equal(2, vm.Entries.Count);
+        Assert.Equal(3, vm.Entries.Count);
+        Assert.Equal("a.txt", vm.Entries[1].Name);
+        Assert.Equal("b.txt", vm.Entries[2].Name);
     }
 
     [Fact]

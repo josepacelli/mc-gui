@@ -100,15 +100,15 @@ T7 -> T8
 **Requirement**: PII-05, PII-06, PII-07, PII-08, PII-09; edge cases (raiz, vazio, Up)
 
 **Done when**:
-- [ ] `..` presente no topo p/ dir não-raiz; ausente na raiz
-- [ ] Ativar `..` navega ao pai e cursor pousa na pasta de origem
-- [ ] Entrar em diretório pousa cursor no 1º item real (não em `..`)
-- [ ] Testes App passam
+- [x] `..` presente no topo p/ dir não-raiz; ausente na raiz
+- [x] Ativar `..` navega ao pai e cursor pousa na pasta de origem
+- [x] Entrar em diretório pousa cursor no 1º item real (não em `..`)
+- [x] Testes App passam (82)
 
 **Tests**: unit (lista, cursor, navegação)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

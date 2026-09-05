@@ -99,8 +99,8 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/right", new FileEntry("c.txt", "/right/c.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
         var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
-        vm.ActivePanel.ToggleMark(0);
         vm.ActivePanel.ToggleMark(1);
+        vm.ActivePanel.ToggleMark(2);
         CopyMoveDialogViewModel? requested = null;
         vm.CopyMoveRequested += (_, dialog) => requested = dialog;
 
