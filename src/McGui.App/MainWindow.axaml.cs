@@ -56,6 +56,8 @@ public partial class MainWindow : Window
         viewModel.RightPanel.PersistCurrentDirectory();
     }
 
+    private void OnExitClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => Close();
+
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
         if (DataContext is not MainWindowViewModel viewModel)

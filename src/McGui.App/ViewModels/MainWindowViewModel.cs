@@ -83,6 +83,18 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     public void RequestMove() => RequestCopyOrMove(OperationMode.Move);
 
+    [RelayCommand]
+    public async Task RescanActivePanelAsync() => await ActivePanel.RefreshCommand.ExecuteAsync(null);
+
+    [RelayCommand]
+    public void SelectAll() => ActivePanel.MarkByPattern("*");
+
+    [RelayCommand]
+    public void UnselectAll() => ActivePanel.UnmarkByPattern("*");
+
+    [RelayCommand]
+    public void InvertSelection() => ActivePanel.InvertMarks();
+
     private void RequestCopyOrMove(OperationMode mode)
     {
         var sources = GetOperationSources(ActivePanel);

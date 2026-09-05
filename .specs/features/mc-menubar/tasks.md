@@ -76,15 +76,15 @@ T3 -> T4
 **Requirement**: MB-01, MB-02, MB-03, MB-04, MB-05, MB-07, MB-09
 
 **Done when**:
-- [ ] 5 menus top-level na ordem; Right espelha Left
-- [ ] Menus File/Command/Options com itens e separadores do original; Theme dentro de Options
-- [ ] Habilitados ligados a commands; desabilitados inertes
-- [ ] `dotnet build McGui.sln -warnaserror` passa
+- [x] 5 menus top-level na ordem; Right espelha Left
+- [x] Menus File/Command/Options com itens e separadores do original; Theme dentro de Options
+- [x] Habilitados ligados a commands; desabilitados inertes
+- [x] `dotnet build McGui.sln -warnaserror` passa
 
 **Tests**: none (XAML; estrutura coberta em T1/T3)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

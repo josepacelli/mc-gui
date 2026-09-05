@@ -9,11 +9,108 @@
         x:DataType="vm:MainWindowViewModel"
         Title="mc-gui">
   <Grid RowDefinitions="Auto,*,Auto">
-    <Menu Grid.Row="0">
-      <MenuItem Header="Theme">
-        <MenuItem Header="System" IsChecked="{Binding IsSystemThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.System}" />
-        <MenuItem Header="Light" IsChecked="{Binding IsLightThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Light}" />
-        <MenuItem Header="Dark" IsChecked="{Binding IsDarkThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Dark}" />
+    <Menu Grid.Row="0" x:Name="MainMenu">
+      <MenuItem Header="_Left">
+        <MenuItem Header="File listing" IsEnabled="False" />
+        <MenuItem Header="Quick view" IsEnabled="False" />
+        <MenuItem Header="Info" IsEnabled="False" />
+        <MenuItem Header="Tree" IsEnabled="False" />
+        <MenuItem Header="Panelize" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Listing format..." IsEnabled="False" />
+        <MenuItem Header="Sort order..." IsEnabled="False" />
+        <MenuItem Header="Filter..." IsEnabled="False" />
+        <MenuItem Header="Encoding..." IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="FTP link..." IsEnabled="False" />
+        <MenuItem Header="Shell link..." IsEnabled="False" />
+        <MenuItem Header="SFTP link..." IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Rescan" Command="{Binding RescanActivePanelCommand}" />
+      </MenuItem>
+      <MenuItem Header="_File">
+        <MenuItem Header="View" IsEnabled="False" />
+        <MenuItem Header="View file..." IsEnabled="False" />
+        <MenuItem Header="Filtered view" IsEnabled="False" />
+        <MenuItem Header="Edit" IsEnabled="False" />
+        <MenuItem Header="Copy" Command="{Binding RequestCopyCommand}" />
+        <MenuItem Header="Chmod" IsEnabled="False" />
+        <MenuItem Header="Link" IsEnabled="False" />
+        <MenuItem Header="Symlink" IsEnabled="False" />
+        <MenuItem Header="Relative symlink" IsEnabled="False" />
+        <MenuItem Header="Edit symlink" IsEnabled="False" />
+        <MenuItem Header="Chown" IsEnabled="False" />
+        <MenuItem Header="Advanced chown" IsEnabled="False" />
+        <MenuItem Header="Chattr" IsEnabled="False" />
+        <MenuItem Header="Rename/Move" Command="{Binding RequestMoveCommand}" />
+        <MenuItem Header="Mkdir" Command="{Binding RequestMkdirCommand}" />
+        <MenuItem Header="Delete" Command="{Binding RequestDeleteCommand}" />
+        <MenuItem Header="Quick cd" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Select group" Command="{Binding SelectAllCommand}" />
+        <MenuItem Header="Unselect group" Command="{Binding UnselectAllCommand}" />
+        <MenuItem Header="Invert selection" Command="{Binding InvertSelectionCommand}" />
+        <Separator />
+        <MenuItem Header="Exit" Click="OnExitClick" />
+      </MenuItem>
+      <MenuItem Header="_Command">
+        <MenuItem Header="User menu" IsEnabled="False" />
+        <MenuItem Header="Directory tree" IsEnabled="False" />
+        <MenuItem Header="Find file" IsEnabled="False" />
+        <MenuItem Header="Swap panels" IsEnabled="False" />
+        <MenuItem Header="Switch panels on/off" IsEnabled="False" />
+        <MenuItem Header="Compare directories" IsEnabled="False" />
+        <MenuItem Header="Compare files" IsEnabled="False" />
+        <MenuItem Header="External panelize" IsEnabled="False" />
+        <MenuItem Header="Show directory sizes" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Command history" IsEnabled="False" />
+        <MenuItem Header="Viewed/edited files history" IsEnabled="False" />
+        <MenuItem Header="Directory hotlist" IsEnabled="False" />
+        <MenuItem Header="Active VFS list" IsEnabled="False" />
+        <MenuItem Header="Background jobs" IsEnabled="False" />
+        <MenuItem Header="Screen list" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Edit extension file" IsEnabled="False" />
+        <MenuItem Header="Edit menu file" IsEnabled="False" />
+        <MenuItem Header="Edit highlighting group file" IsEnabled="False" />
+      </MenuItem>
+      <MenuItem Header="_Options">
+        <MenuItem Header="Configuration..." IsEnabled="False" />
+        <MenuItem Header="Layout..." IsEnabled="False" />
+        <MenuItem Header="Panel options..." IsEnabled="False" />
+        <MenuItem Header="Confirmation..." IsEnabled="False" />
+        <MenuItem Header="Appearance..." IsEnabled="False" />
+        <MenuItem Header="Learn keys..." IsEnabled="False" />
+        <MenuItem Header="Virtual FS..." IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Save setup" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="About..." IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="_Theme">
+          <MenuItem Header="System" IsChecked="{Binding IsSystemThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.System}" />
+          <MenuItem Header="Light" IsChecked="{Binding IsLightThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Light}" />
+          <MenuItem Header="Dark" IsChecked="{Binding IsDarkThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Dark}" />
+        </MenuItem>
+      </MenuItem>
+      <MenuItem Header="_Right">
+        <MenuItem Header="File listing" IsEnabled="False" />
+        <MenuItem Header="Quick view" IsEnabled="False" />
+        <MenuItem Header="Info" IsEnabled="False" />
+        <MenuItem Header="Tree" IsEnabled="False" />
+        <MenuItem Header="Panelize" IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Listing format..." IsEnabled="False" />
+        <MenuItem Header="Sort order..." IsEnabled="False" />
+        <MenuItem Header="Filter..." IsEnabled="False" />
+        <MenuItem Header="Encoding..." IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="FTP link..." IsEnabled="False" />
+        <MenuItem Header="Shell link..." IsEnabled="False" />
+        <MenuItem Header="SFTP link..." IsEnabled="False" />
+        <Separator />
+        <MenuItem Header="Rescan" Command="{Binding RescanActivePanelCommand}" />
       </MenuItem>
     </Menu>
 
