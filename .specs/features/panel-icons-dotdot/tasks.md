@@ -141,15 +141,15 @@ T7 -> T8
 **Requirement**: PII-12, PII-13
 
 **Done when**:
-- [ ] Flags e `SizeText` expostos na row
-- [ ] F5/F6/F8 com cursor em `..` e sem marca não abrem diálogo
-- [ ] Operação com marcação nunca lista `..` como source
-- [ ] Testes App passam
+- [x] Flags e `SizeText` expostos na row
+- [x] F5/F6/F8 com cursor em `..` e sem marca não abrem diálogo
+- [x] Operação com marcação nunca lista `..` como source
+- [x] Testes App passam (97)
 
 **Tests**: unit (sources)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

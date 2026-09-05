@@ -129,6 +129,42 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
+    public void RequestCopy_CursorOnDotDot_DoesNotRaiseCopyMoveRequested()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
+        vm.ActivePanel.MoveCursorTo(0);
+        var raised = false;
+        vm.CopyMoveRequested += (_, _) => raised = true;
+
+        vm.RequestCopy();
+
+        Assert.False(raised);
+    }
+
+    [Fact]
+    public void RequestCopy_OneMarkedEntry_ExcludesDotDotFromSources()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
+        vm.ActivePanel.ToggleMark(1);
+        CopyMoveDialogViewModel? requested = null;
+        vm.CopyMoveRequested += (_, dialog) => requested = dialog;
+
+        vm.RequestCopy();
+
+        Assert.NotNull(requested);
+        Assert.Single(requested!.Sources);
+        Assert.Equal("/left/a.txt", requested.Sources[0].FullPath);
+    }
+
+    [Fact]
     public void RequestMove_NoMarkedEntriesAndNoCursorEntry_DoesNotRaiseCopyMoveRequested()
     {
         var fs = new FakeFileSystemService();
