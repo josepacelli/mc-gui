@@ -203,14 +203,14 @@ T7 -> T8
 **Requirement**: edge cases (raiz, vazio, Up), PII-12, PII-13
 
 **Done when**:
-- [ ] Testes de raiz, vazio, Up e navegação à raiz passam
-- [ ] Teste de marcação mista com `..` presente passa (sources = reais)
-- [ ] Nenhuma regressão nos testes existentes
+- [x] Testes de raiz, vazio, Up e navegação à raiz passam
+- [x] Teste de marcação mista com `..` presente passa (sources = reais)
+- [x] Nenhuma regressão nos testes existentes (100 App verdes)
 
 **Tests**: unit (edge + sources)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

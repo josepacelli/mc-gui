@@ -29,6 +29,21 @@ public class PanelViewModelTests
     }
 
     [Fact]
+    public void Constructor_OnFilesystemRoot_DoesNotShowDotDot()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/", File("root.txt", "/"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/", "/") };
+
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/");
+
+        Assert.Equal("/", vm.CurrentDirectory);
+        Assert.Single(vm.Entries);
+        Assert.Equal("root.txt", vm.Entries[0].Name);
+        Assert.Equal(0, vm.CursorIndex);
+    }
+
+    [Fact]
     public void Constructor_PersistedDirectoryMissing_FallsBackToHomeDirectory()
     {
         var fs = new FakeFileSystemService();
@@ -140,9 +155,42 @@ public class PanelViewModelTests
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
         var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
 
+        vm.MoveCursorTo(1);
         vm.MoveCursorUp();
 
         Assert.Equal(0, vm.CursorIndex);
+    }
+
+    [Fact]
+    public void MoveCursorUp_OnDotDot_DoesNotGoAboveDotDot()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        vm.MoveCursorTo(0);
+
+        vm.MoveCursorUp();
+
+        Assert.Equal(0, vm.CursorIndex);
+        Assert.Equal("..", vm.Entries[vm.CursorIndex].Name);
+    }
+
+    [Fact]
+    public async Task ActivateCursorEntryAsync_OnEmptyNonRootDirectory_ShowsDotDotAndNavigatesUp()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", Dir("empty", "/root"));
+        fs.AddDirectory("/root/empty");
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root/empty", "/root/empty") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        Assert.Single(vm.Entries);
+        Assert.Equal("..", vm.Entries[0].Name);
+
+        await vm.ActivateCursorEntryAsync();
+
+        Assert.Equal("/root", vm.CurrentDirectory);
     }
 
     [Fact]
