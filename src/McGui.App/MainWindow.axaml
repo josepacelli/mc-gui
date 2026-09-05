@@ -8,13 +8,21 @@
         x:Class="McGui.App.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="mc-gui">
-  <Grid RowDefinitions="*,Auto">
-    <Grid Grid.Row="0" ColumnDefinitions="*,*">
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Menu Grid.Row="0">
+      <MenuItem Header="Theme">
+        <MenuItem Header="System" IsChecked="{Binding IsSystemThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.System}" />
+        <MenuItem Header="Light" IsChecked="{Binding IsLightThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Light}" />
+        <MenuItem Header="Dark" IsChecked="{Binding IsDarkThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Dark}" />
+      </MenuItem>
+    </Menu>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,*">
       <views:PanelView Grid.Column="0" DataContext="{Binding LeftPanel}" />
       <views:PanelView Grid.Column="1" DataContext="{Binding RightPanel}" />
     </Grid>
 
-    <UniformGrid Grid.Row="1" Columns="10" Rows="1">
+    <UniformGrid Grid.Row="2" Columns="10" Rows="1">
       <Button Content="F1 Help" IsEnabled="True" />
       <Button Content="F2 Menu" IsEnabled="True" />
       <Button Content="F3 View" IsEnabled="False" />

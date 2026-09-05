@@ -180,14 +180,15 @@ T7 -> T8
 **Requirement**: THM-11, THM-12, THM-13, THM-14, THM-15, THM-16, THM-17, THM-18
 
 **Done when**:
-- [ ] `MenuBar` sempre visível no topo com menu `Theme` de 3 itens
-- [ ] Itens ligados a `SetThemeCommand` + check-state; nenhum cor literal adicionada
-- [ ] `dotnet build McGui.sln -warnaserror` passa
+- [x] `Menu` sempre visível no topo com menu `Theme` de 3 itens
+- [x] Itens ligados a `SetThemeCommand` + check-state; nenhum cor literal adicionada
+- [x] `dotnet build McGui.sln -warnaserror` passa
 
 **Tests**: none (XAML; lógica coberta em T4, visual em UAT)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
+> SPEC_DEVIATION: controle `MenuBar` não existe no Avalonia 12.1.2 (removido/renomeado). Reason: usado `Menu` (controle top-level horizontal da v12, confirmado na API `Avalonia.Controls.Menu`). Comportamento visual idêntico: barra de menu no topo com `MenuItem Header="Theme"` e sub-itens System/Light/Dark.
 
 ---
 
