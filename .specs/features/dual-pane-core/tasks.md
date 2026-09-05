@@ -186,11 +186,13 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] Todos os tipos listados no design existem com as propriedades especificadas
-- [ ] `dotnet build McGui.sln` compila sem erros
+- [x] Todos os tipos listados no design existem com as propriedades especificadas
+- [x] `dotnet build McGui.sln` compila sem erros
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
 
 ---
 
