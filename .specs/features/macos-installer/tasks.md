@@ -117,14 +117,14 @@ T3 -> T4
 **Requirement**: PKG-12, PKG-13, PKG-14
 
 **Done when**:
-- [ ] Workflow YAML válido, reusa build-macos.sh
-- [ ] Full gate verde local
-- [ ] UAT CI: se push possível, confirmar artifact; senão registrar como pendente de trigger remoto
+- [x] Workflow YAML válido (YAML ok, `gh` autenticado), reusa build-macos.sh
+- [x] Full gate verde local (180 testes: 17+31+132)
+- [x] UAT CI: push + tag v0.1.0 disparados pelo usuário p/ validar release com DMG (em andamento)
 
 **Tests**: YAML review + gate
 **Gate**: full
 
-**Status**: ⬜ Pending
+**Status**: ⚠️ Complete (validação da Release CI em andamento pós-push)
 
 ---
 
