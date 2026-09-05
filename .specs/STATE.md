@@ -12,4 +12,11 @@
 
 ## Handoff
 
-(nenhuma sessão pausada ainda)
+- **Feature**: `dual-pane-core` (`.specs/features/dual-pane-core/`) — **DONE**.
+- **Phase / Task**: Execute T1-T21 commitadas + simplify pass (8 fixes aplicados, commits `11a4a47`..`741cc7e`, decisões em `tasks.md` seção "Simplify pass") + Verifier independente **PASS** (`validation.md`, commits `83fdd31`), gate `validate_state.py` 0 erros.
+- **Completed**: 108 testes (13 Core + 31 Infra + 64 App). Working tree limpo (exceto este `STATE.md`), branch `master`.
+- **Gaps aceitos (não bloqueiam, registrados em `validation.md` "Ranked gaps")**: (1) semântica de symlink em Copy/Move/Delete sem teste automatizado; (4) ramo `.Trashes/<uid>` cross-volume sem verificação (limitação de ambiente T9, precisa 2º volume físico ou seam injetável no `VolumeLocator`); (5) resumo de entradas puladas nunca exibido na UI (DPC-31 "report"); (6) matriz de conflito Move (Skip/Rename/Abort) sem teoria individual; (7) spec-precision gaps informacionais. Fixes 2 (bytes de move) e 3 (delete off-thread) já fechados com testes de regressão (`1e92d9d`, `3d92359`).
+- **Next step**: feature nova de theming Avalonia (pedida pelo usuário antes da pausa, NUNCA iniciada) — usar skill `ui-ux-pro-max` (guidance de design, não gera Avalonia nativo) + doc oficial `https://docs.avaloniaui.net/docs/styling/styles` pra criar `Styles`/`ResourceDictionary` do Avalonia cobrindo tema claro/escuro consistente em Mac/Windows/Linux. Passar de novo pelo fluxo `tlc-spec-driven` (Specify → Execute).
+- **Blockers**: none
+- **Uncommitted files**: este `STATE.md` (handoff atual).
+- **Branch**: master
