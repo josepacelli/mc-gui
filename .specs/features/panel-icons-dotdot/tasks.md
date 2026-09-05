@@ -80,14 +80,14 @@ T7 -> T8
 **Requirement**: PII-10, PII-11, PII-13
 
 **Done when**:
-- [ ] Toggle sobre `..` deixa `MarkedPaths` sem o path do `..` e `CursorIndex` inalterado
-- [ ] Invert/pattern/unmark não marcam nem desmarcam `..`
-- [ ] Testes Core passam: `dotnet test tests/McGui.Core.Tests/McGui.Core.Tests.csproj`
+- [x] Toggle sobre `..` deixa `MarkedPaths` sem o path do `..` e `CursorIndex` inalterado
+- [x] Invert/pattern/unmark não marcam nem desmarcam `..`
+- [x] Testes Core passam: `dotnet test tests/McGui.Core.Tests/McGui.Core.Tests.csproj` (17)
 
 **Tests**: unit (guarda `..`)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

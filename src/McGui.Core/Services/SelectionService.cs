@@ -5,6 +5,8 @@ namespace McGui.Core.Services;
 
 public static class SelectionService
 {
+    private const string DotDot = "..";
+
     public static PanelState Toggle(PanelState state, int index)
     {
         if (index < 0 || index >= state.Entries.Count)
@@ -12,7 +14,13 @@ public static class SelectionService
             return state;
         }
 
-        var path = state.Entries[index].FullPath;
+        var entry = state.Entries[index];
+        if (entry.Name == DotDot)
+        {
+            return state;
+        }
+
+        var path = entry.FullPath;
         if (!state.MarkedPaths.Remove(path))
         {
             state.MarkedPaths.Add(path);
@@ -27,7 +35,7 @@ public static class SelectionService
         var regex = GlobToRegex(pattern);
         foreach (var entry in state.Entries)
         {
-            if (regex.IsMatch(entry.Name))
+            if (entry.Name != DotDot && regex.IsMatch(entry.Name))
             {
                 state.MarkedPaths.Add(entry.FullPath);
             }
@@ -41,7 +49,7 @@ public static class SelectionService
         var regex = GlobToRegex(pattern);
         foreach (var entry in state.Entries)
         {
-            if (regex.IsMatch(entry.Name))
+            if (entry.Name != DotDot && regex.IsMatch(entry.Name))
             {
                 state.MarkedPaths.Remove(entry.FullPath);
             }
@@ -54,6 +62,11 @@ public static class SelectionService
     {
         foreach (var entry in state.Entries)
         {
+            if (entry.Name == DotDot)
+            {
+                continue;
+            }
+
             if (!state.MarkedPaths.Remove(entry.FullPath))
             {
                 state.MarkedPaths.Add(entry.FullPath);

@@ -8,6 +8,9 @@ public class SelectionServiceTests
     private static FileEntry Entry(string name, long size = 0) =>
         new(name, $"/panel/{name}", IsDirectory: false, SizeBytes: size, ModifiedUtc: DateTimeOffset.UnixEpoch, IsSymlink: false, IsHidden: false);
 
+    private static FileEntry DotDotEntry(string currentDirectory) =>
+        new("..", Path.GetDirectoryName(currentDirectory) ?? currentDirectory, IsDirectory: true, SizeBytes: 0, ModifiedUtc: DateTimeOffset.UnixEpoch, IsSymlink: false, IsHidden: false);
+
     private static PanelState StateWith(params FileEntry[] entries)
     {
         return new PanelState
@@ -109,5 +112,54 @@ public class SelectionServiceTests
 
         Assert.Equal(2, marked.Count);
         Assert.Equal(350, marked.Sum(e => e.SizeBytes));
+    }
+
+    [Fact]
+    public void Toggle_OnDotDot_DoesNotMarkOrMoveCursor()
+    {
+        var dotDot = DotDotEntry("/panel/sub");
+        var state = StateWith(dotDot, Entry("a.txt"), Entry("b.txt"));
+
+        SelectionService.Toggle(state, 0);
+
+        Assert.DoesNotContain(dotDot.FullPath, state.MarkedPaths);
+        Assert.Equal(0, state.CursorIndex);
+    }
+
+    [Fact]
+    public void Invert_DoesNotMarkDotDot()
+    {
+        var dotDot = DotDotEntry("/panel/sub");
+        var state = StateWith(dotDot, Entry("a.txt"), Entry("b.txt"));
+        SelectionService.Toggle(state, 1);
+
+        SelectionService.Invert(state);
+
+        Assert.DoesNotContain("/panel/a.txt", state.MarkedPaths);
+        Assert.Contains("/panel/b.txt", state.MarkedPaths);
+        Assert.DoesNotContain(dotDot.FullPath, state.MarkedPaths);
+    }
+
+    [Fact]
+    public void MarkByPattern_Star_DoesNotMarkDotDot()
+    {
+        var dotDot = DotDotEntry("/panel/sub");
+        var state = StateWith(dotDot, Entry("a.txt"), Entry("b.txt"));
+
+        SelectionService.MarkByPattern(state, "*");
+
+        Assert.Equal(2, state.MarkedPaths.Count);
+        Assert.DoesNotContain(dotDot.FullPath, state.MarkedPaths);
+    }
+
+    [Fact]
+    public void UnmarkByPattern_DoesNotTouchDotDot()
+    {
+        var state = StateWith(DotDotEntry("/panel/sub"), Entry("a.txt"));
+        SelectionService.MarkByPattern(state, "*");
+
+        SelectionService.UnmarkByPattern(state, "*");
+
+        Assert.Empty(state.MarkedPaths);
     }
 }
