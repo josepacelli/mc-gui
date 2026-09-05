@@ -182,15 +182,15 @@ T7 -> T8
 **Requirement**: PII-01, PII-03, PII-04, PII-14, PII-15
 
 **Done when**:
-- [ ] DataTemplate exibe ícone pasta p/ `IsFolder`, arquivo p/ `IsFile`
-- [ ] `..` usa ícone de pasta (PII-03); coluna de tamanho mostra `SizeText` (vazio p/ dir)
-- [ ] Nenhuma cor literal em `PanelView.axaml`
-- [ ] `dotnet build McGui.sln -warnaserror` passa
+- [x] DataTemplate exibe ícone pasta p/ `IsFolder`, arquivo p/ `IsFile`
+- [x] `..` usa ícone de pasta (PII-03); coluna de tamanho mostra `SizeText` (vazio p/ dir)
+- [x] Nenhuma cor literal em `PanelView.axaml`
+- [x] `dotnet build McGui.sln -warnaserror` passa
 
 **Tests**: none (XAML; varredura em T8, visual em UAT)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
