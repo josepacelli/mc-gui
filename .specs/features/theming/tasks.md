@@ -161,13 +161,13 @@ T7 -> T8
 **Requirement**: THM-19, THM-20..23 (base do ciclo)
 
 **Done when**:
-- [ ] F12 presente no mapa e mapeado para `CycleTheme`; contagem de `RequiredGestures` e do dicionário iguais
-- [ ] Testes xunit passam: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] F12 presente no mapa e mapeado para `CycleTheme`; contagem de `RequiredGestures` e do dicionário iguais
+- [x] Testes xunit passam: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
 
 **Tests**: unit (mapa)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

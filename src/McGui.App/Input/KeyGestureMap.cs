@@ -25,6 +25,7 @@ public static class KeyGestureMap
         [new KeyGesture(Key.R, KeyModifiers.Control)] = GestureAction.RefreshPanel,
         [new KeyGesture(Key.H, KeyModifiers.Control)] = GestureAction.ToggleHiddenEntries,
         [new KeyGesture(Key.Back)] = GestureAction.NavigateToParent,
+        [new KeyGesture(Key.F12)] = GestureAction.CycleTheme,
     };
 
     public static readonly IReadOnlySet<GestureAction> DisabledActions = new HashSet<GestureAction>

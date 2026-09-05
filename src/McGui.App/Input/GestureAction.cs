@@ -20,4 +20,5 @@ public enum GestureAction
     RefreshPanel,
     ToggleHiddenEntries,
     NavigateToParent,
+    CycleTheme,
 }

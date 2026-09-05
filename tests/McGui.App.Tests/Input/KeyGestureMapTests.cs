@@ -17,6 +17,7 @@ public class KeyGestureMapTests
         new(Key.F8),
         new(Key.F9),
         new(Key.F10),
+        new(Key.F12),
         new(Key.Tab),
         new(Key.Insert),
         new(Key.Add),
@@ -51,5 +52,11 @@ public class KeyGestureMapTests
     {
         Assert.Equal(GestureAction.View, KeyGestureMap.Gestures[new KeyGesture(Key.F3)]);
         Assert.Equal(GestureAction.Edit, KeyGestureMap.Gestures[new KeyGesture(Key.F4)]);
+    }
+
+    [Fact]
+    public void F12_MapsToCycleTheme()
+    {
+        Assert.Equal(GestureAction.CycleTheme, KeyGestureMap.Gestures[new KeyGesture(Key.F12)]);
     }
 }
