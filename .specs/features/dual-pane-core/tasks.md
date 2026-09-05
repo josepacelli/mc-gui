@@ -703,6 +703,29 @@ T20 -> T21
 
 ---
 
+## Simplify pass (pós-Execute, `/simplify`)
+
+Qualidade (reuso/simplificação/eficiência/altitude) revisada por 4 agentes após T21. 8 dos 9 fixes decididos foram aplicados em commits atômicos; 5 itens foram pulados com motivo (4 marcados como "não aplicar" + 1 condicional). Nenhuma mudança de comportamento: 105→106 testes (1 novo no fix 8), 0 falhas.
+
+**Aplicados** (commits `11a4a47`..`741cc7e`):
+- **Fix 1** (→ T8/T9): `ResolveNonCollidingPath` (`MacFileSystemService`) e `ResolveTrashCollision` (`MacTrashService`) unificados em `NamingCollisionResolver.ResolveCollision` (`src/McGui.Infrastructure.macOS/NamingCollisionResolver.cs`). Comportamento dos dois preservado byte a byte (o pré-cheque de existência do caminho base, que só o Trash precisava por ser chamado incondicionalmente, vive dentro do helper e é no-op nos call sites do Copy/Move que já só o chamam sob colisão).
+- **Fix 2** (→ T9): a raiz do volume da home é resolvida 1x no construtor de `MacTrashService` (antes `DefaultTrashRootForPath` chamava `VolumeLocator.FindDrive(home)` por entrada do lote); resolução por-entrada permanece apenas para `entryRoot`.
+- **Fix 3** (→ T16): `CopyMoveDialogViewModel.ConfirmAsync` agora usa `ex.Message` do `InsufficientDiskSpaceException` em vez de reconstruir a string idêntica.
+- **Fix 4** (→ T15/T16/T17/T18): o padrão "assinar `IsCompleted`, fechar o diálogo, atualizar painéis" (3 call sites em `MainWindow.axaml.cs` + progresso aninhado em `CopyMoveDialog.axaml.cs`) virou `DialogCompletion.CloseOnCompleted(Window, ICompletable)` + `ShowUntilCompletedAsync` (interface nova `ICompletable` implementada pelas ViewModels de Copy/Move, Delete e Mkdir). A thread-safety de fechar no `IsCompleted` não muda: nas 3 ViewModels o `IsCompleted` é setado na UI thread (continuation de command async / command síncrono da UI).
+- **Fix 6** (→ T17): `DeleteConfirmDialogViewModel.Execute` virou `ExecuteAsync` rodando `_trashService.Delete` dentro de `Task.Run` (antes bloqueava a UI), espelhando o padrão de Copy/Move do T16; comandos `Confirm`/`ConfirmPermanent` viraram async (`Task`), testes ajustados de `Execute(null)` para `await ConfirmCommand.ExecuteAsync(null)`.
+- **Fix 7** (→ T8): `ExecuteMove` pré-computa o tamanho de subárvore por entrada de topo 1x (`BuildSubtreeSizes`) em vez de refazer `Where(...).Sum(...)` sobre o plano inteiro a cada entrada (era O(topLevel × totalExpandedEntries)); bytes por entrada inalterados.
+- **Fix 8** (→ T12/T20): lacuna de erro engolido em `NavigateToAsync` fechada — `TryLoadDirectoryAsync` compartilhado entre `NavigateToAsync` e `RefreshAsync`; navegar para diretório que falha ao listar agora também aciona o estado de erro inline (`IsDirectoryInaccessible`/`DirectoryErrorMessage`). Teste novo: `PanelViewModelTests.NavigateToAsync_InaccessibleDirectory_ShowsInlineErrorStateWithoutNavigating`.
+- **Extra (da lista "não aplicar", permitido se seguro/mecânico)** (→ T8): `BuildEntry` reusa um único `FileInfo` (`LinkTarget`/`Length`/`LastWriteTimeUtc`) em vez de instanciar dois; nenhum resultado observável muda (coberto pelo teste de symlink existente).
+
+**Pulados (motivo)**:
+- **Fix 9** — extrair resolução de conflito compartilhada entre `ExecuteCopy`/`ExecuteMove`: os 4 casos divergem na E/S (Copy sobrescreve via `File.Copy(overwrite: true)`, Move faz `DeleteExisting` + move; Copy só conflita em `File.Exists`, Move em `File.Exists || Directory.Exists`), então um helper forçaria callback-em-callback deixando as branches nos callers — aumentaria a complexidade líquida, condição de não-aplicar do próprio fix.
+- Unificar trio `ErrorMessage`/`HasError` entre `CopyMoveDialogViewModel` e `MkdirDialogViewModel`: duplicação de 3 linhas pequena demais para o risco de indireção com source generators do CommunityToolkit.Mvvm em classes parciais.
+- Unificar os dois `FakeFileSystemService` (`McGui.Core.Tests` vs `McGui.App.Tests`): já divergiram de comportamento (um devolve lista vazia em diretório ausente, o outro lança `DirectoryNotFoundException` e suporta `Delay`/`RemoveDirectory`); unificar mudaria a semântica de um dos suites.
+- Reescrever `DisplayEntries`/`NotifySelectionChanged` para não realocar a lista a cada toggle: exigiria tornar `PanelEntryRow` mutável/observável, com implicação em binding de UI fora do escopo de limpeza segura.
+- Unificar a "normalização de path" espalhada em ~7 lugares: ao ler o código, cada ocorrência tem propósito semântico diferente (comparação de igualdade vs. obter o diretório pai) — forçar abstração única seria incorreto.
+
+---
+
 ## Phase Execution Map
 
 ```
