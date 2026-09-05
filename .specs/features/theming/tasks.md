@@ -201,14 +201,14 @@ T7 -> T8
 **Requirement**: THM-13, THM-14, THM-15, THM-19, THM-20..23, edge cases (diálogo herda variante)
 
 **Done when**:
-- [ ] Mudar `CurrentTheme` aplica a variante no `Application` imediatamente
-- [ ] F12 dispara `CycleThemeCommand`
-- [ ] `dotnet build McGui.sln -warnaserror` passa; `dotnet test McGui.sln` verde
+- [x] Mudar `CurrentTheme` aplica a variante no `Application` imediatamente
+- [x] F12 dispara `CycleThemeCommand`
+- [x] `dotnet build McGui.sln -warnaserror` passa; `dotnet test McGui.sln` verde
 
 **Tests**: none (glue visual; coberto por UAT)
 **Gate**: full
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

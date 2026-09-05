@@ -1,8 +1,11 @@
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using McGui.App.Input;
 using McGui.App.ViewModels;
 using McGui.App.Views;
@@ -37,6 +40,9 @@ public partial class MainWindow : Window
             return;
         }
 
+        viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        ApplyTheme(viewModel.CurrentTheme);
+
         viewModel.ConflictPrompt = new WindowConflictPrompt(this);
         viewModel.CopyMoveRequested += async (_, dialogViewModel) =>
             await ShowUntilCompletedAsync(new CopyMoveDialog(), dialogViewModel, RefreshBothPanelsAsync);
@@ -44,6 +50,26 @@ public partial class MainWindow : Window
             await ShowUntilCompletedAsync(new DeleteConfirmDialog(), dialogViewModel, RefreshBothPanelsAsync);
         viewModel.MkdirRequested += async (_, dialogViewModel) =>
             await ShowUntilCompletedAsync(new MkdirDialog(), dialogViewModel, RefreshActivePanelAsync);
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(MainWindowViewModel.CurrentTheme) || DataContext is not MainWindowViewModel viewModel)
+        {
+            return;
+        }
+
+        ApplyTheme(viewModel.CurrentTheme);
+    }
+
+    private static void ApplyTheme(ThemePreference preference)
+    {
+        Application.Current!.RequestedThemeVariant = preference switch
+        {
+            ThemePreference.Light => ThemeVariant.Light,
+            ThemePreference.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default,
+        };
     }
 
     private async Task ShowUntilCompletedAsync<TViewModel>(
@@ -147,6 +173,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.RefreshPanel:
                 await activePanel.RefreshCommand.ExecuteAsync(null);
+                break;
+            case GestureAction.CycleTheme:
+                viewModel.CycleThemeCommand.Execute(null);
                 break;
             default:
                 return;
