@@ -5,7 +5,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 OUT_DIR="${1:-$SCRIPT_DIR/../artifacts/build}"
-SRC_PNG="$SCRIPT_DIR/icon/mc-gui-icon-1024.png"
+SRC_PNG="$SCRIPT_DIR/icon-asset/mc-gui-icon-1024.png"
 ICONSET_DIR="$OUT_DIR/mc-gui.iconset"
 ICNS="$OUT_DIR/mc-gui.icns"
 
