@@ -1,54 +1,17 @@
 using System.Runtime.Versioning;
 using McGui.Core.Models;
 using McGui.Infrastructure.macOS;
+using static McGui.Infrastructure.macOS.Tests.TempDirectoryFixture;
 
 namespace McGui.Infrastructure.macOS.Tests;
 
 [SupportedOSPlatform("macos")]
 public class MacFileSystemServiceTests : IDisposable
 {
-    private readonly DirectoryInfo _root = Directory.CreateTempSubdirectory("mcgui-fs-");
+    private readonly TempDirectoryFixture _temp = new("mcgui-fs-");
     private readonly MacFileSystemService _sut = new();
 
-    public void Dispose()
-    {
-        try
-        {
-            foreach (var dir in _root.EnumerateDirectories("*", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    File.SetUnixFileMode(dir.FullName, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-                }
-                catch (IOException)
-                {
-                }
-            }
-
-            _root.Delete(recursive: true);
-        }
-        catch (IOException)
-        {
-        }
-    }
-
-    private string NewSubdir(string name)
-    {
-        var path = Path.Combine(_root.FullName, name);
-        Directory.CreateDirectory(path);
-        return path;
-    }
-
-    private static string WriteFile(string dir, string name, string content = "content")
-    {
-        var path = Path.Combine(dir, name);
-        File.WriteAllText(path, content);
-        return path;
-    }
-
-    private static FileEntry ToEntry(string fullPath, bool isDirectory) =>
-        new(Path.GetFileName(fullPath), fullPath, isDirectory, isDirectory ? 0 : new FileInfo(fullPath).Length,
-            DateTimeOffset.UtcNow, IsSymlink: false, IsHidden: Path.GetFileName(fullPath).StartsWith('.'));
+    public void Dispose() => _temp.Dispose();
 
     private static Func<string, FileConflictResolution> AlwaysReturn(FileConflictResolution resolution) => _ => resolution;
 
@@ -60,7 +23,7 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public void ListDirectory_ReturnsFilesAndDirectoriesWithExpectedMetadata()
     {
-        var source = NewSubdir("list-src");
+        var source = _temp.NewSubdir("list-src");
         WriteFile(source, "visible.txt", "hello");
         WriteFile(source, ".hidden.txt", "secret");
         Directory.CreateDirectory(Path.Combine(source, "subdir"));
@@ -82,7 +45,7 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public void ListDirectory_SymbolicLink_IsFlaggedAsSymlink()
     {
-        var source = NewSubdir("list-symlink-src");
+        var source = _temp.NewSubdir("list-symlink-src");
         var targetFile = WriteFile(source, "target.txt", "target-content");
         var linkPath = Path.Combine(source, "link-to-target.txt");
         File.CreateSymbolicLink(linkPath, targetFile);
@@ -99,7 +62,7 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public void CreateDirectory_CreatesFolderInsideParent()
     {
-        var parent = NewSubdir("mkdir-parent");
+        var parent = _temp.NewSubdir("mkdir-parent");
 
         _sut.CreateDirectory(parent, "new-folder");
 
@@ -109,7 +72,7 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public void CreateDirectory_DuplicateName_ThrowsIOException()
     {
-        var parent = NewSubdir("mkdir-dup");
+        var parent = _temp.NewSubdir("mkdir-dup");
         Directory.CreateDirectory(Path.Combine(parent, "existing"));
 
         Assert.Throws<IOException>(() => _sut.CreateDirectory(parent, "existing"));
@@ -118,7 +81,7 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public void CreateDirectory_InvalidCharacter_ThrowsArgumentExceptionIdentifyingChar()
     {
-        var parent = NewSubdir("mkdir-invalid");
+        var parent = _temp.NewSubdir("mkdir-invalid");
 
         var ex = Assert.Throws<ArgumentException>(() => _sut.CreateDirectory(parent, "bad/name"));
 
@@ -128,10 +91,10 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task CopyAsync_DirectoryWithSubfile_CopiesRecursively()
     {
-        var source = NewSubdir("copy-src");
+        var source = _temp.NewSubdir("copy-src");
         var subDir = Directory.CreateDirectory(Path.Combine(source, "sub")).FullName;
         var filePath = WriteFile(subDir, "nested.txt", "nested-content");
-        var destination = NewSubdir("copy-dst");
+        var destination = _temp.NewSubdir("copy-dst");
 
         var sourceDirEntry = ToEntry(source, isDirectory: true);
         var sourceSubEntry = ToEntry(subDir, isDirectory: true);
@@ -150,10 +113,10 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task CopyAsync_ReportsProgressForEachEntry()
     {
-        var source = NewSubdir("copy-progress-src");
+        var source = _temp.NewSubdir("copy-progress-src");
         var file1 = WriteFile(source, "a.txt");
         var file2 = WriteFile(source, "b.txt");
-        var destination = NewSubdir("copy-progress-dst");
+        var destination = _temp.NewSubdir("copy-progress-dst");
 
         var plan = new CopyMovePlan([ToEntry(file1, false), ToEntry(file2, false)], destination, OperationMode.Copy);
         var reports = new List<OperationProgress>();
@@ -169,10 +132,10 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task CopyAsync_CancelledBeforeSecondFile_StopsWithoutRollingBackFirstFile()
     {
-        var source = NewSubdir("copy-cancel-src");
+        var source = _temp.NewSubdir("copy-cancel-src");
         var file1 = WriteFile(source, "a.txt");
         var file2 = WriteFile(source, "b.txt");
-        var destination = NewSubdir("copy-cancel-dst");
+        var destination = _temp.NewSubdir("copy-cancel-dst");
 
         var plan = new CopyMovePlan([ToEntry(file1, false), ToEntry(file2, false)], destination, OperationMode.Copy);
         using var cts = new CancellationTokenSource();
@@ -199,9 +162,9 @@ public class MacFileSystemServiceTests : IDisposable
     [InlineData(FileConflictResolution.Rename)]
     public async Task CopyAsync_NameConflict_AppliesRequestedResolution(FileConflictResolution resolution)
     {
-        var source = NewSubdir($"conflict-src-{resolution}");
+        var source = _temp.NewSubdir($"conflict-src-{resolution}");
         var filePath = WriteFile(source, "dup.txt", "new-content");
-        var destination = NewSubdir($"conflict-dst-{resolution}");
+        var destination = _temp.NewSubdir($"conflict-dst-{resolution}");
         WriteFile(destination, "dup.txt", "old-content");
 
         var plan = new CopyMovePlan([ToEntry(filePath, false)], destination, OperationMode.Copy);
@@ -228,9 +191,9 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task CopyAsync_NameConflictWithAbort_StopsOperationAndReportsFailure()
     {
-        var source = NewSubdir("abort-src");
+        var source = _temp.NewSubdir("abort-src");
         var filePath = WriteFile(source, "dup.txt", "new-content");
-        var destination = NewSubdir("abort-dst");
+        var destination = _temp.NewSubdir("abort-dst");
         WriteFile(destination, "dup.txt", "old-content");
 
         var plan = new CopyMovePlan([ToEntry(filePath, false)], destination, OperationMode.Copy);
@@ -245,9 +208,9 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task CopyAsync_InsufficientSpace_ThrowsBeforeCopyingAnyFile()
     {
-        var source = NewSubdir("space-src");
+        var source = _temp.NewSubdir("space-src");
         var filePath = WriteFile(source, "big.txt", "content");
-        var destination = NewSubdir("space-dst");
+        var destination = _temp.NewSubdir("space-dst");
         var lowSpaceService = new MacFileSystemService(_ => 1);
         var plan = new CopyMovePlan([ToEntry(filePath, false)], destination, OperationMode.Copy);
 
@@ -261,10 +224,10 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task CopyAsync_PermissionDenied_SkipsEntryAndContinuesReportingReason()
     {
-        var source = NewSubdir("perm-copy-src");
+        var source = _temp.NewSubdir("perm-copy-src");
         var file1 = WriteFile(source, "one.txt");
         var file2 = WriteFile(source, "two.txt");
-        var destination = NewSubdir("perm-copy-dst");
+        var destination = _temp.NewSubdir("perm-copy-dst");
         File.SetUnixFileMode(destination, UnixFileMode.UserRead | UnixFileMode.UserExecute);
 
         try
@@ -287,9 +250,9 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task MoveAsync_NameConflictWithOverwrite_ReplacesDestinationEntry()
     {
-        var source = NewSubdir("move-conflict-src");
+        var source = _temp.NewSubdir("move-conflict-src");
         var filePath = WriteFile(source, "dup.txt", "new-content");
-        var destination = NewSubdir("move-conflict-dst");
+        var destination = _temp.NewSubdir("move-conflict-dst");
         WriteFile(destination, "dup.txt", "old-content");
 
         var plan = new CopyMovePlan([ToEntry(filePath, false)], destination, OperationMode.Move);
@@ -304,9 +267,9 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task MoveAsync_MovesEntryToDestinationDirectory()
     {
-        var source = NewSubdir("move-src");
+        var source = _temp.NewSubdir("move-src");
         var filePath = WriteFile(source, "move-me.txt", "payload");
-        var destination = NewSubdir("move-dst");
+        var destination = _temp.NewSubdir("move-dst");
 
         var plan = new CopyMovePlan([ToEntry(filePath, false)], destination, OperationMode.Move);
 
@@ -320,7 +283,7 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task MoveAsync_SameDirectoryDifferentEntryName_RenamesFileInPlace()
     {
-        var source = NewSubdir("rename-src");
+        var source = _temp.NewSubdir("rename-src");
         var filePath = WriteFile(source, "old-name.txt", "payload");
         var renameEntry = ToEntry(filePath, false) with { Name = "new-name.txt" };
         var plan = new CopyMovePlan([renameEntry], source, OperationMode.Move);
@@ -335,10 +298,10 @@ public class MacFileSystemServiceTests : IDisposable
     [Fact]
     public async Task MoveAsync_PermissionDenied_SkipsEntryAndContinuesReportingReason()
     {
-        var source = NewSubdir("perm-move-src");
+        var source = _temp.NewSubdir("perm-move-src");
         var file1 = WriteFile(source, "one.txt");
         var file2 = WriteFile(source, "two.txt");
-        var destination = NewSubdir("perm-move-dst");
+        var destination = _temp.NewSubdir("perm-move-dst");
         File.SetUnixFileMode(destination, UnixFileMode.UserRead | UnixFileMode.UserExecute);
 
         try

@@ -1,62 +1,22 @@
 using System.Runtime.Versioning;
 using McGui.Core.Models;
 using McGui.Infrastructure.macOS;
+using static McGui.Infrastructure.macOS.Tests.TempDirectoryFixture;
 
 namespace McGui.Infrastructure.macOS.Tests;
 
 [SupportedOSPlatform("macos")]
 public class MacTrashServiceTests : IDisposable
 {
-    private readonly DirectoryInfo _root = Directory.CreateTempSubdirectory("mcgui-trash-");
+    private readonly TempDirectoryFixture _temp = new("mcgui-trash-");
 
-    public void Dispose()
-    {
-        try
-        {
-            foreach (var dir in _root.EnumerateDirectories("*", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    File.SetUnixFileMode(dir.FullName, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-                }
-                catch (IOException)
-                {
-                }
-            }
-
-            _root.Delete(recursive: true);
-        }
-        catch (IOException)
-        {
-        }
-    }
-
-    private string NewSubdir(string name)
-    {
-        var path = Path.Combine(_root.FullName, name);
-        Directory.CreateDirectory(path);
-        return path;
-    }
-
-    private static string WriteFile(string dir, string name, string content = "content")
-    {
-        var path = Path.Combine(dir, name);
-        File.WriteAllText(path, content);
-        return path;
-    }
-
-    private static FileEntry FileOf(string fullPath) =>
-        new(Path.GetFileName(fullPath), fullPath, IsDirectory: false, new FileInfo(fullPath).Length,
-            DateTimeOffset.UtcNow, IsSymlink: false, IsHidden: false);
-
-    private static FileEntry DirectoryOf(string fullPath) =>
-        new(Path.GetFileName(fullPath), fullPath, IsDirectory: true, 0, DateTimeOffset.UtcNow, IsSymlink: false, IsHidden: false);
+    public void Dispose() => _temp.Dispose();
 
     [Fact]
     public void Delete_NormalFile_MovesToHomeTrash()
     {
-        var home = NewSubdir("home");
-        var source = NewSubdir("source");
+        var home = _temp.NewSubdir("home");
+        var source = _temp.NewSubdir("source");
         var filePath = WriteFile(source, "doc.txt", "payload");
         var sut = new MacTrashService(homeDirectory: home);
 
@@ -72,10 +32,10 @@ public class MacTrashServiceTests : IDisposable
     [Fact]
     public void Delete_NameCollisionInTrash_RenamesUsingFinderConvention()
     {
-        var home = NewSubdir("home-collision");
+        var home = _temp.NewSubdir("home-collision");
         Directory.CreateDirectory(Path.Combine(home, ".Trash"));
         WriteFile(Path.Combine(home, ".Trash"), "doc.txt", "already-in-trash");
-        var source = NewSubdir("source-collision");
+        var source = _temp.NewSubdir("source-collision");
         var filePath = WriteFile(source, "doc.txt", "new-delete");
         var sut = new MacTrashService(homeDirectory: home);
 
@@ -89,8 +49,8 @@ public class MacTrashServiceTests : IDisposable
     [Fact]
     public void Delete_Directory_MovesEntireTreeToTrash()
     {
-        var home = NewSubdir("home-dir");
-        var source = NewSubdir("source-dir");
+        var home = _temp.NewSubdir("home-dir");
+        var source = _temp.NewSubdir("source-dir");
         var folder = Directory.CreateDirectory(Path.Combine(source, "folder")).FullName;
         WriteFile(folder, "inner.txt", "inner");
         var sut = new MacTrashService(homeDirectory: home);
@@ -105,8 +65,8 @@ public class MacTrashServiceTests : IDisposable
     [Fact]
     public void Delete_PermanentTrue_DeletesWithoutUsingTrash()
     {
-        var home = NewSubdir("home-permanent");
-        var source = NewSubdir("source-permanent");
+        var home = _temp.NewSubdir("home-permanent");
+        var source = _temp.NewSubdir("source-permanent");
         var filePath = WriteFile(source, "gone.txt");
         var sut = new MacTrashService(homeDirectory: home);
 
@@ -120,7 +80,7 @@ public class MacTrashServiceTests : IDisposable
     [Fact]
     public void Delete_NoTrashAvailable_FallsBackToPermanentDelete()
     {
-        var source = NewSubdir("source-no-trash");
+        var source = _temp.NewSubdir("source-no-trash");
         var filePath = WriteFile(source, "no-trash.txt");
         var sut = new MacTrashService(trashRootForPath: _ => null);
 
@@ -133,8 +93,8 @@ public class MacTrashServiceTests : IDisposable
     [Fact]
     public void Delete_TrashRootCannotBeWritten_ReportsFailureWithoutDeletingAnything()
     {
-        var readOnlyParent = NewSubdir("readonly-parent");
-        var source = NewSubdir("source-write-fail");
+        var readOnlyParent = _temp.NewSubdir("readonly-parent");
+        var source = _temp.NewSubdir("source-write-fail");
         var filePath = WriteFile(source, "protected.txt", "keep-me");
         File.SetUnixFileMode(readOnlyParent, UnixFileMode.UserRead | UnixFileMode.UserExecute);
         var unwritableTrashRoot = Path.Combine(readOnlyParent, "TrashSub");
@@ -158,9 +118,9 @@ public class MacTrashServiceTests : IDisposable
     [Fact]
     public void Delete_OneEntryFailsAnotherSucceeds_ReportsFailureAndStillProcessesTheOther()
     {
-        var readOnlyParent = NewSubdir("readonly-parent-batch");
-        var home = NewSubdir("home-batch");
-        var source = NewSubdir("source-batch");
+        var readOnlyParent = _temp.NewSubdir("readonly-parent-batch");
+        var home = _temp.NewSubdir("home-batch");
+        var source = _temp.NewSubdir("source-batch");
         var blockedFile = WriteFile(source, "blocked.txt");
         var okFile = WriteFile(source, "ok.txt");
         File.SetUnixFileMode(readOnlyParent, UnixFileMode.UserRead | UnixFileMode.UserExecute);
