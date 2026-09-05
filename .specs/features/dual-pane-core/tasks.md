@@ -354,14 +354,18 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] `Save` grava os dois caminhos em JSON no caminho esperado (parametrizável para diretório temporário nos testes)
-- [ ] `Load` restaura os caminhos salvos (DPC-07)
-- [ ] `Load` cai para o diretório home quando o arquivo não existe ou aponta para um caminho inexistente (DPC-08)
-- [ ] Gate check passa: `dotnet test tests/McGui.Infrastructure.macOS.Tests/McGui.Infrastructure.macOS.Tests.csproj`
-- [ ] Contagem de testes: 4+ testes passando
+- [x] `Save` grava os dois caminhos em JSON no caminho esperado (parametrizável para diretório temporário nos testes)
+- [x] `Load` restaura os caminhos salvos (DPC-07)
+- [x] `Load` cai para o diretório home quando o arquivo não existe ou aponta para um caminho inexistente (DPC-08)
+- [x] Gate check passa: `dotnet test tests/McGui.Infrastructure.macOS.Tests/McGui.Infrastructure.macOS.Tests.csproj`
+- [x] Contagem de testes: 4+ testes passando — 5 passaram (30 no total do projeto)
 
 **Tests**: integration
 **Gate**: full
+
+**Status**: ✅ Complete
+> Spec-precision gap: DPC-08 é aplicado por painel individualmente (cada caminho persistido é validado de forma independente), não como fallback "tudo ou nada" para o par — spec.md não deixa explícito se um painel válido deve cair para home quando o outro está inválido; tratado como comportamento mais útil e coberto por teste dedicado (`Load_PersistedPathNoLongerExists_FallsBackToHomeForThatPanelOnly`).
+> JSON corrompido/ilegível no arquivo de estado também cai para o fallback de home em ambos os painéis (mesma tratativa de "arquivo não existe" da DPC-08), já que spec.md não distingue os dois casos.
 
 ---
 
