@@ -110,7 +110,7 @@ public sealed class MacFileSystemService : IFileSystemService
                             skipped.Add((entry.FullPath, "aborted by user at conflict prompt"));
                             return new OperationResult(false, skipped);
                         case FileConflictResolution.Rename:
-                            destinationPath = ResolveNonCollidingPath(destinationPath);
+                            destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
                             File.Copy(entry.FullPath, destinationPath, overwrite: false);
                             break;
                         case FileConflictResolution.Overwrite:
@@ -183,7 +183,7 @@ public sealed class MacFileSystemService : IFileSystemService
                             skipped.Add((entry.FullPath, "aborted by user at conflict prompt"));
                             return new OperationResult(false, skipped);
                         case FileConflictResolution.Rename:
-                            destinationPath = ResolveNonCollidingPath(destinationPath);
+                            destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
                             MoveEntry(entry, destinationPath);
                             break;
                         case FileConflictResolution.Overwrite:
@@ -284,21 +284,6 @@ public sealed class MacFileSystemService : IFileSystemService
         if (available < required)
         {
             throw new InsufficientDiskSpaceException(required, available);
-        }
-    }
-
-    private static string ResolveNonCollidingPath(string path)
-    {
-        var directory = Path.GetDirectoryName(path) ?? "";
-        var stem = Path.GetFileNameWithoutExtension(path);
-        var extension = Path.GetExtension(path);
-        for (var counter = 2; ; counter++)
-        {
-            var candidate = Path.Combine(directory, $"{stem} {counter}{extension}");
-            if (!File.Exists(candidate) && !Directory.Exists(candidate))
-            {
-                return candidate;
-            }
         }
     }
 

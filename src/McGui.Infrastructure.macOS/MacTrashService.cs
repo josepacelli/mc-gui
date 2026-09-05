@@ -37,7 +37,7 @@ public sealed class MacTrashService : ITrashService
                 }
 
                 Directory.CreateDirectory(trashRoot);
-                var destination = ResolveTrashCollision(trashRoot, entry.Name);
+                var destination = NamingCollisionResolver.ResolveCollision(Path.Combine(trashRoot, entry.Name));
                 MoveIntoTrash(entry, destination);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -70,26 +70,6 @@ public sealed class MacTrashService : ITrashService
         else
         {
             File.Delete(entry.FullPath);
-        }
-    }
-
-    private static string ResolveTrashCollision(string trashRoot, string name)
-    {
-        var candidate = Path.Combine(trashRoot, name);
-        if (!File.Exists(candidate) && !Directory.Exists(candidate))
-        {
-            return candidate;
-        }
-
-        var stem = Path.GetFileNameWithoutExtension(name);
-        var extension = Path.GetExtension(name);
-        for (var counter = 2; ; counter++)
-        {
-            candidate = Path.Combine(trashRoot, $"{stem} {counter}{extension}");
-            if (!File.Exists(candidate) && !Directory.Exists(candidate))
-            {
-                return candidate;
-            }
         }
     }
 
