@@ -154,6 +154,7 @@ public sealed class MacFileSystemService : IFileSystemService
         var skipped = new List<(string Path, string Reason)>();
         var filesTotal = topLevel.Count;
         var bytesTotal = plan.Sources.Where(e => !e.IsDirectory).Sum(e => e.SizeBytes);
+        var subtreeSizeByTopLevel = BuildSubtreeSizes(plan.Sources, topLevel);
         var filesDone = 0;
         var bytesDone = 0L;
 
@@ -166,7 +167,7 @@ public sealed class MacFileSystemService : IFileSystemService
             }
 
             var destinationPath = Path.Combine(plan.DestinationDirectory, entry.Name);
-            var entrySize = SubtreeSize(plan.Sources, entry);
+            var entrySize = subtreeSizeByTopLevel.GetValueOrDefault(entry.FullPath.TrimEnd(Path.DirectorySeparatorChar));
 
             try
             {
@@ -266,15 +267,44 @@ public sealed class MacFileSystemService : IFileSystemService
         }
     }
 
-    private static long SubtreeSize(IReadOnlyList<FileEntry> allEntries, FileEntry root)
+    private static Dictionary<string, long> BuildSubtreeSizes(
+        IReadOnlyList<FileEntry> allEntries,
+        IReadOnlyList<FileEntry> topLevel)
     {
-        if (!root.IsDirectory)
+        var topLevelPaths = new HashSet<string>(
+            topLevel.Select(e => e.FullPath.TrimEnd(Path.DirectorySeparatorChar)),
+            StringComparer.Ordinal);
+
+        var sizes = new Dictionary<string, long>(StringComparer.Ordinal);
+        foreach (var entry in allEntries)
         {
-            return root.SizeBytes;
+            if (entry.IsDirectory)
+            {
+                continue;
+            }
+
+            var key = TopLevelPathFor(entry, topLevelPaths);
+            sizes[key] = sizes.GetValueOrDefault(key) + entry.SizeBytes;
         }
 
-        var prefix = root.FullPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-        return allEntries.Where(e => !e.IsDirectory && e.FullPath.StartsWith(prefix, StringComparison.Ordinal)).Sum(e => e.SizeBytes);
+        return sizes;
+    }
+
+    private static string TopLevelPathFor(FileEntry entry, HashSet<string> topLevelPaths)
+    {
+        var current = Path.GetDirectoryName(entry.FullPath);
+        while (current is not null)
+        {
+            var trimmed = current.TrimEnd(Path.DirectorySeparatorChar);
+            if (topLevelPaths.Contains(trimmed))
+            {
+                return trimmed;
+            }
+
+            current = Path.GetDirectoryName(trimmed);
+        }
+
+        return entry.FullPath.TrimEnd(Path.DirectorySeparatorChar);
     }
 
     private void EnsureSufficientSpace(CopyMovePlan plan)
