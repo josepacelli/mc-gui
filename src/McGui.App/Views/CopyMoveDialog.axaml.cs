@@ -27,13 +27,6 @@ public partial class CopyMoveDialog : Window
         }
 
         viewModel.ProgressReported += (_, progress) => Dispatcher.UIThread.Post(() => ApplyProgress(viewModel, progress));
-        viewModel.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(CopyMoveDialogViewModel.IsCompleted) && viewModel.IsCompleted)
-            {
-                Dispatcher.UIThread.Post(() => _progressWindow?.Close());
-            }
-        };
     }
 
     private void ApplyProgress(CopyMoveDialogViewModel viewModel, OperationProgress progress)
@@ -42,6 +35,7 @@ public partial class CopyMoveDialog : Window
         {
             _progressViewModel = new ProgressDialogViewModel(() => viewModel.CancelCommand.Execute(null));
             _progressWindow = new ProgressDialog { DataContext = _progressViewModel };
+            DialogCompletion.CloseOnCompleted(_progressWindow, viewModel);
             _progressWindow.Show(this);
         }
 

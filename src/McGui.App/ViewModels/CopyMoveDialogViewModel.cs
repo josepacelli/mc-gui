@@ -12,7 +12,7 @@ using McGui.Infrastructure.macOS;
 
 namespace McGui.App.ViewModels;
 
-public sealed partial class CopyMoveDialogViewModel : ObservableObject
+public sealed partial class CopyMoveDialogViewModel : ObservableObject, ICompletable
 {
     private readonly IFileSystemService _fileSystemService;
     private readonly CopyMovePlanner _planner;

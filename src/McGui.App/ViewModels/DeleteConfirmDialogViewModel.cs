@@ -7,7 +7,7 @@ using McGui.Core.Models;
 
 namespace McGui.App.ViewModels;
 
-public sealed partial class DeleteConfirmDialogViewModel : ObservableObject
+public sealed partial class DeleteConfirmDialogViewModel : ObservableObject, ICompletable
 {
     private readonly ITrashService _trashService;
 

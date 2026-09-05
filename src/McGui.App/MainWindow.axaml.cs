@@ -38,67 +38,41 @@ public partial class MainWindow : Window
         }
 
         viewModel.ConflictPrompt = new WindowConflictPrompt(this);
-        viewModel.CopyMoveRequested += async (_, dialogViewModel) => await ShowCopyMoveDialogAsync(dialogViewModel);
-        viewModel.DeleteRequested += async (_, dialogViewModel) => await ShowDeleteConfirmDialogAsync(dialogViewModel);
-        viewModel.MkdirRequested += async (_, dialogViewModel) => await ShowMkdirDialogAsync(dialogViewModel);
+        viewModel.CopyMoveRequested += async (_, dialogViewModel) =>
+            await ShowUntilCompletedAsync(new CopyMoveDialog(), dialogViewModel, RefreshBothPanelsAsync);
+        viewModel.DeleteRequested += async (_, dialogViewModel) =>
+            await ShowUntilCompletedAsync(new DeleteConfirmDialog(), dialogViewModel, RefreshBothPanelsAsync);
+        viewModel.MkdirRequested += async (_, dialogViewModel) =>
+            await ShowUntilCompletedAsync(new MkdirDialog(), dialogViewModel, RefreshActivePanelAsync);
     }
 
-    private async Task ShowMkdirDialogAsync(MkdirDialogViewModel dialogViewModel)
+    private async Task ShowUntilCompletedAsync<TViewModel>(
+        Window dialog,
+        TViewModel dialogViewModel,
+        Func<Task> refreshAfter)
+        where TViewModel : class, ICompletable
     {
-        var dialog = new MkdirDialog { DataContext = dialogViewModel };
-        dialogViewModel.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(MkdirDialogViewModel.IsCompleted) && dialogViewModel.IsCompleted)
-            {
-                dialog.Close();
-            }
-        };
+        dialog.DataContext = dialogViewModel;
+        using var _ = DialogCompletion.CloseOnCompleted(dialog, dialogViewModel);
 
         await dialog.ShowDialog(this);
+        await refreshAfter();
+    }
 
+    private async Task RefreshBothPanelsAsync()
+    {
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            await viewModel.LeftPanel.NavigateToAsync(viewModel.LeftPanel.CurrentDirectory);
+            await viewModel.RightPanel.NavigateToAsync(viewModel.RightPanel.CurrentDirectory);
+        }
+    }
+
+    private async Task RefreshActivePanelAsync()
+    {
         if (DataContext is MainWindowViewModel viewModel)
         {
             await viewModel.ActivePanel.NavigateToAsync(viewModel.ActivePanel.CurrentDirectory);
-        }
-    }
-
-    private async Task ShowDeleteConfirmDialogAsync(DeleteConfirmDialogViewModel dialogViewModel)
-    {
-        var dialog = new DeleteConfirmDialog { DataContext = dialogViewModel };
-        dialogViewModel.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(DeleteConfirmDialogViewModel.IsCompleted) && dialogViewModel.IsCompleted)
-            {
-                dialog.Close();
-            }
-        };
-
-        await dialog.ShowDialog(this);
-
-        if (DataContext is MainWindowViewModel viewModel)
-        {
-            await viewModel.LeftPanel.NavigateToAsync(viewModel.LeftPanel.CurrentDirectory);
-            await viewModel.RightPanel.NavigateToAsync(viewModel.RightPanel.CurrentDirectory);
-        }
-    }
-
-    private async Task ShowCopyMoveDialogAsync(CopyMoveDialogViewModel dialogViewModel)
-    {
-        var dialog = new CopyMoveDialog { DataContext = dialogViewModel };
-        dialogViewModel.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(CopyMoveDialogViewModel.IsCompleted) && dialogViewModel.IsCompleted)
-            {
-                dialog.Close();
-            }
-        };
-
-        await dialog.ShowDialog(this);
-
-        if (DataContext is MainWindowViewModel viewModel)
-        {
-            await viewModel.LeftPanel.NavigateToAsync(viewModel.LeftPanel.CurrentDirectory);
-            await viewModel.RightPanel.NavigateToAsync(viewModel.RightPanel.CurrentDirectory);
         }
     }
 

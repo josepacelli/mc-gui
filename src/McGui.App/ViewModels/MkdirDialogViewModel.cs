@@ -6,7 +6,7 @@ using McGui.Core.Interfaces;
 
 namespace McGui.App.ViewModels;
 
-public sealed partial class MkdirDialogViewModel : ObservableObject
+public sealed partial class MkdirDialogViewModel : ObservableObject, ICompletable
 {
     private readonly IFileSystemService _fileSystemService;
     private readonly string _parentDirectory;
