@@ -13,7 +13,7 @@
     <TextBlock Text="{Binding Count, StringFormat='Delete {0} entries?'}" FontWeight="Bold" />
     <TextBlock Text="{Binding TotalSizeBytes, StringFormat='Total size: {0} bytes'}" />
     <TextBlock Text="Hold Shift while confirming to delete permanently, bypassing the Trash. This cannot be undone."
-               Foreground="OrangeRed" TextWrapping="Wrap" />
+               Foreground="{DynamicResource TextWarningBrush}" TextWrapping="Wrap" />
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
       <Button Content="Cancel" Click="OnCancelClick" />
       <Button Content="Delete permanently" Command="{Binding ConfirmPermanentCommand}" />

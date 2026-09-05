@@ -120,14 +120,14 @@ T7 -> T8
 **Requirement**: THM-03, THM-04, THM-05
 
 **Done when**:
-- [ ] `CopyMoveDialog`/`MkdirDialog` usam `TextErrorBrush`; `DeleteConfirmDialog` usa `TextWarningBrush`
-- [ ] Nenhum `.axaml` de diálogo em `Views/` contém cor literal em propriedade visual
-- [ ] `dotnet build McGui.sln -warnaserror` passa
+- [x] `CopyMoveDialog`/`MkdirDialog` usam `TextErrorBrush`; `DeleteConfirmDialog` usa `TextWarningBrush`
+- [x] Nenhum `.axaml` de diálogo em `Views/` contém cor literal em propriedade visual
+- [x] `dotnet build McGui.sln -warnaserror` passa
 
 **Tests**: none (varredura em T8 cobre)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

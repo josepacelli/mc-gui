@@ -17,7 +17,7 @@
       <TextBox Text="{Binding NewName}" Width="260" />
     </StackPanel>
 
-    <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource TextErrorBrush}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
 
     <StackPanel Spacing="4" IsVisible="{Binding HasProgress}">
       <TextBlock Text="{Binding ProgressFileName, StringFormat='Copying: {0}'}" />
