@@ -188,4 +188,107 @@ public class MainWindowViewModelTests
         Assert.NotNull(requested);
         Assert.Equal("/left", requested!.ParentDirectory);
     }
+
+    [Fact]
+    public void Constructor_CurrentThemeDefaultsToSystem()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+
+        Assert.Equal(ThemePreference.System, vm.CurrentTheme);
+        Assert.True(vm.IsSystemThemeChecked);
+        Assert.False(vm.IsLightThemeChecked);
+        Assert.False(vm.IsDarkThemeChecked);
+    }
+
+    [Fact]
+    public void SetTheme_ForEachPreference_UpdatesCurrentThemeAndCheckState()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+
+        vm.SetTheme(ThemePreference.Light);
+
+        Assert.Equal(ThemePreference.Light, vm.CurrentTheme);
+        Assert.True(vm.IsLightThemeChecked);
+        Assert.False(vm.IsSystemThemeChecked);
+        Assert.False(vm.IsDarkThemeChecked);
+
+        vm.SetTheme(ThemePreference.Dark);
+
+        Assert.Equal(ThemePreference.Dark, vm.CurrentTheme);
+        Assert.True(vm.IsDarkThemeChecked);
+        Assert.False(vm.IsLightThemeChecked);
+
+        vm.SetTheme(ThemePreference.System);
+
+        Assert.Equal(ThemePreference.System, vm.CurrentTheme);
+        Assert.True(vm.IsSystemThemeChecked);
+        Assert.False(vm.IsDarkThemeChecked);
+    }
+
+    [Fact]
+    public void CycleTheme_FromSystem_MovesToLight()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+
+        vm.CycleTheme();
+
+        Assert.Equal(ThemePreference.Light, vm.CurrentTheme);
+    }
+
+    [Fact]
+    public void CycleTheme_FromLight_MovesToDark()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+        vm.SetTheme(ThemePreference.Light);
+
+        vm.CycleTheme();
+
+        Assert.Equal(ThemePreference.Dark, vm.CurrentTheme);
+    }
+
+    [Fact]
+    public void CycleTheme_FromDark_ReturnsToSystem()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+        vm.SetTheme(ThemePreference.Dark);
+
+        vm.CycleTheme();
+
+        Assert.Equal(ThemePreference.System, vm.CurrentTheme);
+        Assert.True(vm.IsSystemThemeChecked);
+    }
+
+    [Fact]
+    public void CycleTheme_ThreeTimes_ReturnsToSystem()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+
+        vm.CycleTheme();
+        vm.CycleTheme();
+        vm.CycleTheme();
+
+        Assert.Equal(ThemePreference.System, vm.CurrentTheme);
+    }
+
+    [Fact]
+    public void SetTheme_RaisesPropertyChangedForCurrentThemeAndCheckStates()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        vm.SetTheme(ThemePreference.Dark);
+
+        Assert.Contains(nameof(vm.CurrentTheme), changed);
+        Assert.Contains(nameof(vm.IsDarkThemeChecked), changed);
+        Assert.Contains(nameof(vm.IsLightThemeChecked), changed);
+        Assert.Contains(nameof(vm.IsSystemThemeChecked), changed);
+    }
 }

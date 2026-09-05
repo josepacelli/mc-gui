@@ -20,6 +20,12 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private PanelViewModel activePanel;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSystemThemeChecked))]
+    [NotifyPropertyChangedFor(nameof(IsLightThemeChecked))]
+    [NotifyPropertyChangedFor(nameof(IsDarkThemeChecked))]
+    private ThemePreference currentTheme = ThemePreference.System;
+
     public MainWindowViewModel(IFileSystemService fileSystemService, ITrashService trashService, IPathHistoryStore pathHistoryStore)
     {
         _fileSystemService = fileSystemService;
@@ -43,6 +49,24 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public event EventHandler<DeleteConfirmDialogViewModel>? DeleteRequested;
 
     public event EventHandler<MkdirDialogViewModel>? MkdirRequested;
+
+    public bool IsSystemThemeChecked => CurrentTheme == ThemePreference.System;
+
+    public bool IsLightThemeChecked => CurrentTheme == ThemePreference.Light;
+
+    public bool IsDarkThemeChecked => CurrentTheme == ThemePreference.Dark;
+
+    [RelayCommand]
+    public void SetTheme(ThemePreference preference) => CurrentTheme = preference;
+
+    [RelayCommand]
+    public void CycleTheme() =>
+        CurrentTheme = CurrentTheme switch
+        {
+            ThemePreference.System => ThemePreference.Light,
+            ThemePreference.Light => ThemePreference.Dark,
+            _ => ThemePreference.System,
+        };
 
     [RelayCommand]
     public void SwitchActivePanel()

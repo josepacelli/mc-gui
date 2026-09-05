@@ -140,15 +140,15 @@ T7 -> T8
 **Requirement**: THM-11..18 (estado/check), THM-19..23 (lógica de ciclo)
 
 **Done when**:
-- [ ] `CycleTheme()` produz a sequência System→Light→Dark→System→… a partir de qualquer estado
-- [ ] `SetTheme(x)` define `CurrentTheme == x` e atualiza as três propriedades de check
-- [ ] Testes xunit passam: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
-- [ ] Nenhuma referência a `Application.Current`/Avalonia runtime na VM (preserva testabilidade)
+- [x] `CycleTheme()` produz a sequência System→Light→Dark→System→… a partir de qualquer estado
+- [x] `SetTheme(x)` define `CurrentTheme == x` e atualiza as três propriedades de check
+- [x] Testes xunit passam: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] Nenhuma referência a `Application.Current`/Avalonia runtime na VM (preserva testabilidade)
 
 **Tests**: unit (ciclo, set, check-state)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
