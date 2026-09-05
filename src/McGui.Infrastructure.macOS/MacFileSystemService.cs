@@ -320,7 +320,8 @@ public sealed class MacFileSystemService : IFileSystemService
     private static FileEntry BuildEntry(string fullPath)
     {
         var name = Path.GetFileName(fullPath);
-        var isSymlink = new FileInfo(fullPath).LinkTarget is not null;
+        var fileInfo = new FileInfo(fullPath);
+        var isSymlink = fileInfo.LinkTarget is not null;
         var isDirectory = Directory.Exists(fullPath);
         long sizeBytes = 0;
         var modifiedUtc = DateTime.UnixEpoch;
@@ -329,14 +330,10 @@ public sealed class MacFileSystemService : IFileSystemService
         {
             modifiedUtc = Directory.GetLastWriteTimeUtc(fullPath);
         }
-        else
+        else if (fileInfo.Exists)
         {
-            var fileInfo = new FileInfo(fullPath);
-            if (fileInfo.Exists)
-            {
-                sizeBytes = fileInfo.Length;
-                modifiedUtc = fileInfo.LastWriteTimeUtc;
-            }
+            sizeBytes = fileInfo.Length;
+            modifiedUtc = fileInfo.LastWriteTimeUtc;
         }
 
         var isHidden = name.StartsWith('.');
