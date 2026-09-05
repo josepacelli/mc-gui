@@ -12,12 +12,12 @@
 
 ## Handoff
 
-- **Feature**: `panel-icons-dotdot` (`.specs/features/panel-icons-dotdot/`) — **DONE**.
-- **Execute**: T1-T7 commitadas (`f863ee7`..`da718c6`), T8 full gate + UAT (`7880d66`, gap ícone `6575009`), Verifier independente FAIL→Fix 1 (M6/PII-15) → re-verify **PASS** (`ee3613b`; 17/17 ACs, sensor 6/6, PII-01..17 Verified). `validate_state.py` 0 erros.
-- **Completed**: 151 testes (17 Core + 31 Infra + 103 App). Working tree limpo, branch `main`.
-- **Decisões**: `..` = FileEntry virtual (`Name=".."`) injetado no topo de `PanelState.Entries` pelo PanelViewModel (exceto raiz `/`); `SelectionService` guarda por nome `..` (Toggle/invert/pattern/unmark); `GetOperationSources` exclui `..`; ativar `..`/Backspace sobe pousando cursor na pasta de origem; descer pousa no 1º real; `FileSizeFormatter` base 1024 (B/kB/MB/GB/TB, ≤1 casa, dir/`..` vazio); ícones `PathIcon` pasta(`FolderIconBrush`)/arquivo(`FileIconBrush`) novos tokens na paleta.
-- **UAT notes**: app GUI às vezes falha com `Avalonia.Native -6661` (RenderTimer) ao abrir remoto via `dotnet run` — requer sessão gráfica; alternar matar processos (`pkill -9 -f McGui`) e relançar.
-- **Next step**: **Feature B — menubar F9 replicando o MC original** (`../mc/src/filemanager/filemanager.c`: menus Left/File/Command/Options/Right; ~50 itens, ausentes desabilitados, mnemonics + teclado). Especificar primeiro via `tlc-spec-driven`.
+- **Features**: `panel-icons-dotdot` (**DONE**, Verifier PASS 17/17) e `mc-menubar` (**DONE**, Verifier PASS 12/12) — detalhes abaixo.
+- **panel-icons-dotdot** (`.specs/features/panel-icons-dotdot/`): T1-T7 + fix gap ícone + Verifier PASS (`ee3613b`). `..` virtual no topo (exceto raiz), não-marcável, navega origem; ícones `PathIcon` pasta/arquivo; tamanhos B/kB/MB/GB/TB base 1024.
+- **mc-menubar** (`.specs/features/mc-menubar/`): T1-T4 (`b89f24f`..`b3002f5`) + Verifier FAIL→Fix G1/G2 (testes estruturais) → re-verify PASS (`68d0315`). Menubar Left/File/Command/Options/Right replicando `../mc/src/filemanager/filemanager.c`; Theme movido p/ Options; F9 abre 1º menu; itens inexistentes desabilitados; novos commands de VM: `RescanActivePanel`, `SelectAll`, `UnselectAll`, `InvertSelection`.
+- **Completed**: 180 testes (17 Core + 31 Infra + 132 App). Working tree limpo, branch `main`.
+- **UAT notes**: app GUI às vezes falha com `Avalonia.Native -6661` (RenderTimer) ao abrir remoto via `dotnet run` — requer sessão gráfica; matar processos (`pkill -9 -f McGui`) e relançar. Usuário confirmou visualmente: feature A painéis ok, feature B menubar ok.
+- **Next step**: aguardando próxima feature do usuário. Backlog MC não-implementado (desabilitado na menubar): viewer F3, editor F4, chmod/chown, links, VFS/FTP, hotlist, find-file, tree, panelize, usermenu F2, quick cd. Fluxo: `tlc-spec-driven`.
 - **Blockers**: none
 - **Uncommitted files**: este `STATE.md` (handoff atual).
-- **Branch**: main (origin/main em `568d20e`; commits locais desde então NÃO pushados — requer go-ahead).
+- **Branch**: main (origin/main em `568d20e`; commits locais desde `9a97be4` NÃO pushados — requer go-ahead explícito).
