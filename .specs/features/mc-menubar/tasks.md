@@ -55,15 +55,15 @@ T3 -> T4
 **Requirement**: MB-01, MB-02, MB-03, MB-05, MB-06, MB-08
 
 **Done when**:
-- [ ] `McMenuDefinitions` expõe 5 menus (Left/File/Command/Options/Right), Right clonando Left
-- [ ] Itens/texto/ordem/separadores das 4 funções do original presentes (lista canônica embutida no teste)
-- [ ] Habilitação reflete ações existentes; desabilitados cobrem o conjunto do spec
-- [ ] Testes passam: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] `McMenuDefinitions` expõe 5 menus (Left/File/Command/Options/Right), Right clonando Left
+- [x] Itens/texto/ordem/separadores das 4 funções do original presentes (lista canônica embutida no teste)
+- [x] Habilitação reflete ações existentes; desabilitados cobrem o conjunto do spec
+- [x] Testes passam: 25 (McMenuDefinitionsTests)
 
 **Tests**: unit (estrutura/habilitação)
 **Gate**: quick
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
