@@ -55,15 +55,15 @@ T3 -> T4
 **Requirement**: PKG-10, PKG-11
 
 **Done when**:
-- [ ] `Info.plist` template presente com keys de D3 (id `mcgui.jpmo.dev.br`, name mc-gui, exec mc-gui, versão placeholder, APPL, NSHighResolutionCapable, icns)
-- [ ] `make-icon.sh` gera PNG 1024 + `.icns` não-vazio; `iconutil` sem erro
-- [ ] `artifacts/` gitignored
-- [ ] Regressão build ok
+- [x] `Info.plist` template presente com keys de D3 (id `mcgui.jpmo.dev.br`, name mc-gui, exec mc-gui, versão placeholder, APPL, NSHighResolutionCapable, icns)
+- [x] `make-icon.sh` gera PNG 1024 + `.icns` não-vazio; `iconutil` sem erro (108KB icns validado)
+- [x] `artifacts/` gitignored (+ *.dmg, *.app/)
+- [x] Regressão build ok
 
 **Tests**: auto-checks de script (iconutil/sips)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
