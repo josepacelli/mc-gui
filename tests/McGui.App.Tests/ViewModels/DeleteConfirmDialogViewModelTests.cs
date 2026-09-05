@@ -1,5 +1,6 @@
 using System.Runtime.Versioning;
 using McGui.App.ViewModels;
+using McGui.Core.Interfaces;
 using McGui.Core.Models;
 using McGui.Infrastructure.macOS;
 
@@ -18,6 +19,15 @@ public class DeleteConfirmDialogViewModelTests : IDisposable
         }
         catch (IOException)
         {
+        }
+    }
+
+    private sealed class BlockingTrashService(ManualResetEventSlim gate) : ITrashService
+    {
+        public OperationResult Delete(IReadOnlyList<FileEntry> entries, bool permanent)
+        {
+            gate.Wait();
+            return new OperationResult(true, []);
         }
     }
 
@@ -86,5 +96,24 @@ public class DeleteConfirmDialogViewModelTests : IDisposable
         Assert.True(vm.Permanent);
         Assert.False(File.Exists(filePath));
         Assert.Empty(Directory.EnumerateFileSystemEntries(trashDir));
+    }
+
+    [Fact]
+    public async Task Confirm_DoesNotCompleteUntilBackgroundDeleteReturns()
+    {
+        var source = NewSubdir("async-src");
+        var filePath = WriteFile(source, "doomed.txt");
+        using var gate = new ManualResetEventSlim();
+        var vm = new DeleteConfirmDialogViewModel(new BlockingTrashService(gate), [ToEntry(filePath)]);
+
+        var deleteTask = vm.ConfirmCommand.ExecuteAsync(null);
+
+        Assert.False(vm.IsCompleted);
+
+        gate.Set();
+        await deleteTask;
+
+        Assert.True(vm.IsCompleted);
+        Assert.True(vm.Result!.Succeeded);
     }
 }
