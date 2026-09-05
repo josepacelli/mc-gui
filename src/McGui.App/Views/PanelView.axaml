@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:McGui.App.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+             x:Class="McGui.App.Views.PanelView"
+             x:DataType="vm:PanelViewModel">
+  <UserControl.Styles>
+    <Style Selector="Border.panelRoot">
+      <Setter Property="BorderBrush" Value="Gray" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Border.panelRoot.active">
+      <Setter Property="BorderBrush" Value="DodgerBlue" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Classes="panelRoot" Classes.active="{Binding IsActive}">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+      <TextBlock Grid.Row="0" Text="{Binding CurrentDirectory}" FontWeight="Bold" Margin="4" />
+
+      <Grid Grid.Row="1">
+        <ListBox ItemsSource="{Binding DisplayEntries}"
+                 SelectedIndex="{Binding CursorIndex, Mode=OneWay}"
+                 Focusable="False">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:PanelEntryRow">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <TextBlock Grid.Column="0" Text="*" IsVisible="{Binding IsMarked}" Width="14" />
+                <TextBlock Grid.Column="1" Text="{Binding DisplayName}" />
+                <TextBlock Grid.Column="2" Text="{Binding Entry.SizeBytes}" Margin="8,0,0,0" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Border Background="#AA000000" IsVisible="{Binding IsLoading}">
+          <TextBlock Text="Loading..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+      </Grid>
+
+      <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="4" Spacing="12">
+        <TextBlock Text="{Binding MarkedCount, StringFormat='Marked: {0}'}" />
+        <TextBlock Text="{Binding MarkedSizeBytes, StringFormat='({0} bytes)'}" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

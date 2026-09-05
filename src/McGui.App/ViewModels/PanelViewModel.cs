@@ -49,6 +49,9 @@ public sealed partial class PanelViewModel : ObservableObject
 
     public IReadOnlyList<FileEntry> Entries => _state.Entries;
 
+    public IReadOnlyList<PanelEntryRow> DisplayEntries =>
+        _state.Entries.Select(e => new PanelEntryRow(e, _state.MarkedPaths.Contains(e.FullPath))).ToList();
+
     public int CursorIndex
     {
         get => _state.CursorIndex;
@@ -104,6 +107,7 @@ public sealed partial class PanelViewModel : ObservableObject
         OnPropertyChanged(nameof(MarkedPaths));
         OnPropertyChanged(nameof(MarkedCount));
         OnPropertyChanged(nameof(MarkedSizeBytes));
+        OnPropertyChanged(nameof(DisplayEntries));
     }
 
     public async Task NavigateToAsync(string path)
@@ -191,6 +195,7 @@ public sealed partial class PanelViewModel : ObservableObject
         _state.CursorIndex = 0;
         OnPropertyChanged(nameof(CurrentDirectory));
         OnPropertyChanged(nameof(Entries));
+        OnPropertyChanged(nameof(DisplayEntries));
         OnPropertyChanged(nameof(CursorIndex));
     }
 

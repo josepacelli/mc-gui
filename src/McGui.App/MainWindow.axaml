@@ -2,8 +2,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="using:McGui.App.ViewModels"
+        xmlns:views="using:McGui.App.Views"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
         x:Class="McGui.App.MainWindow"
-        Title="McGui.App">
-    Welcome to Avalonia!
+        x:DataType="vm:MainWindowViewModel"
+        Title="mc-gui">
+  <Grid RowDefinitions="*,Auto">
+    <Grid Grid.Row="0" ColumnDefinitions="*,*">
+      <views:PanelView Grid.Column="0" DataContext="{Binding LeftPanel}" />
+      <views:PanelView Grid.Column="1" DataContext="{Binding RightPanel}" />
+    </Grid>
+
+    <UniformGrid Grid.Row="1" Columns="10" Rows="1">
+      <Button Content="F1 Help" IsEnabled="True" />
+      <Button Content="F2 Menu" IsEnabled="True" />
+      <Button Content="F3 View" IsEnabled="False" />
+      <Button Content="F4 Edit" IsEnabled="False" />
+      <Button Content="F5 Copy" IsEnabled="True" />
+      <Button Content="F6 Move" IsEnabled="True" />
+      <Button Content="F7 Mkdir" IsEnabled="True" />
+      <Button Content="F8 Delete" IsEnabled="True" />
+      <Button Content="F9 PullDn" IsEnabled="True" />
+      <Button Content="F10 Quit" IsEnabled="True" />
+    </UniformGrid>
+  </Grid>
 </Window>

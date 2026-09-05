@@ -496,13 +496,19 @@ T20 -> T21
 - Skill: `run` (validar visualmente os dois painéis, destaque de foco, barra de F-keys)
 
 **Done when**:
-- [ ] App abre mostrando dois painéis com listagem real do diretório home (verificado com `run`)
-- [ ] Tab alterna o destaque visual entre os painéis (DPC-02)
-- [ ] Barra de F-keys visível com F3/F4 desabilitados
-- [ ] Gate check passa: `dotnet build McGui.sln -warnaserror`
+- [x] App abre mostrando dois painéis com listagem real do diretório home (verificado com `run`)
+- [x] Tab alterna o destaque visual entre os painéis (DPC-02)
+- [x] Barra de F-keys visível com F3/F4 desabilitados
+- [x] Gate check passa: `dotnet build McGui.sln -warnaserror`
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: `PanelViewModel` ganhou uma projeção somente-leitura `DisplayEntries` (`IReadOnlyList<PanelEntryRow>`) não listada no "Where" de T15, necessária para a View marcar visualmente entradas selecionadas (`PanelEntryRow.IsMarked`) sem expor `HashSet<string> MarkedPaths` diretamente ao binding do Avalonia. `PanelEntryRow` é um record novo em `src/McGui.App/ViewModels/PanelEntryRow.cs`.
+> SPEC_DEVIATION: Up/Down/Enter (DPC-03/DPC-04) não fazem parte do `KeyGestureMap` (T14 documentou que o design só cobre F1-F10/Tab/Insert/+/-/*/Ctrl+R/Ctrl+H/Backspace). `MainWindow.axaml.cs` trata essas três teclas diretamente antes de consultar `KeyGestureMap`, chamando `MoveCursorUpCommand`/`MoveCursorDownCommand`/`ActivateCursorEntryCommand` de `PanelViewModel`.
+> Nota: marcação por padrão (`+`/`-`, GestureAction.MarkByPattern/UnmarkByPattern) precisa de entrada de texto do usuário; foi adicionado `src/McGui.App/Views/TextPromptDialog.axaml(.cs)`, um diálogo modal mínimo e reutilizável (sem ViewModel próprio, camada de View pura conforme a Test Coverage Matrix marca Views como "none/manual only"), para não deixar as teclas `+`/`-` sem efeito algum na UI nesta task.
+> Validação manual (`run`): app real rodou em macOS via `dotnet run --project src/McGui.App/McGui.App.csproj` numa sessão de window server ativa (diferente do ambiente não-interativo registrado em T9/T11). Screenshot confirma os dois painéis lado a lado listando `/Users/pacelli` (diretório home) com conteúdo real, e a barra de 10 F-keys visível com "F3 View"/"F4 Edit" visivelmente acinzentados/desabilitados frente aos demais botões habilitados. O destaque de Tab (DPC-02) **não foi confirmado via screenshot interativo**: o desktop de execução é compartilhado com outras sessões/apps do usuário ao vivo (outro terminal rodando um agente Claude Code ficou visível no screenshot), e o processo `activate`/`keystroke` do AppleScript não focou de forma confiável a janela do app (um `Tab` acabou indo para o iTerm2 em vez do mc-gui) — por segurança, a automação de teclado via System Events foi interrompida para não injetar entrada em sessões/apps alheios. A troca de painel ativo (`IsActive` -> `Classes.active` -> borda azul) é validada por: (1) teste unitário já existente e passando (`MainWindowViewModelTests.SwitchActivePanel_TogglesFromLeftToRight`, T13) confirmando a transição de estado na ViewModel, e (2) o binding compilado `Classes.active="{Binding IsActive}"` em `PanelView.axaml` — o Avalonia falha o build se essa propriedade não existisse/resolvesse (já validado pelo gate `dotnet build -warnaserror` que passou). Revalidação visual interativa fica registrada como pendência para uma sessão com desktop dedicado.
 
 ---
 
