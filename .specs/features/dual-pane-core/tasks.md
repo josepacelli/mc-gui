@@ -162,11 +162,14 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] `dotnet format McGui.sln --verify-no-changes` retorna sem alterações pendentes
-- [ ] Gate de Build completo (`dotnet build ... && dotnet format ... && dotnet test ...`) passa
+- [x] `dotnet format McGui.sln --verify-no-changes` retorna sem alterações pendentes
+- [x] Gate de Build completo (`dotnet build ... && dotnet format ... && dotnet test ...`) passa
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: aplicado `dotnet format McGui.sln` (sem `--verify-no-changes`) uma vez para corrigir os arquivos gerados pelo template Avalonia (fim de linha, newline final, ordenação de usings) que já violavam o `.editorconfig` novo. Reason: T3 exige o gate de formatação limpo; sem essa correção pontual o `--verify-no-changes` falharia permanentemente nos arquivos de template do T1.
 
 ---
 
