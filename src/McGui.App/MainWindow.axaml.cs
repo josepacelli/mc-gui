@@ -159,6 +159,9 @@ public partial class MainWindow : Window
             case GestureAction.MakeDirectory:
                 viewModel.RequestMkdirCommand.Execute(null);
                 break;
+            case GestureAction.RefreshPanel:
+                await activePanel.RefreshCommand.ExecuteAsync(null);
+                break;
             default:
                 return;
         }

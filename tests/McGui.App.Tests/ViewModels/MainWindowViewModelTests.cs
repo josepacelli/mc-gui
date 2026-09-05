@@ -129,6 +129,22 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
+    public void RequestMove_NoMarkedEntriesAndNoCursorEntry_DoesNotRaiseCopyMoveRequested()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left");
+        fs.AddDirectory("/right");
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history);
+        var raised = false;
+        vm.CopyMoveRequested += (_, _) => raised = true;
+
+        vm.RequestMove();
+
+        Assert.False(raised);
+    }
+
+    [Fact]
     public void RequestDelete_WithCursorEntry_RaisesDeleteRequestedWithSelectedEntries()
     {
         var (fs, trash, history) = BuildDependencies();

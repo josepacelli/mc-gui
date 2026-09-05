@@ -646,14 +646,20 @@ T20 -> T21
 - Skill: `run` (validar manualmente desmontar/renomear um diretório aberto no painel)
 
 **Done when**:
-- [ ] F5/F6/F8 com zero entradas selecionadas e sem cursor válido não abrem diálogo algum
-- [ ] Painel cujo diretório desaparece mostra estado de erro inline com ação "ir para home", testável simulando remoção do diretório corrente
-- [ ] Diálogo de destino inexistente oferece criar o diretório ao confirmar, em vez de falhar
-- [ ] Gate check passa: `dotnet test McGui.sln`
-- [ ] Contagem de testes: 3+ testes
+- [x] F5/F6/F8 com zero entradas selecionadas e sem cursor válido não abrem diálogo algum
+- [x] Painel cujo diretório desaparece mostra estado de erro inline com ação "ir para home", testável simulando remoção do diretório corrente
+- [x] Diálogo de destino inexistente oferece criar o diretório ao confirmar, em vez de falhar
+- [x] Gate check passa: `dotnet test McGui.sln`
+- [x] Contagem de testes: 3+ testes — 6 novos (1 `RequestMove` zero-entradas em `MainWindowViewModelTests`, F5/F8 já cobertos em T16/T17; 3 novos em `PanelViewModelTests` para diretório inacessível/ir-pra-home/refresh-ok; 2 novos em `CopyMoveDialogViewModelTests` para destino ausente) — 105 no total da solução
 
 **Tests**: unit
 **Gate**: full
+
+**Status**: ✅ Complete
+> Nota: os guards de "zero entradas não abre diálogo" para F5 (Copy) e F8 (Delete) já tinham sido implementados e testados em T16/T17 respectivamente (mesma lógica `GetOperationSources`, reaproveitada por Copy/Move/Delete); esta task adicionou o teste que faltava para F6 (Move) e documenta a cobertura completa aqui.
+> SPEC_DEVIATION: o mecanismo usado para detectar "diretório do painel ficou inacessível" reaproveita o gesto Ctrl+R (`GestureAction.RefreshPanel`, DPC-32/P2, já mapeado em T14 mas sem handler até agora) através de um novo `PanelViewModel.RefreshCommand` — não há watcher de sistema de arquivos nesta feature (fora de escopo do MVP), então a única forma testável de "descobrir" que o diretório sumiu é uma tentativa explícita de releitura. `RefreshCommand` failure define `IsDirectoryInaccessible`/`DirectoryErrorMessage` (novos, `PanelViewModel`) em vez de engolir o erro como `NavigateToAsync` já fazia (T12) — `NavigateToAsync` não foi alterado para não regredir seu comportamento de fallback silencioso já testado. `GoToHomeCommand` limpa o estado de erro e navega para `_fallbackHomeDirectory`. `PanelView.axaml` ganhou o overlay de erro inline + botão "Go to home directory" que havia sido propositalmente adiado de T15 (documentado lá) por depender destas propriedades.
+> Nota: `CopyMoveDialogViewModel.ConfirmAsync` verifica existência do destino (via `ListDirectory` capturando `DirectoryNotFoundException`) **depois** de `CopyMovePlanner.Build` validar circularidade/bloqueio-painel-oposto, e só então cria o diretório ausente (via `IFileSystemService.CreateDirectory`, um único nível — não recursivo). A ordem importa: criar o destino ausente antes de validar poderia materializar um subdiretório dentro da própria origem para uma operação que seria rejeitada como circular; o teste `ConfirmAsync_CircularCopyWithMissingDestination_DoesNotCreateDestinationDirectory` prova que nada é criado nesse caso.
+> Spec-precision gap: "oferece criar o diretório" (spec.md) é implementado como criação automática e silenciosa ao confirmar (sem um segundo prompt de "sim/não"), já que o AC diz "SHALL offer to create it as part of confirming the dialog, rather than failing silently" — interpretado como "o ato de confirmar já é a oferta/aceite", não uma segunda confirmação. Spec.md não define comportamento para um caminho de destino faltando múltiplos níveis (`/a/b/c` quando nem `/a` existe); `CreateMissingDestinationDirectory` cria apenas o último nível e propaga a falha (via `IOException`/`ArgumentException` capturados) como `ErrorMessage` se o pai também não existir.
 
 ---
 

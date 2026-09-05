@@ -174,6 +174,37 @@ public class CopyMoveDialogViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task ConfirmAsync_DestinationDoesNotExist_CreatesItAsPartOfConfirming()
+    {
+        var source = NewSubdir("missing-dest-src");
+        var filePath = WriteFile(source, "a.txt", "hello");
+        var destination = Path.Combine(_root.FullName, "missing-dest-dst");
+        var vm = BuildViewModel([ToEntry(filePath, false)], destination, OperationMode.Copy);
+
+        await vm.ConfirmCommand.ExecuteAsync(null);
+
+        Assert.True(vm.IsCompleted);
+        Assert.Null(vm.ErrorMessage);
+        Assert.True(Directory.Exists(destination));
+        Assert.True(File.Exists(Path.Combine(destination, "a.txt")));
+    }
+
+    [Fact]
+    public async Task ConfirmAsync_CircularCopyWithMissingDestination_DoesNotCreateDestinationDirectory()
+    {
+        var source = NewSubdir("circular-missing-src");
+        WriteFile(source, "keep.txt");
+        var missingSubdir = Path.Combine(source, "sub");
+        var vm = BuildViewModel([ToEntry(source, true)], missingSubdir, OperationMode.Copy);
+
+        await vm.ConfirmCommand.ExecuteAsync(null);
+
+        Assert.False(vm.IsCompleted);
+        Assert.NotNull(vm.ErrorMessage);
+        Assert.False(Directory.Exists(missingSubdir));
+    }
+
+    [Fact]
     public async Task ConfirmAsync_CircularCopy_SetsErrorMessageAndDoesNotCopy()
     {
         var source = NewSubdir("circular-src");

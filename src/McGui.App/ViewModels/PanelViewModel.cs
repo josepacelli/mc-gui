@@ -27,6 +27,12 @@ public sealed partial class PanelViewModel : ObservableObject
     [ObservableProperty]
     private bool isActive;
 
+    [ObservableProperty]
+    private bool isDirectoryInaccessible;
+
+    [ObservableProperty]
+    private string? directoryErrorMessage;
+
     public PanelViewModel(
         IFileSystemService fileSystemService,
         IPathHistoryStore pathHistoryStore,
@@ -160,6 +166,31 @@ public sealed partial class PanelViewModel : ObservableObject
 
     [RelayCommand]
     public void MoveCursorDown() => CursorIndex = Entries.Count == 0 ? 0 : Math.Min(Entries.Count - 1, CursorIndex + 1);
+
+    [RelayCommand]
+    public async Task RefreshAsync()
+    {
+        try
+        {
+            var entries = await Task.Run(() => _fileSystemService.ListDirectory(CurrentDirectory));
+            ApplyLoadedState(CurrentDirectory, entries);
+            IsDirectoryInaccessible = false;
+            DirectoryErrorMessage = null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            IsDirectoryInaccessible = true;
+            DirectoryErrorMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    public async Task GoToHomeAsync()
+    {
+        IsDirectoryInaccessible = false;
+        DirectoryErrorMessage = null;
+        await NavigateToAsync(_fallbackHomeDirectory);
+    }
 
     public void PersistCurrentDirectory()
     {

@@ -39,6 +39,13 @@
         <Border Background="#AA000000" IsVisible="{Binding IsLoading}">
           <TextBlock Text="Loading..." Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
+
+        <Border Background="#DD400000" IsVisible="{Binding IsDirectoryInaccessible}">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+            <TextBlock Text="{Binding DirectoryErrorMessage}" Foreground="White" HorizontalAlignment="Center" TextWrapping="Wrap" />
+            <Button Content="Go to home directory" Command="{Binding GoToHomeCommand}" HorizontalAlignment="Center" />
+          </StackPanel>
+        </Border>
       </Grid>
 
       <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="4" Spacing="12">

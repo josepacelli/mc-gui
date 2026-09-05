@@ -223,6 +223,55 @@ public class PanelViewModelTests
     }
 
     [Fact]
+    public async Task RefreshAsync_CurrentDirectoryNoLongerExists_ShowsInlineErrorState()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        fs.RemoveDirectory("/root");
+
+        await vm.RefreshAsync();
+
+        Assert.True(vm.IsDirectoryInaccessible);
+        Assert.NotNull(vm.DirectoryErrorMessage);
+        Assert.Equal("/root", vm.CurrentDirectory);
+    }
+
+    [Fact]
+    public async Task GoToHomeAsync_AfterDirectoryBecameInaccessible_NavigatesHomeAndClearsErrorState()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"));
+        fs.AddDirectory("/home", File("readme.txt", "/home"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        fs.RemoveDirectory("/root");
+        await vm.RefreshAsync();
+
+        await vm.GoToHomeAsync();
+
+        Assert.False(vm.IsDirectoryInaccessible);
+        Assert.Null(vm.DirectoryErrorMessage);
+        Assert.Equal("/home", vm.CurrentDirectory);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_DirectoryStillAccessible_ReloadsEntriesWithoutError()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/root", File("a.txt", "/root"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/root", "/root") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+        fs.AddDirectory("/root", File("a.txt", "/root"), File("b.txt", "/root"));
+
+        await vm.RefreshAsync();
+
+        Assert.False(vm.IsDirectoryInaccessible);
+        Assert.Equal(2, vm.Entries.Count);
+    }
+
+    [Fact]
     public void PersistCurrentDirectory_SavesCurrentPathForItsSideOnly()
     {
         var fs = new FakeFileSystemService();

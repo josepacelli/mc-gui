@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -101,6 +102,19 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject
             return;
         }
 
+        if (!DestinationExists(DestinationDirectory))
+        {
+            try
+            {
+                CreateMissingDestinationDirectory(DestinationDirectory);
+            }
+            catch (Exception ex) when (ex is IOException or ArgumentException)
+            {
+                ErrorMessage = $"Could not create destination directory '{DestinationDirectory}': {ex.Message}";
+                return;
+            }
+        }
+
         using var cts = new CancellationTokenSource();
         _cts = cts;
         _applyToAllResolution = null;
@@ -125,6 +139,32 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject
 
     [RelayCommand]
     private void Cancel() => _cts?.Cancel();
+
+    private bool DestinationExists(string path)
+    {
+        try
+        {
+            _fileSystemService.ListDirectory(path);
+            return true;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return false;
+        }
+    }
+
+    private void CreateMissingDestinationDirectory(string path)
+    {
+        var trimmed = path.TrimEnd(Path.DirectorySeparatorChar);
+        var parent = Path.GetDirectoryName(trimmed);
+        var name = Path.GetFileName(trimmed);
+        if (string.IsNullOrEmpty(parent) || string.IsNullOrEmpty(name))
+        {
+            throw new IOException($"Cannot create destination directory '{path}'.");
+        }
+
+        _fileSystemService.CreateDirectory(parent, name);
+    }
 
     private void ReportProgress(OperationProgress progress)
     {

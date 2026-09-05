@@ -11,6 +11,8 @@ public sealed class FakeFileSystemService : IFileSystemService
 
     public void AddDirectory(string path, params FileEntry[] entries) => _directories[path] = entries;
 
+    public void RemoveDirectory(string path) => _directories.Remove(path);
+
     public IReadOnlyList<FileEntry> ListDirectory(string path)
     {
         if (Delay > TimeSpan.Zero)
