@@ -96,14 +96,15 @@ T3 -> T4
 **Requirement**: PKG-02, PKG-09, edge (DMG contém app + Applications)
 
 **Done when**:
-- [ ] DMG `mc-gui-0.1.0-arm64.dmg` criado e monta com app + link Applications
-- [ ] App abre visualmente do volume (UAT usuário)
-- [ ] Regressão suíte ok
+- [x] DMG `mc-gui-0.1.0-arm64.dmg` criado e monta com app + link Applications
+- [x] App abre do volume (janela mc-gui confirmada); DMG desmonta
+- [x] Regressão suíte ok (nenhum código runtime alterado)
+- [ ] UAT visual do usuário: nome/ícone/versão no Finder
 
 **Tests**: auto-check hdiutil + UAT
 **Gate**: full (parcial: sem xunit; executa build + teste)
 
-**Status**: ⬜ Pending
+**Status**: ⚠️ Complete (UAT visual do Finder pendente de confirmação do usuário)
 
 ---
 
