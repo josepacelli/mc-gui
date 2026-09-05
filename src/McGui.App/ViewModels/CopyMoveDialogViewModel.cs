@@ -129,7 +129,7 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject
         }
         catch (InsufficientDiskSpaceException ex)
         {
-            ErrorMessage = $"Insufficient disk space: required {ex.RequiredBytes} bytes, available {ex.AvailableBytes} bytes.";
+            ErrorMessage = ex.Message;
         }
         finally
         {
