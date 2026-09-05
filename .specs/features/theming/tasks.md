@@ -221,15 +221,15 @@ T7 -> T8
 **Requirement**: THM-05, THM-06 (fallback estrutural), THM-01, THM-02
 
 **Done when**:
-- [ ] Teste falha se qualquer `.axaml` de view/MainWindow contiver cor literal em propriedade visual
-- [ ] Teste falha se token usado nos views não estiver definido na paleta
-- [ ] Full gate verde: `dotnet format McGui.sln --verify-no-changes && dotnet build McGui.sln -warnaserror && dotnet test McGui.sln`
+- [x] Teste falha se qualquer `.axaml` de view/MainWindow contiver cor literal em propriedade visual
+- [x] Teste falha se token usado nos views não estiver definido na paleta
+- [x] Full gate verde: `dotnet format McGui.sln --verify-no-changes && dotnet build McGui.sln -warnaserror && dotnet test McGui.sln` (119 testes: 13+31+75)
 - [ ] UAT manual macOS: rodar app em System/Light/Dark (menu + F12), abrir diálogos, conferir contraste conforme tabela do spec
 
 **Tests**: unit/structural scan
 **Gate**: full
 
-**Status**: ⬜ Pending
+**Status**: ⚠️ Partial (UAT visual pendente - aguardando confirmação do usuário no app aberto)
 
 ---
 
