@@ -12,12 +12,11 @@
 
 ## Handoff
 
-- **Feature**: `theming` (`.specs/features/theming/`) — **DONE**.
-- **Phase / Task**: Execute T1-T8 commitadas (`50fa1ad`..`5e7715a`, 10 commits) + Verifier independente **PASS** (`validation.md`, 23/23 ACs, sensor 4/6 kill, 2 survivors em zona UAT/build declarada) + fix-gap M4 (`d1050be`, distinctness Light≠Dark) + gate `validate_state.py` 0 erros.
-- **Completed**: 120 testes (13 Core + 31 Infra + 76 App). Working tree limpo (exceto este `STATE.md`), branch `main`.
-- **Gaps aceitos (não bloqueiam)**: (M5) glue `ApplyTheme` (MainWindow.axaml.cs) sem teste unit — zona UAT declarada, sem `Avalonia.Headless` (decisão do usuário); (M6) variante boot `Default` no `App.axaml` sem assert automatizado — declarativa + UAT; Fix 2 (THM-06 wording) já resolvido no spec. 3 lições candidates em `.specs/lessons.json` aguardando review (MenuBar→Menu v12, distinctness, THM-06 enforcement).
-- **Decisões de implementação**: `MenuBar` NÃO existe no Avalonia 12 — usado `Menu` top-level; `Themes.axaml` sem dicionário `Default` fallback (Default do sistema resolve p/ Light/Dark); `MergeResourceInclude` (v12) p/ mesclar paleta.
-- **Next step**: aguardando próxima feature do usuário. Features previstas no backlog de `dual-pane-core`: editor F4, viewer F3, persistência de tema, skins, hotlist. Pré-requisito p/ qualquer feature nova: passar pelo fluxo `tlc-spec-driven` (Specify → Execute).
+- **Feature**: `theming` (`.specs/features/theming/`) — **DONE** + 3 micro-features pós-verificação entregues inline.
+- **Phase / Task**: theming Execute T1-T8 + Verifier PASS + fix M4 (detalhes em handoff anterior). Pós-DONE, usuário pediu 3 ajustes entregues como micro-features (sem artifacts próprios): (1) **navegação por mouse** `9a97be4` (single-click move cursor via SelectionChanged, duplo-clique ativa = entra em dir); (2) **barra de progresso inline no CopyMoveDialog** `b1abbbf` (PercentComplete/ProgressSummary na VM, ProgressBar no dialog, bindings re-notificados na UI thread pelo code-behind; ProgressDialog fica no código mas inativo); (3) **accent nativo macOS na borda do painel ativo** `39e211c` (MainWindow lê `PlatformColorValues.AccentColor1` em `Opened` + subscreve `ColorValuesChanged`, sobrescreve recurso da janela `PanelBorderActiveBrush`). Fix separado: **barra F-keys justificada** `06b19e0` (UniformGrid não esticava botões; trocado por Grid de 10 colunas `*` + `HorizontalAlignment=Stretch`).
+- **Completed**: 124 testes (13 Core + 31 Infra + 80 App). Working tree limpo (exceto este `STATE.md`), branch `main`.
+- **Decisões relevantes**: `MenuBar` não existe no Avalonia 12 (usar `Menu`); `UniformGrid` não estica filhos (usar Grid `*` + Stretch); copiar/mover roda em `Task.Run` (updates de progresso precisam re-notificação na UI thread); accent do sistema via `VisualExtensions.GetPlatformSettings(Visual).GetColorValues().AccentColor1`.
+- **Next step**: aguardando próxima feature do usuário. Fluxo: `tlc-spec-driven` (Specify → Execute).
 - **Blockers**: none
 - **Uncommitted files**: este `STATE.md` (handoff atual).
-- **Branch**: main (origin/main configurado; último push manual do usuário. Push de novos commits NÃO feito — requer go-ahead explícito).
+- **Branch**: main (origin/main em `568d20e`; commits locais `9a97be4`..`39e211c` NÃO pushados — requer go-ahead explícito).
