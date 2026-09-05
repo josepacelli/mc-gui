@@ -139,29 +139,29 @@ Explicitamente excluído desta feature (fatia B separada).
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| PII-01 | P1: Ícone em cada linha | Design | Pending |
-| PII-02 | P1: Ícone em cada linha | Design | Pending |
-| PII-03 | P1: Ícone em cada linha | Design | Pending |
-| PII-04 | P1: Ícone em cada linha | Design | Pending |
-| PII-05 | P1: Entrada `..` | Design | Pending |
-| PII-06 | P1: Entrada `..` | Design | Pending |
-| PII-07 | P1: Entrada `..` | Design | Pending |
-| PII-08 | P1: Entrada `..` | Design | Pending |
-| PII-09 | P1: Entrada `..` | Design | Pending |
-| PII-10 | P1: `..` não marcável | Design | Pending |
-| PII-11 | P1: `..` não marcável | Design | Pending |
-| PII-12 | P1: `..` não marcável | Design | Pending |
-| PII-13 | P1: `..` não marcável | Design | Pending |
+| PII-01 | P1: Ícone em cada linha | Design | Verified |
+| PII-02 | P1: Ícone em cada linha | Design | Verified |
+| PII-03 | P1: Ícone em cada linha | Design | Verified |
+| PII-04 | P1: Ícone em cada linha | Design | Verified |
+| PII-05 | P1: Entrada `..` | Design | Verified |
+| PII-06 | P1: Entrada `..` | Design | Verified |
+| PII-07 | P1: Entrada `..` | Design | Verified |
+| PII-08 | P1: Entrada `..` | Design | Verified |
+| PII-09 | P1: Entrada `..` | Design | Verified |
+| PII-10 | P1: `..` não marcável | Design | Verified |
+| PII-11 | P1: `..` não marcável | Design | Verified |
+| PII-12 | P1: `..` não marcável | Design | Verified |
+| PII-13 | P1: `..` não marcável | Design | Verified |
 
-| PII-14 | P1: Tamanho formatado | Design | Pending |
-| PII-15 | P1: Tamanho formatado | Design | Pending |
-| PII-16 | P1: Tamanho formatado | Design | Pending |
-| PII-17 | P1: Tamanho formatado | Design | Pending |
+| PII-14 | P1: Tamanho formatado | Design | Verified |
+| PII-15 | P1: Tamanho formatado | Design | Verified |
+| PII-16 | P1: Tamanho formatado | Design | Verified |
+| PII-17 | P1: Tamanho formatado | Design | Verified |
 
 **ID format:** `PII-N` (Panel Icons + dotdot)
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 17 total, 0 mapped to tasks, 17 unmapped ⚠️
+**Coverage:** 17 total, 17 mapped to tasks, 0 unmapped
 
 ---
 

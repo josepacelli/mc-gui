@@ -32,6 +32,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: .specs/features/theming/tasks.md:191 (Avalonia)
 - last seen: 2026-09-05T20:20:58Z
 
+### L-004 - Row view-models that gate a spec-visible column value (empty size for directory and '..' rows) need an explicit unit test on the derived property; a XAML binding alone does not discriminate a regression.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `App view-row layer` · harmful: 0
+- features: panel-icons-dotdot
+- evidence: M6: src/McGui.App/ViewModels/PanelEntryRow.cs:15 (App view-row layer)
+- last seen: 2026-09-05T21:53:25Z
+
+### L-005 - Every AC that hides or shows a UI column value (not just formats it) must map to an App-layer unit assertion on the row/view-model, never only to the view file.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `spec coverage` · harmful: 0
+- features: panel-icons-dotdot
+- evidence: PII-15: spec.md size AC 2 (spec coverage)
+- last seen: 2026-09-05T21:53:29Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

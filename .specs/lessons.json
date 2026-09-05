@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 4,
+  "next_id": 6,
   "lessons": [
     {
       "id": "L-001",
@@ -58,6 +58,42 @@
       ],
       "created": "2026-09-05T20:20:58Z",
       "last_seen": "2026-09-05T20:20:58Z"
+    },
+    {
+      "id": "L-004",
+      "key": "surviving_mutant::row view models that gate a spec visible column value empty size for directory and rows need an explicit unit test on the derived property a xaml binding alone does not discriminate a regression",
+      "text": "Row view-models that gate a spec-visible column value (empty size for directory and '..' rows) need an explicit unit test on the derived property; a XAML binding alone does not discriminate a regression.",
+      "signal": "surviving_mutant",
+      "scope": "App view-row layer",
+      "status": "candidate",
+      "features": [
+        "panel-icons-dotdot"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M6: src/McGui.App/ViewModels/PanelEntryRow.cs:15 (App view-row layer)"
+      ],
+      "created": "2026-09-05T21:53:25Z",
+      "last_seen": "2026-09-05T21:53:25Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::every ac that hides or shows a ui column value not just formats it must map to an app layer unit assertion on the row view model never only to the view file",
+      "text": "Every AC that hides or shows a UI column value (not just formats it) must map to an App-layer unit assertion on the row/view-model, never only to the view file.",
+      "signal": "ac_gap",
+      "scope": "spec coverage",
+      "status": "candidate",
+      "features": [
+        "panel-icons-dotdot"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "PII-15: spec.md size AC 2 (spec coverage)"
+      ],
+      "created": "2026-09-05T21:53:29Z",
+      "last_seen": "2026-09-05T21:53:29Z"
     }
   ]
 }
