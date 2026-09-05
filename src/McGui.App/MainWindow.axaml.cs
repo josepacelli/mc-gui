@@ -87,6 +87,15 @@ public partial class MainWindow : Window
         ApplyTheme(viewModel.CurrentTheme);
     }
 
+    private void OpenFirstMenu()
+    {
+        if (MainMenu.Items.Count > 0 && MainMenu.Items[0] is MenuItem first)
+        {
+            first.IsSubMenuOpen = true;
+            first.Focus();
+        }
+    }
+
     private static void ApplyTheme(ThemePreference preference)
     {
         Application.Current!.RequestedThemeVariant = preference switch
@@ -201,6 +210,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.CycleTheme:
                 viewModel.CycleThemeCommand.Execute(null);
+                break;
+            case GestureAction.PullDownMenu:
+                OpenFirstMenu();
                 break;
             default:
                 return;

@@ -116,14 +116,14 @@ T3 -> T4
 **Requirement**: MB-06, MB-10, MB-11, MB-12
 
 **Done when**:
-- [ ] F9 abre o primeiro menu (Left)
-- [ ] Full gate verde
-- [ ] UAT registrado (F9, mnemonics, Theme em Options, disabled inertes)
+- [x] F9 abre o primeiro menu (Left)
+- [x] Full gate verde (180 testes: 17+31+132)
+- [x] UAT registrado (F9, mnemonics, Theme em Options, disabled inertes) - usuário confirmou "Tudo ok"
 
 **Tests**: none (UAT; estrutura coberta) — full gate
 **Gate**: full
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
