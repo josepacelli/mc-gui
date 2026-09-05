@@ -16,6 +16,18 @@ public partial class MainWindow : Window
         InitializeComponent();
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
         DataContextChanged += OnDataContextChanged;
+        Closing += OnClosing;
+    }
+
+    private void OnClosing(object? sender, WindowClosingEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.LeftPanel.PersistCurrentDirectory();
+        viewModel.RightPanel.PersistCurrentDirectory();
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)
