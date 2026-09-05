@@ -162,14 +162,14 @@ T7 -> T8
 **Requirement**: PII-02 (cores por variante); integra com theming existente
 
 **Done when**:
-- [ ] `FolderIconBrush` e `FileIconBrush` definidos em Light e Dark com valores distintos entre variantes
-- [ ] `ExpectedTokens` atualizado; teste estrutural passa
-- [ ] `dotnet build McGui.sln -warnaserror` passa
+- [x] `FolderIconBrush` e `FileIconBrush` definidos em Light e Dark com valores distintos entre variantes
+- [x] `ExpectedTokens` atualizado; teste estrutural passa
+- [x] `dotnet build McGui.sln -warnaserror` passa
 
 **Tests**: structural (tokens)
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 

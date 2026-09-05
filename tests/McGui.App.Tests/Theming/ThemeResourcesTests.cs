@@ -20,6 +20,8 @@ public class ThemeResourcesTests
         "OverlayErrorForegroundBrush",
         "TextErrorBrush",
         "TextWarningBrush",
+        "FolderIconBrush",
+        "FileIconBrush",
     ];
 
     private static readonly Regex HexColor = new(@"#[0-9A-Fa-f]{6,8}", RegexOptions.Compiled);

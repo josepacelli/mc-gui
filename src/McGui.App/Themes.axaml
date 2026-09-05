@@ -10,6 +10,8 @@
       <SolidColorBrush x:Key="OverlayErrorForegroundBrush" Color="#B00020" />
       <SolidColorBrush x:Key="TextErrorBrush" Color="#B00020" />
       <SolidColorBrush x:Key="TextWarningBrush" Color="#C2410C" />
+      <SolidColorBrush x:Key="FolderIconBrush" Color="#1967D2" />
+      <SolidColorBrush x:Key="FileIconBrush" Color="#5F6368" />
     </ResourceDictionary>
     <ResourceDictionary x:Key="Dark">
       <SolidColorBrush x:Key="PanelBorderBrush" Color="#4D4D4D" />
@@ -20,6 +22,8 @@
       <SolidColorBrush x:Key="OverlayErrorForegroundBrush" Color="#FFFFFF" />
       <SolidColorBrush x:Key="TextErrorBrush" Color="#FF8A80" />
       <SolidColorBrush x:Key="TextWarningBrush" Color="#FFB74D" />
+      <SolidColorBrush x:Key="FolderIconBrush" Color="#8AB4F8" />
+      <SolidColorBrush x:Key="FileIconBrush" Color="#9AA0A6" />
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
