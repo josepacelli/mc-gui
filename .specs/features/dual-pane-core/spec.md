@@ -215,11 +215,11 @@ Toda ambiguidade foi resolvida ou registrada aqui - nada fica silenciosamente in
 | DPC-06 | P1: Navegação dual-pane | Design | Pending |
 | DPC-07 | P1: Navegação dual-pane | Design | Pending |
 | DPC-08 | P1: Navegação dual-pane | Design | Pending |
-| DPC-09 | P1: Seleção múltipla de arquivos | Design | Pending |
-| DPC-10 | P1: Seleção múltipla de arquivos | Design | Pending |
-| DPC-11 | P1: Seleção múltipla de arquivos | Design | Pending |
-| DPC-12 | P1: Seleção múltipla de arquivos | Design | Pending |
-| DPC-13 | P1: Seleção múltipla de arquivos | Design | Pending |
+| DPC-09 | P1: Seleção múltipla de arquivos | Tasks (T6) | Implementing |
+| DPC-10 | P1: Seleção múltipla de arquivos | Tasks (T6) | Implementing |
+| DPC-11 | P1: Seleção múltipla de arquivos | Tasks (T6) | Implementing |
+| DPC-12 | P1: Seleção múltipla de arquivos | Tasks (T6) | Implementing |
+| DPC-13 | P1: Seleção múltipla de arquivos | Tasks (T6) | Implementing |
 | DPC-14 | P1: Copiar arquivos (F5) | Design | Pending |
 | DPC-15 | P1: Copiar arquivos (F5) | Design | Pending |
 | DPC-16 | P1: Copiar arquivos (F5) | Design | Pending |

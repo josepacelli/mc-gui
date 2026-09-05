@@ -232,15 +232,17 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] Toggle marca/desmarca uma entrada e avança o cursor (DPC-09)
-- [ ] MarkByPattern/UnmarkByPattern aplicam glob sobre os nomes do painel (DPC-10, DPC-11)
-- [ ] Invert inverte o estado de marcação de todas as entradas (DPC-12)
-- [ ] Contagem/tamanho total de marcados é calculável a partir do estado resultante (DPC-13)
-- [ ] Gate check passa: `dotnet test tests/McGui.Core.Tests/McGui.Core.Tests.csproj`
-- [ ] Contagem de testes: 5+ testes passando (um por AC DPC-09..13, incluindo padrão sem match)
+- [x] Toggle marca/desmarca uma entrada e avança o cursor (DPC-09)
+- [x] MarkByPattern/UnmarkByPattern aplicam glob sobre os nomes do painel (DPC-10, DPC-11)
+- [x] Invert inverte o estado de marcação de todas as entradas (DPC-12)
+- [x] Contagem/tamanho total de marcados é calculável a partir do estado resultante (DPC-13)
+- [x] Gate check passa: `dotnet test tests/McGui.Core.Tests/McGui.Core.Tests.csproj`
+- [x] Contagem de testes: 5+ testes passando (um por AC DPC-09..13, incluindo padrão sem match) — 8 passaram
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
 
 ---
 
