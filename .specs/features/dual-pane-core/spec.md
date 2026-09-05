@@ -224,12 +224,12 @@ Toda ambiguidade foi resolvida ou registrada aqui - nada fica silenciosamente in
 | DPC-15 | P1: Copiar arquivos (F5) | Design | Pending |
 | DPC-16 | P1: Copiar arquivos (F5) | Design | Pending |
 | DPC-17 | P1: Copiar arquivos (F5) | Design | Pending |
-| DPC-18 | P1: Copiar arquivos (F5) | Design | Pending |
+| DPC-18 | P1: Copiar arquivos (F5) | Tasks (T7) | Implementing |
 | DPC-19 | P1: Copiar arquivos (F5) | Design | Pending |
 | DPC-20 | P1: Mover / Renomear arquivos (F6) | Design | Pending |
 | DPC-21 | P1: Mover / Renomear arquivos (F6) | Design | Pending |
-| DPC-22 | P1: Mover / Renomear arquivos (F6) | Design | Pending |
-| DPC-23 | P1: Mover / Renomear arquivos (F6) | Design | Pending |
+| DPC-22 | P1: Mover / Renomear arquivos (F6) | Tasks (T7) | Implementing |
+| DPC-23 | P1: Mover / Renomear arquivos (F6) | Tasks (T7) | Implementing |
 | DPC-24 | P1: Criar diretório (F7) | Design | Pending |
 | DPC-25 | P1: Criar diretório (F7) | Design | Pending |
 | DPC-26 | P1: Criar diretório (F7) | Design | Pending |

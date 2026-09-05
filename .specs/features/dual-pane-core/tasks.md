@@ -259,15 +259,18 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] Destino igual à origem ou subdiretório dela é rejeitado com erro identificando o ciclo (DPC-18)
-- [ ] Mover uma pasta para dentro dela mesma/subdiretório é rejeitado (DPC-22)
-- [ ] Mover a entrada que é o diretório atual do painel oposto é bloqueado com explicação (DPC-23)
-- [ ] Caso feliz (sem conflito) produz um `CopyMovePlan` com todas as entradas expandidas recursivamente
-- [ ] Gate check passa: `dotnet test tests/McGui.Core.Tests/McGui.Core.Tests.csproj`
-- [ ] Contagem de testes: 5+ testes passando (feliz + 3 rejeições + expansão recursiva)
+- [x] Destino igual à origem ou subdiretório dela é rejeitado com erro identificando o ciclo (DPC-18)
+- [x] Mover uma pasta para dentro dela mesma/subdiretório é rejeitado (DPC-22)
+- [x] Mover a entrada que é o diretório atual do painel oposto é bloqueado com explicação (DPC-23)
+- [x] Caso feliz (sem conflito) produz um `CopyMovePlan` com todas as entradas expandidas recursivamente
+- [x] Gate check passa: `dotnet test tests/McGui.Core.Tests/McGui.Core.Tests.csproj`
+- [x] Contagem de testes: 5+ testes passando (feliz + 3 rejeições + expansão recursiva) — 13 passaram no total do projeto (5 novos)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: `Build` recebe um 4º parâmetro `otherPanelCurrentDir` (nullable) não listado na assinatura de design.md, necessário para DPC-23; seguido o texto mais concreto/posterior desta task (T7). Rejeições (DPC-18/22/23) lançam `CopyMovePlanValidationException` com mensagem explicativa, já que `CopyMovePlan` (design.md) não tem campo de erro.
 
 ---
 
