@@ -76,14 +76,14 @@ T3 -> T4
 **Requirement**: PKG-01, PKG-03, PKG-04, PKG-05, PKG-06, PKG-07, PKG-08
 
 **Done when**:
-- [ ] `./packaging/build-macos.sh` gera `artifacts/mc-gui.app` com estrutura e binário arm64
-- [ ] Idempotente (2ª execução sem erro)
-- [ ] Auto-checks passam (plutil lint ok, file arm64)
+- [x] `./packaging/build-macos.sh` gera `artifacts/mc-gui.app` com estrutura e binário arm64
+- [x] Idempotente (2ª execução sem erro)
+- [x] Auto-checks passam (plutil lint ok, file arm64); versão por arg (0.2.0) ok
 
 **Tests**: auto-checks script
 **Gate**: build
 
-**Status**: ⬜ Pending
+**Status**: ✅ Complete
 
 ---
 
