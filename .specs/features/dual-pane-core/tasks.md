@@ -209,11 +209,13 @@ T20 -> T21
 - Skill: NONE
 
 **Done when**:
-- [ ] As 3 interfaces existem com as assinaturas do design, usando os tipos de T4
-- [ ] `dotnet build McGui.sln` compila sem erros
+- [x] As 3 interfaces existem com as assinaturas do design, usando os tipos de T4
+- [x] `dotnet build McGui.sln` compila sem erros
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ✅ Complete
 
 ---
 
