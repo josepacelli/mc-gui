@@ -56,6 +56,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: tests/McGui.App.Tests/McMenuDefinitionsTests.cs:175 (MainWindow.axaml tests)
 - last seen: 2026-09-05T22:17:05Z
 
+### L-008 - CI portability beats repo-local convenience: when a build dependency (PIL) is dropped from packaging, update the spec text or add a SPEC_DEVIATION marker at the same commit — stale spec lines mislead the Verifier.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · harmful: 0
+- features: macos-installer
+- evidence: spec.md:38,95
+- last seen: 2026-09-05T22:55:01Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

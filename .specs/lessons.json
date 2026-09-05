@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 8,
+  "next_id": 9,
   "lessons": [
     {
       "id": "L-001",
@@ -130,6 +130,24 @@
       ],
       "created": "2026-09-05T22:17:05Z",
       "last_seen": "2026-09-05T22:17:05Z"
+    },
+    {
+      "id": "L-008",
+      "key": "spec_deviation::ci portability beats repo local convenience when a build dependency pil is dropped from packaging update the spec text or add a spec deviation marker at the same commit stale spec lines mislead the verifier",
+      "text": "CI portability beats repo-local convenience: when a build dependency (PIL) is dropped from packaging, update the spec text or add a SPEC_DEVIATION marker at the same commit — stale spec lines mislead the Verifier.",
+      "signal": "spec_deviation",
+      "scope": "",
+      "status": "candidate",
+      "features": [
+        "macos-installer"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:38,95"
+      ],
+      "created": "2026-09-05T22:55:01Z",
+      "last_seen": "2026-09-05T22:55:01Z"
     }
   ]
 }

@@ -35,7 +35,7 @@ O `mc-gui` hoje roda apenas via `dotnet run`/publish manual — não há um arte
 | Bundle id | `mcgui.jpmo.dev.br` | Decisão do usuário | y |
 | Versão | `0.1.0` (`CFBundleShortVersionString`/`CFBundleVersion`), default no script; CI usa versão de tag quando presente | Decisão | y |
 | Nome | Bundle `Midnight Commander GUI.app`; executável interno `mc-gui` (`CFBundleExecutable`); `CFBundleName=MC GUI` (≤15 chars) e `CFBundleDisplayName=Midnight Commander GUI`; título da janela `Midnight Commander GUI` | Nome exibido pedido pelo usuário; CFBundleName limitado a 15 chars pelo macOS | y |
-| Ícone | `.icns` gerado a partir de PNG 1024 programático (`packaging/icon/icon-source.png`) via `iconutil`; sem asset externo | Decisão "incluir .icns próprio"; reproducible | y |
+| Ícone | `.icns` gerado a partir de PNG 1024 commitado (`packaging/icon-asset/mc-gui-icon-1024.png`) via `sips`+`iconutil`; sem dependência de PIL (CI-safe) | Decisão "incluir .icns próprio"; reproducible | y |
 | OutputType | Mantém `WinExe` atual (não altera csproj app); apphost forçado por `-p:UseAppHost=true` | Validado: publish gera Mach-O arm64 executável | y |
 | Estrutura .app | `mc-gui.app/Contents/{MacOS (publish), Resources (mc-gui.icns), Info.plist}` | Doc oficial Avalonia macOS | y |
 | Script | `packaging/build-macos.sh` idempotente, cria bundle+DMG em `artifacts/` | Local + CI reusam | y |
@@ -92,7 +92,7 @@ O `mc-gui` hoje roda apenas via `dotnet run`/publish manual — não há um arte
 
 **Acceptance Criteria**:
 
-1. WHEN the script runs THEN it SHALL generate a 1024×1024 source PNG (`packaging/icon/icon-source.png`) and convert it to an `.icns` containing the standard icon sizes via `iconutil`. <!-- event-driven -->
+1. WHEN the script runs THEN it SHALL convert the committed 1024×1024 source PNG (`packaging/icon-asset/mc-gui-icon-1024.png`) to an `.icns` containing the standard icon sizes via `sips`+`iconutil`. <!-- event-driven -->
 2. The generated `.icns` SHALL be non-empty and structurally valid (iconutil succeeds). <!-- ubiquitous -->
 
 **Independent Test**: Rodar; conferir PNG e `.icns` gerados e `iconutil -c icns` sem erro.
@@ -128,25 +128,25 @@ O `mc-gui` hoje roda apenas via `dotnet run`/publish manual — não há um arte
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| PKG-01 | P1: Script local | Design | Pending |
-| PKG-02 | P1: Script local | Design | Pending |
-| PKG-03 | P1: Script local | Design | Pending |
-| PKG-04 | P1: Script local | Design | Pending |
-| PKG-05 | P1: Bundle válido | Design | Pending |
-| PKG-06 | P1: Bundle válido | Design | Pending |
-| PKG-07 | P1: Bundle válido | Design | Pending |
-| PKG-08 | P1: Bundle válido | Design | Pending |
-| PKG-09 | P1: Bundle válido | Design | Pending |
-| PKG-10 | P1: Ícone | Design | Pending |
-| PKG-11 | P1: Ícone | Design | Pending |
-| PKG-12 | P1: CI | Design | Pending |
-| PKG-13 | P1: CI | Design | Pending |
-| PKG-14 | P1: CI | Design | Pending |
+| PKG-01 | P1: Script local | Design | Verified |
+| PKG-02 | P1: Script local | Design | Verified |
+| PKG-03 | P1: Script local | Design | Verified |
+| PKG-04 | P1: Script local | Design | Verified |
+| PKG-05 | P1: Bundle válido | Design | Verified |
+| PKG-06 | P1: Bundle válido | Design | Verified |
+| PKG-07 | P1: Bundle válido | Design | Verified |
+| PKG-08 | P1: Bundle válido | Design | Verified |
+| PKG-09 | P1: Bundle válido | Design | Verified |
+| PKG-10 | P1: Ícone | Design | Verified |
+| PKG-11 | P1: Ícone | Design | Verified |
+| PKG-12 | P1: CI | Design | Verified |
+| PKG-13 | P1: CI | Design | Verified |
+| PKG-14 | P1: CI | Design | Verified |
 
 **ID format:** `PKG-N` (Packaging)
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 14 total, 0 mapped to tasks, 14 unmapped ⚠️
+**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped
 
 ---
 

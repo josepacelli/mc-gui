@@ -10,7 +10,7 @@ Empacotamento do app Avalonia em `.app` + DMG via um script shell idempotente + 
 packaging/
 ├── build-macos.sh          # publish + monta .app + gera DMG (usa geração de ícone)
 ├── Info.plist              # template do bundle
-├── make-icon.sh            # gera icon-source.png (PIL) + converte p/ mc-gui.icns
+├── make-icon.sh            # converte PNG commitado p/ mc-gui.icns (sips+iconutil)
 └── icon/
     └── mc-gui.icns         # (gerado, commitado? não — regenerado no build)
 .github/workflows/build-macos.yml   # CI: roda build-macos.sh, sobe artefato, release em tag
@@ -41,7 +41,7 @@ Template estático commitado em `packaging/Info.plist` com `CFBundleIdentifier=m
 
 ### D4. Ícone programático
 
-- `make-icon.sh`: usa Python (PIL, disponível) p/ desenhar PNG 1024×1024 simples (fundo arredondado escuro + dois painéis de "arquivos" estilo MC ou `../` + pasta) → `artifacts/build/icon-source.png`; `sips -z` gera os tamanhos do iconset; `iconutil -c icns` produz `mc-gui.icns`.
+- `make-icon.sh`: converte o PNG 1024×1024 commitado (`packaging/icon-asset/mc-gui-icon-1024.png`) com `sips -z` (gera os tamanhos do iconset) e `iconutil -c icns` produz `mc-gui.icns`. Sem Python/PIL — roda em CI.
 - PNG desenhado em Python = deterministic, sem asset binário externo (spec PKG-10..11).
 
 ### D5. DMG drag-to-install
