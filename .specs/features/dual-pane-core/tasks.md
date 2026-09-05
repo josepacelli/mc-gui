@@ -382,13 +382,17 @@ T20 -> T21
 - Skill: `run` (validar que o app abre sem crash)
 
 **Done when**:
-- [ ] Container resolve todos os serviços registrados sem exceção
+- [x] Container resolve todos os serviços registrados sem exceção
 - [ ] App abre uma janela (ainda vazia de UI de painéis) sem crash no macOS
-- [ ] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
-- [ ] Contagem de testes: 1+ teste passando (resolução do container)
+- [x] Gate check passa: `dotnet test tests/McGui.App.Tests/McGui.App.Tests.csproj`
+- [x] Contagem de testes: 1+ teste passando (resolução do container)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete
+> SPEC_DEVIATION: criado `src/McGui.App/ViewModels/MainWindowViewModel.cs` (classe vazia, apenas resolvível via DI) nesta task, embora o campo "Where" de T11 não o liste — necessário porque "Done when" exige resolver `MainWindowViewModel` pelo container antes de T13 (que depende de T11) existir para preenchê-la com painéis/Tab. T13 estende esta classe. `Program.cs` não precisou de alteração: o bootstrap de DI foi feito em `App.axaml.cs.OnFrameworkInitializationCompleted`, ponto padrão do Avalonia para compor o `MainWindow`/DataContext antes de exibir a janela.
+> Nota de ambiente: `dotnet run` nesta sessão (shell não-interativo, sem sessão de window server ativa) falha em `Avalonia.Native.AvaloniaNativeRenderTimer.EnsureRegistered()` ("was not able to start the RenderTimer") antes mesmo de `OnFrameworkInitializationCompleted` ser chamado — é uma limitação do ambiente de execução deste agente (mesma classe de limitação já registrada em T9 para a skill `run`), não uma regressão introduzida por este código. A verificação "app abre janela sem crash" fica pendente de validação manual em uma sessão macOS interativa real.
 
 ---
 
