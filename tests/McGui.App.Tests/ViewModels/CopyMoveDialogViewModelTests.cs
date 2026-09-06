@@ -278,4 +278,15 @@ public class CopyMoveDialogViewModelTests : IDisposable
         Assert.Equal("Insufficient disk space: required 7 bytes, available 1 bytes.", vm.ErrorMessage);
         Assert.False(File.Exists(Path.Combine(destination, "big.txt")));
     }
+
+    [Fact]
+    public void PreserveAttributes_DefaultsToFalse()
+    {
+        var source = NewSubdir("preserve-src");
+        var filePath = WriteFile(source, "a.txt");
+        var destination = NewSubdir("preserve-dst");
+        var vm = BuildViewModel([ToEntry(filePath, false)], destination, OperationMode.Copy);
+
+        Assert.False(vm.PreserveAttributes);
+    }
 }

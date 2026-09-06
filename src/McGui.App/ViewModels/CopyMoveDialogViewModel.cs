@@ -53,6 +53,9 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject, IComplet
     private string newName;
 
     [ObservableProperty]
+    private bool preserveAttributes;
+
+    [ObservableProperty]
     private string? errorMessage;
 
     [ObservableProperty]
@@ -155,9 +158,10 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject, IComplet
 
 try
             {
+                var options = new CopyMoveOptions(PreserveAttributes, true);
                 LastResult = Mode == OperationMode.Copy
-                    ? await _fileSystemService.CopyAsync(plan, progress, ResolveConflict, cts.Token, CopyMoveOptions.Default)
-                    : await _fileSystemService.MoveAsync(plan, progress, ResolveConflict, cts.Token, CopyMoveOptions.Default);
+                    ? await _fileSystemService.CopyAsync(plan, progress, ResolveConflict, cts.Token, options)
+                    : await _fileSystemService.MoveAsync(plan, progress, ResolveConflict, cts.Token, options);
                 IsCompleted = true;
             }
         catch (InsufficientDiskSpaceException ex)

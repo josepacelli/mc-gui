@@ -17,6 +17,8 @@
       <TextBox Text="{Binding NewName}" Width="260" />
     </StackPanel>
 
+    <CheckBox Content="Preservar atributos" IsChecked="{Binding PreserveAttributes}" />
+
     <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource TextErrorBrush}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
 
     <StackPanel Spacing="4" IsVisible="{Binding HasProgress}">
