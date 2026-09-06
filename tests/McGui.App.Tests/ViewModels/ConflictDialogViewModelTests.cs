@@ -51,6 +51,17 @@ public class ConflictDialogViewModelTests
     }
 
     [Fact]
+    public async Task Update_CompletesResultWithUpdateResolution()
+    {
+        var vm = new ConflictDialogViewModel("/dest/file.txt");
+
+        vm.UpdateCommand.Execute(null);
+
+        var result = await vm.ResultTask;
+        Assert.Equal(FileConflictResolution.Update, result.Resolution);
+    }
+
+    [Fact]
     public async Task ApplyToAll_WhenChecked_IsCarriedIntoResult()
     {
         var vm = new ConflictDialogViewModel("/dest/file.txt") { ApplyToAll = true };
@@ -58,6 +69,18 @@ public class ConflictDialogViewModelTests
         vm.OverwriteCommand.Execute(null);
 
         var result = await vm.ResultTask;
+        Assert.True(result.ApplyToAll);
+    }
+
+    [Fact]
+    public async Task Update_WithApplyToAll_CarriesApplyToAllIntoResult()
+    {
+        var vm = new ConflictDialogViewModel("/dest/file.txt") { ApplyToAll = true };
+
+        vm.UpdateCommand.Execute(null);
+
+        var result = await vm.ResultTask;
+        Assert.Equal(FileConflictResolution.Update, result.Resolution);
         Assert.True(result.ApplyToAll);
     }
 

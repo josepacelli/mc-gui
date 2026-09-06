@@ -31,6 +31,9 @@ public sealed partial class ConflictDialogViewModel : ObservableObject
     private void Rename() => Complete(FileConflictResolution.Rename);
 
     [RelayCommand]
+    private void Update() => Complete(FileConflictResolution.Update);
+
+    [RelayCommand]
     private void Abort() => Complete(FileConflictResolution.Abort);
 
     private void Complete(FileConflictResolution resolution) =>

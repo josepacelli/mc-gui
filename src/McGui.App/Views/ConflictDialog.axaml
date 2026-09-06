@@ -17,6 +17,7 @@
       <Button Content="Abort" Command="{Binding AbortCommand}" />
       <Button Content="Skip" Command="{Binding SkipCommand}" />
       <Button Content="Rename" Command="{Binding RenameCommand}" />
+      <Button Content="Update" Command="{Binding UpdateCommand}" />
       <Button Content="Overwrite" Command="{Binding OverwriteCommand}" IsDefault="True" />
     </StackPanel>
   </StackPanel>
