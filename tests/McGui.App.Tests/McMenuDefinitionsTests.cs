@@ -159,6 +159,13 @@ public class MainWindowMenuBarStructureTests
     }
 
     [Fact]
+    public void WindowTitle_IsUnchanged()
+    {
+        var content = File.ReadAllText(MainWindowAxaml);
+        Assert.Contains("Title=\"Midnight Commander GUI\"", content);
+    }
+
+    [Fact]
     public void MenuBar_HasFiveTopLevelMenusInOrder()
     {
         var content = File.ReadAllText(MainWindowAxaml);

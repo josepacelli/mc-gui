@@ -228,6 +228,28 @@ T3 → T4 → T5 → T6
 
 ---
 
+## Fix Tasks (from Verifier round 1 - `validation.md`)
+
+### T7: Add regression test for the window title ✅ Done
+
+**What**: Assert `Title="Midnight Commander GUI"` in `MainWindow.axaml` structure tests (MACUI-04 had zero test evidence per Verifier round 1).
+**Where**: `tests/McGui.App.Tests/McMenuDefinitionsTests.cs` (new `WindowTitle_IsUnchanged` fact)
+**Requirement**: MACUI-04
+**Tests**: unit (text-based)
+**Gate**: full
+**Commit**: `test(app): assert window title is unchanged`
+
+### T8: Cover Theme radio items' CommandParameter/IsChecked parity in NativeMenu ✅ Done
+
+**What**: Extend `MainWindowNativeMenuTests` with a theory asserting the 3 native `Theme` items (`System`/`Light`/`Dark`) mirror `Command`, `CommandParameter`, and `IsChecked` from their in-window counterparts (MACUI-06 gap: only plain-`Command` items were covered before).
+**Where**: `tests/McGui.App.Tests/MainWindowNativeMenuTests.cs` (new `NativeThemeItem_MirrorsCommandParameterAndCheckedStateOfInWindowItem` theory)
+**Requirement**: MACUI-06
+**Tests**: unit (text-based)
+**Gate**: full
+**Commit**: `test(app): cover native theme menu items' command parameter parity`
+
+---
+
 ## Phase Execution Map
 
 ```

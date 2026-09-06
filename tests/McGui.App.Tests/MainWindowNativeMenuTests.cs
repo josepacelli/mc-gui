@@ -67,6 +67,17 @@ public class MainWindowNativeMenuTests
     }
 
     [Theory]
+    [InlineData("System", "vm:ThemePreference.System", "IsSystemThemeChecked")]
+    [InlineData("Light", "vm:ThemePreference.Light", "IsLightThemeChecked")]
+    [InlineData("Dark", "vm:ThemePreference.Dark", "IsDarkThemeChecked")]
+    public void NativeThemeItem_MirrorsCommandParameterAndCheckedStateOfInWindowItem(string header, string commandParameter, string isCheckedProperty)
+    {
+        Assert.Contains(
+            $"<NativeMenuItem Header=\"{header}\" ToggleType=\"Radio\" IsChecked=\"{{Binding {isCheckedProperty}}}\" Command=\"{{Binding SetThemeCommand}}\" CommandParameter=\"{{x:Static {commandParameter}}}\"",
+            NativeMenuSection);
+    }
+
+    [Theory]
     [InlineData("View")]
     [InlineData("Edit")]
     [InlineData("Chmod")]

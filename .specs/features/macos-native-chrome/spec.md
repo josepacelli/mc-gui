@@ -112,9 +112,9 @@ Explicitamente excluído. Documentado para prevenir scope creep.
 | MACUI-01 | P1: Barra de título estendida | T1 | Implementing |
 | MACUI-02 | P1: Barra de título estendida | T1 | Implementing |
 | MACUI-03 | P1: Barra de título estendida | T1 | Implementing |
-| MACUI-04 | P1: Barra de título estendida | T1 | Implementing |
+| MACUI-04 | P1: Barra de título estendida | T1, T7 | Implementing |
 | MACUI-05 | P2: Menu nativo | T2 | Implementing |
-| MACUI-06 | P2: Menu nativo | T2 | Implementing |
+| MACUI-06 | P2: Menu nativo | T2, T8 | Implementing |
 | MACUI-07 | P2: Menu nativo | T2 | Implementing |
 | MACUI-08 | P2: Menu nativo | T2 | Implementing |
 | MACUI-09 | P2: Menu nativo | T2 | Implementing |
