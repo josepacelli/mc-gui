@@ -398,6 +398,98 @@ public class MacFileSystemServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CopyAsync_FollowSymlinksFalse_PreservesSymlinkAsSymlink()
+    {
+        var source = _temp.NewSubdir("follow-false-src");
+        var targetFile = WriteFile(source, "target.txt", "target-content");
+        var linkPath = Path.Combine(source, "link.txt");
+        File.CreateSymbolicLink(linkPath, targetFile);
+
+        var destination = _temp.NewSubdir("follow-false-dst");
+
+        var sourceEntry = new FileEntry(
+            "link.txt",
+            linkPath,
+            false,
+            new FileInfo(linkPath).Length,
+            new DateTimeOffset(File.GetLastWriteTimeUtc(linkPath)),
+            true,
+            false);
+        var options = new CopyMoveOptions(PreserveAttributes: false, FollowSymlinks: false);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None, options);
+
+        Assert.True(result.Succeeded);
+        var destLink = Path.Combine(destination, "link.txt");
+        Assert.True(File.Exists(destLink));
+        var destInfo = new FileInfo(destLink);
+        Assert.True(destInfo.LinkTarget is not null);
+        Assert.Equal("target.txt", Path.GetFileName(destInfo.LinkTarget));
+    }
+
+    [Fact]
+    public async Task CopyAsync_FollowSymlinksTrue_CopiesTargetContent()
+    {
+        var source = _temp.NewSubdir("follow-true-src");
+        var targetFile = WriteFile(source, "target.txt", "target-content");
+        var linkPath = Path.Combine(source, "link.txt");
+        File.CreateSymbolicLink(linkPath, targetFile);
+
+        var destination = _temp.NewSubdir("follow-true-dst");
+
+        var sourceEntry = new FileEntry(
+            "link.txt",
+            linkPath,
+            false,
+            new FileInfo(linkPath).Length,
+            new DateTimeOffset(File.GetLastWriteTimeUtc(linkPath)),
+            true,
+            false);
+        var options = new CopyMoveOptions(PreserveAttributes: false, FollowSymlinks: true);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None, options);
+
+        Assert.True(result.Succeeded);
+        var destFile = Path.Combine(destination, "link.txt");
+        Assert.True(File.Exists(destFile));
+        var destInfo = new FileInfo(destFile);
+        Assert.False(destInfo.LinkTarget is not null); // Not a symlink, it's a regular file
+        Assert.Equal("target-content", File.ReadAllText(destFile));
+    }
+
+    [Fact]
+    public async Task CopyAsync_BrokenSymlinkWithFollowTrue_SkipsAndReportsReason()
+    {
+        var source = _temp.NewSubdir("broken-symlink-src");
+        var linkPath = Path.Combine(source, "broken.txt");
+        File.CreateSymbolicLink(linkPath, "/nonexistent/target.txt"); // Broken symlink
+
+        var destination = _temp.NewSubdir("broken-symlink-dst");
+
+        var sourceEntry = new FileEntry(
+            "broken.txt",
+            linkPath,
+            false,
+            0,
+            DateTimeOffset.UtcNow,
+            true,
+            false);
+        var options = new CopyMoveOptions(PreserveAttributes: false, FollowSymlinks: true);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None, options);
+
+        Assert.True(result.Succeeded);
+        var destFile = Path.Combine(destination, "broken.txt");
+        Assert.False(File.Exists(destFile)); // Nothing copied
+        Assert.Single(result.SkippedEntries);
+        Assert.Equal(linkPath, result.SkippedEntries[0].Path);
+        Assert.Contains("broken symlink", result.SkippedEntries[0].Reason, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task CopyAsync_InsufficientSpace_ThrowsBeforeCopyingAnyFile()
     {
         var source = _temp.NewSubdir("space-src");

@@ -314,6 +314,34 @@ try
         CopyMoveOptions options,
         List<(string Path, string Reason)> skipped)
     {
+        if (entry.IsSymlink && !options.FollowSymlinks)
+        {
+            var linkTarget = new FileInfo(entry.FullPath).LinkTarget;
+            if (linkTarget is not null)
+            {
+                File.CreateSymbolicLink(destinationPath, linkTarget);
+            }
+            else
+            {
+                skipped.Add((entry.FullPath, "failed to read symlink target"));
+            }
+            return;
+        }
+
+        if (entry.IsSymlink && options.FollowSymlinks)
+        {
+            var linkTarget = new FileInfo(entry.FullPath).LinkTarget;
+            if (linkTarget is not null)
+            {
+                var resolvedTarget = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(entry.FullPath) ?? string.Empty, linkTarget));
+                if (!File.Exists(resolvedTarget) && !Directory.Exists(resolvedTarget))
+                {
+                    skipped.Add((entry.FullPath, "broken symlink"));
+                    return;
+                }
+            }
+        }
+
         File.Copy(entry.FullPath, destinationPath, overwrite: true);
 
         if (options.PreserveAttributes)
