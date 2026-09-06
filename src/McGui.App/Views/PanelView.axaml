@@ -15,6 +15,12 @@
       <Setter Property="BorderBrush" Value="{DynamicResource PanelBorderActiveBrush}" />
       <Setter Property="BorderThickness" Value="2" />
     </Style>
+    <Style Selector="ListBox.native ListBoxItem:pointerover">
+      <Setter Property="Background" Value="{DynamicResource NativeListHoverBrush}" />
+    </Style>
+    <Style Selector="ListBox.native ListBoxItem:selected">
+      <Setter Property="Background" Value="{DynamicResource NativeListSelectedBrush}" />
+    </Style>
   </UserControl.Styles>
 
   <Border Classes="panelRoot" Classes.active="{Binding IsActive}">
@@ -26,7 +32,8 @@
                  SelectedIndex="{Binding CursorIndex, Mode=OneWay}"
                  SelectionChanged="OnListSelectionChanged"
                  DoubleTapped="OnListDoubleTapped"
-                 Focusable="False">
+                 Focusable="False"
+                 Classes.native="{Binding IsMacOS}">
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:PanelEntryRow">
               <Grid ColumnDefinitions="Auto,Auto,*,Auto">

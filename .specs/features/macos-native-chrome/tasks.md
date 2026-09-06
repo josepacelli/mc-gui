@@ -171,7 +171,7 @@ T3 → T4 → T5 → T6
 
 ---
 
-### T5: Native hover/selection styling on the file list (macOS only)
+### T5: Native hover/selection styling on the file list (macOS only) ✅ Done
 
 **What**: In `PanelView.axaml`, bind `Classes.native="{Binding IsMacOS}"` on the file-list `ListBox` (same pattern as the existing `Classes.active="{Binding IsActive}"` on `Border.panelRoot`), and add `Style Selector="ListBox.native ListBoxItem:pointerover"` / `:selected` using `{DynamicResource NativeListHoverBrush}` / `NativeListSelectedBrush`. No zebra-striping (per spec Assumptions). Add a text-based test on `PanelView.axaml` asserting the binding and the two selectors exist.
 **Where**: `src/McGui.App/Views/PanelView.axaml` (modify), `tests/McGui.App.Tests/PanelViewNativeStyleTests.cs` (new)

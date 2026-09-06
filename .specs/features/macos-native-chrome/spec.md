@@ -118,10 +118,10 @@ Explicitamente excluído. Documentado para prevenir scope creep.
 | MACUI-07 | P2: Menu nativo | T2 | Implementing |
 | MACUI-08 | P2: Menu nativo | T2 | Implementing |
 | MACUI-09 | P2: Menu nativo | T2 | Implementing |
-| MACUI-10 | P3: Acabamento nativo | T3, T5, T6 | In Tasks |
-| MACUI-11 | P3: Acabamento nativo | T3, T5 | In Tasks |
+| MACUI-10 | P3: Acabamento nativo | T3, T5, T6 | Implementing |
+| MACUI-11 | P3: Acabamento nativo | T3, T5 | Implementing |
 | MACUI-12 | P3: Acabamento nativo | T4, T6 | In Tasks |
-| MACUI-13 | P3: Acabamento nativo | T4, T5 | In Tasks |
+| MACUI-13 | P3: Acabamento nativo | T4, T5 | Implementing |
 | MACUI-14 | P3: Acabamento nativo | T4, T6 | In Tasks |
 
 **ID format:** `MACUI-[NUMBER]`
