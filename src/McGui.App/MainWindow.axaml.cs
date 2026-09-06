@@ -69,6 +69,8 @@ public partial class MainWindow : Window
 
     private void OnExitClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => Close();
 
+    private void OnPullDownMenuClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => OpenFirstMenu();
+
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
         if (DataContext is not MainWindowViewModel viewModel)
@@ -224,6 +226,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.PullDownMenu:
                 OpenFirstMenu();
+                break;
+            case GestureAction.Quit:
+                Close();
                 break;
             default:
                 return;

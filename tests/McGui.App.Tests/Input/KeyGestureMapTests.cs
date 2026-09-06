@@ -40,18 +40,31 @@ public class KeyGestureMapTests
     }
 
     [Fact]
-    public void ViewAndEditActions_AreMarkedDisabled()
+    public void UnimplementedFeatureActions_AreMarkedDisabled()
     {
+        Assert.Contains(GestureAction.Help, KeyGestureMap.DisabledActions);
+        Assert.Contains(GestureAction.UserMenu, KeyGestureMap.DisabledActions);
         Assert.Contains(GestureAction.View, KeyGestureMap.DisabledActions);
         Assert.Contains(GestureAction.Edit, KeyGestureMap.DisabledActions);
-        Assert.Equal(2, KeyGestureMap.DisabledActions.Count);
+        Assert.Equal(4, KeyGestureMap.DisabledActions.Count);
     }
 
     [Fact]
-    public void F3AndF4_MapToDisabledActions()
+    public void F1F2F3AndF4_MapToDisabledActions()
     {
+        Assert.Equal(GestureAction.Help, KeyGestureMap.Gestures[new KeyGesture(Key.F1)]);
+        Assert.Equal(GestureAction.UserMenu, KeyGestureMap.Gestures[new KeyGesture(Key.F2)]);
         Assert.Equal(GestureAction.View, KeyGestureMap.Gestures[new KeyGesture(Key.F3)]);
         Assert.Equal(GestureAction.Edit, KeyGestureMap.Gestures[new KeyGesture(Key.F4)]);
+    }
+
+    [Fact]
+    public void F9AndF10_MapToEnabledActions()
+    {
+        Assert.Equal(GestureAction.PullDownMenu, KeyGestureMap.Gestures[new KeyGesture(Key.F9)]);
+        Assert.Equal(GestureAction.Quit, KeyGestureMap.Gestures[new KeyGesture(Key.F10)]);
+        Assert.DoesNotContain(GestureAction.PullDownMenu, KeyGestureMap.DisabledActions);
+        Assert.DoesNotContain(GestureAction.Quit, KeyGestureMap.DisabledActions);
     }
 
     [Fact]

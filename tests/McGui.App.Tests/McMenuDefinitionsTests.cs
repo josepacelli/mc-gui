@@ -232,7 +232,7 @@ public class MainWindowMenuBarStructureTests
     }
 
     [Theory]
-    [InlineData("F1 Help", "IsEnabled=\"True\"")]
+    [InlineData("F1 Help", "IsEnabled=\"False\"")]
     [InlineData("F2 Menu", "IsEnabled=\"True\"")]
     [InlineData("F3 View", "IsEnabled=\"False\"")]
     [InlineData("F4 Edit", "IsEnabled=\"False\"")]
@@ -240,8 +240,8 @@ public class MainWindowMenuBarStructureTests
     [InlineData("F6 Move", "Command=\"{Binding RequestMoveCommand}\"")]
     [InlineData("F7 Mkdir", "Command=\"{Binding RequestMkdirCommand}\"")]
     [InlineData("F8 Delete", "Command=\"{Binding RequestDeleteCommand}\"")]
-    [InlineData("F9 PullDn", "IsEnabled=\"True\"")]
-    [InlineData("F10 Quit", "IsEnabled=\"True\"")]
+    [InlineData("F9 PullDn", "Click=\"OnPullDownMenuClick\"")]
+    [InlineData("F10 Quit", "Click=\"OnExitClick\"")]
     public void FKeyButton_KeepsExistingCommandOrEnabledStateAndGainsNativeClass(string content, string preservedAttribute)
     {
         var xaml = File.ReadAllText(MainWindowAxaml);

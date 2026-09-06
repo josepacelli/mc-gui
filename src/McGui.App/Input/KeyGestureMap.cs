@@ -30,6 +30,8 @@ public static class KeyGestureMap
 
     public static readonly IReadOnlySet<GestureAction> DisabledActions = new HashSet<GestureAction>
     {
+        GestureAction.Help,
+        GestureAction.UserMenu,
         GestureAction.View,
         GestureAction.Edit,
     };
