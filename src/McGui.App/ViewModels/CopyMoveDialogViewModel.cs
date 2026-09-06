@@ -56,6 +56,9 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject, IComplet
     private bool preserveAttributes;
 
     [ObservableProperty]
+    private bool followSymlinks = true;
+
+    [ObservableProperty]
     private string? errorMessage;
 
     [ObservableProperty]
@@ -158,7 +161,7 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject, IComplet
 
 try
             {
-                var options = new CopyMoveOptions(PreserveAttributes, true);
+                var options = new CopyMoveOptions(PreserveAttributes, FollowSymlinks);
                 LastResult = Mode == OperationMode.Copy
                     ? await _fileSystemService.CopyAsync(plan, progress, ResolveConflict, cts.Token, options)
                     : await _fileSystemService.MoveAsync(plan, progress, ResolveConflict, cts.Token, options);

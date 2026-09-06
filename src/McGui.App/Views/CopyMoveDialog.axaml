@@ -18,6 +18,7 @@
     </StackPanel>
 
     <CheckBox Content="Preservar atributos" IsChecked="{Binding PreserveAttributes}" />
+    <CheckBox Content="Seguir links" IsChecked="{Binding FollowSymlinks}" />
 
     <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource TextErrorBrush}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
 

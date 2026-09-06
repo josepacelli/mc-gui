@@ -31,4 +31,13 @@ public class CopyMoveDialogStructureTests
         Assert.Contains("Preservar atributos", content);
         Assert.Contains("IsChecked=\"{Binding PreserveAttributes}\"", content);
     }
+
+    [Fact]
+    public void FollowSymlinks_CheckboxPresentInXaml()
+    {
+        var content = File.ReadAllText(CopyMoveDialogAxaml);
+
+        Assert.Contains("Seguir links", content);
+        Assert.Contains("IsChecked=\"{Binding FollowSymlinks}\"", content);
+    }
 }

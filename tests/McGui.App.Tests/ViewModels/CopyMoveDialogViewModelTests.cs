@@ -289,4 +289,15 @@ public class CopyMoveDialogViewModelTests : IDisposable
 
         Assert.False(vm.PreserveAttributes);
     }
+
+    [Fact]
+    public void FollowSymlinks_DefaultsToTrue()
+    {
+        var source = NewSubdir("follow-src");
+        var filePath = WriteFile(source, "a.txt");
+        var destination = NewSubdir("follow-dst");
+        var vm = BuildViewModel([ToEntry(filePath, false)], destination, OperationMode.Copy);
+
+        Assert.True(vm.FollowSymlinks);
+    }
 }
