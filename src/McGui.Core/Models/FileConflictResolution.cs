@@ -5,5 +5,6 @@ public enum FileConflictResolution
     Overwrite,
     Skip,
     Rename,
+    Update,
     Abort,
 }

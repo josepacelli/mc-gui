@@ -71,3 +71,5 @@ rm -f "$DMG_PATH"
 hdiutil create -volname "$APP_EXECUTABLE_NAME" -srcfolder "$STAGE_DIR" -ov -format UDZO "$DMG_PATH" >/dev/null
 
 echo "Done: $DMG_PATH"
+
+open $DMG_PATH
