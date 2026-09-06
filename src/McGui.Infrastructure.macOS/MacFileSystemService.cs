@@ -98,51 +98,51 @@ public sealed class MacFileSystemService : IFileSystemService
                 continue;
             }
 
-            try
-            {
-                if (File.Exists(destinationPath))
+try
                 {
-                    var resolution = resolveConflict(destinationPath);
-                    switch (resolution)
+                    if (File.Exists(destinationPath))
                     {
-                        case FileConflictResolution.Skip:
-                            filesDone++;
-                            progress.Report(new OperationProgress(entry.Name, filesDone, filesTotal, bytesDone, bytesTotal, IsCancelled: false));
-                            continue;
-                        case FileConflictResolution.Abort:
-                            skipped.Add((entry.FullPath, "aborted by user at conflict prompt"));
-                            return new OperationResult(false, skipped);
-                        case FileConflictResolution.Rename:
-                            destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
-                            File.Copy(entry.FullPath, destinationPath, overwrite: false);
-                            break;
-                        case FileConflictResolution.Update:
-                            var sourceModified = entry.ModifiedUtc.UtcDateTime;
-                            var destModified = File.GetLastWriteTimeUtc(destinationPath);
-                            if (sourceModified > destModified)
-                            {
-                                File.Copy(entry.FullPath, destinationPath, overwrite: true);
-                            }
-                            else
-                            {
+                        var resolution = resolveConflict(destinationPath);
+                        switch (resolution)
+                        {
+                            case FileConflictResolution.Skip:
                                 filesDone++;
                                 progress.Report(new OperationProgress(entry.Name, filesDone, filesTotal, bytesDone, bytesTotal, IsCancelled: false));
                                 continue;
-                            }
-                            break;
-                        case FileConflictResolution.Overwrite:
-                        default:
-                            File.Copy(entry.FullPath, destinationPath, overwrite: true);
-                            break;
+                            case FileConflictResolution.Abort:
+                                skipped.Add((entry.FullPath, "aborted by user at conflict prompt"));
+                                return new OperationResult(false, skipped);
+                            case FileConflictResolution.Rename:
+                                destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
+                                CopySingleFile(entry, destinationPath, options, skipped);
+                                break;
+                            case FileConflictResolution.Update:
+                                var sourceModified = entry.ModifiedUtc.UtcDateTime;
+                                var destModified = File.GetLastWriteTimeUtc(destinationPath);
+                                if (sourceModified > destModified)
+                                {
+                                    CopySingleFile(entry, destinationPath, options, skipped);
+                                }
+                                else
+                                {
+                                    filesDone++;
+                                    progress.Report(new OperationProgress(entry.Name, filesDone, filesTotal, bytesDone, bytesTotal, IsCancelled: false));
+                                    continue;
+                                }
+                                break;
+                            case FileConflictResolution.Overwrite:
+                            default:
+                                CopySingleFile(entry, destinationPath, options, skipped);
+                                break;
+                        }
                     }
-                }
-                else
-                {
-                    File.Copy(entry.FullPath, destinationPath, overwrite: false);
-                }
+                    else
+                    {
+                        CopySingleFile(entry, destinationPath, options, skipped);
+                    }
 
-                bytesDone += entry.SizeBytes;
-            }
+                    bytesDone += entry.SizeBytes;
+                }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 skipped.Add((entry.FullPath, ex.Message));
@@ -305,6 +305,46 @@ public sealed class MacFileSystemService : IFileSystemService
         else if (File.Exists(path))
         {
             File.Delete(path);
+        }
+    }
+
+    private static void CopySingleFile(
+        FileEntry entry,
+        string destinationPath,
+        CopyMoveOptions options,
+        List<(string Path, string Reason)> skipped)
+    {
+        File.Copy(entry.FullPath, destinationPath, overwrite: true);
+
+        if (options.PreserveAttributes)
+        {
+            ApplyPreservedAttributes(entry.FullPath, destinationPath, skipped);
+        }
+    }
+
+    private static void ApplyPreservedAttributes(
+        string sourcePath,
+        string destinationPath,
+        List<(string Path, string Reason)> skipped)
+    {
+        try
+        {
+            var mode = File.GetUnixFileMode(sourcePath);
+            File.SetUnixFileMode(destinationPath, mode);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or PlatformNotSupportedException)
+        {
+            skipped.Add((destinationPath, $"failed to preserve Unix mode: {ex.Message}"));
+        }
+
+        try
+        {
+            var modifiedUtc = File.GetLastWriteTimeUtc(sourcePath);
+            File.SetLastWriteTimeUtc(destinationPath, modifiedUtc);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            skipped.Add((destinationPath, $"failed to preserve timestamp: {ex.Message}"));
         }
     }
 

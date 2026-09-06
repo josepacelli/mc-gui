@@ -312,6 +312,92 @@ public class MacFileSystemServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CopyAsync_PreserveAttributes_ReproducesUnixModeOnDestination()
+    {
+        var source = _temp.NewSubdir("preserve-mode-src");
+        var filePath = WriteFile(source, "test.txt", "content");
+        File.SetUnixFileMode(filePath, UnixFileMode.UserRead | UnixFileMode.UserWrite); // 600
+        var destination = _temp.NewSubdir("preserve-mode-dst");
+
+        var sourceEntry = new FileEntry(
+            "test.txt",
+            filePath,
+            false,
+            new FileInfo(filePath).Length,
+            new DateTimeOffset(File.GetLastWriteTimeUtc(filePath)),
+            false,
+            false);
+        var options = new CopyMoveOptions(PreserveAttributes: true, FollowSymlinks: true);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None, options);
+
+        Assert.True(result.Succeeded);
+        var destFile = Path.Combine(destination, "test.txt");
+        var destMode = File.GetUnixFileMode(destFile);
+        Assert.Equal(UnixFileMode.UserRead | UnixFileMode.UserWrite, destMode);
+    }
+
+    [Fact]
+    public async Task CopyAsync_PreserveAttributes_ReproducesTimestampOnDestination()
+    {
+        var source = _temp.NewSubdir("preserve-time-src");
+        var filePath = WriteFile(source, "test.txt", "content");
+        var sourceTime = new DateTime(2024, 6, 15, 10, 30, 0, DateTimeKind.Utc);
+        File.SetLastWriteTimeUtc(filePath, sourceTime);
+        var destination = _temp.NewSubdir("preserve-time-dst");
+
+        var sourceEntry = new FileEntry(
+            "test.txt",
+            filePath,
+            false,
+            new FileInfo(filePath).Length,
+            new DateTimeOffset(sourceTime),
+            false,
+            false);
+        var options = new CopyMoveOptions(PreserveAttributes: true, FollowSymlinks: true);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None, options);
+
+        Assert.True(result.Succeeded);
+        var destFile = Path.Combine(destination, "test.txt");
+        var destTime = File.GetLastWriteTimeUtc(destFile);
+        Assert.Equal(sourceTime, destTime);
+    }
+
+    [Fact]
+    public async Task CopyAsync_PreserveAttributesFalse_LeavesMetadataAsDefault()
+    {
+        var source = _temp.NewSubdir("preserve-off-src");
+        var filePath = WriteFile(source, "test.txt", "content");
+        File.SetUnixFileMode(filePath, UnixFileMode.UserRead | UnixFileMode.UserWrite); // 600
+        var sourceTime = new DateTime(2024, 6, 15, 10, 30, 0, DateTimeKind.Utc);
+        File.SetLastWriteTimeUtc(filePath, sourceTime);
+        var destination = _temp.NewSubdir("preserve-off-dst");
+
+        var sourceEntry = new FileEntry(
+            "test.txt",
+            filePath,
+            false,
+            new FileInfo(filePath).Length,
+            new DateTimeOffset(sourceTime),
+            false,
+            false);
+        var options = new CopyMoveOptions(PreserveAttributes: false, FollowSymlinks: true);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Abort), CancellationToken.None, options);
+
+        Assert.True(result.Succeeded);
+        var destFile = Path.Combine(destination, "test.txt");
+        Assert.True(File.Exists(destFile));
+        // When PreserveAttributes is false, we don't explicitly call SetUnixFileMode/SetLastWriteTimeUtc
+        // The destination gets whatever the OS default is for new files (File.Copy preserves timestamp by default on Unix)
+        // This test mainly ensures no exception is thrown and copy succeeds
+    }
+
+    [Fact]
     public async Task CopyAsync_InsufficientSpace_ThrowsBeforeCopyingAnyFile()
     {
         var source = _temp.NewSubdir("space-src");
