@@ -28,6 +28,11 @@ public partial class MainWindow : Window
 
     private void OnOpened(object? sender, EventArgs e)
     {
+        if (OperatingSystem.IsMacOS())
+        {
+            ApplyMacChrome();
+        }
+
         var settings = this.GetPlatformSettings();
         if (settings is null)
         {
@@ -36,6 +41,12 @@ public partial class MainWindow : Window
 
         settings.ColorValuesChanged += OnColorValuesChanged;
         ApplySystemAccent(settings.GetColorValues());
+    }
+
+    private void ApplyMacChrome()
+    {
+        ExtendClientAreaToDecorationsHint = true;
+        WindowDecorations = WindowDecorations.Full;
     }
 
     private void OnColorValuesChanged(object? sender, PlatformColorValues values) => ApplySystemAccent(values);
