@@ -8,6 +8,134 @@
         x:Class="McGui.App.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Midnight Commander GUI">
+  <NativeMenu.Menu>
+    <NativeMenu>
+      <NativeMenuItem Header="Left">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="File listing" IsEnabled="False" />
+            <NativeMenuItem Header="Quick view" IsEnabled="False" />
+            <NativeMenuItem Header="Info" IsEnabled="False" />
+            <NativeMenuItem Header="Tree" IsEnabled="False" />
+            <NativeMenuItem Header="Panelize" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Listing format..." IsEnabled="False" />
+            <NativeMenuItem Header="Sort order..." IsEnabled="False" />
+            <NativeMenuItem Header="Filter..." IsEnabled="False" />
+            <NativeMenuItem Header="Encoding..." IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="FTP link..." IsEnabled="False" />
+            <NativeMenuItem Header="Shell link..." IsEnabled="False" />
+            <NativeMenuItem Header="SFTP link..." IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Rescan" Command="{Binding RescanActivePanelCommand}" />
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="File">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="View" IsEnabled="False" />
+            <NativeMenuItem Header="View file..." IsEnabled="False" />
+            <NativeMenuItem Header="Filtered view" IsEnabled="False" />
+            <NativeMenuItem Header="Edit" IsEnabled="False" />
+            <NativeMenuItem Header="Copy" Command="{Binding RequestCopyCommand}" />
+            <NativeMenuItem Header="Chmod" IsEnabled="False" />
+            <NativeMenuItem Header="Link" IsEnabled="False" />
+            <NativeMenuItem Header="Symlink" IsEnabled="False" />
+            <NativeMenuItem Header="Relative symlink" IsEnabled="False" />
+            <NativeMenuItem Header="Edit symlink" IsEnabled="False" />
+            <NativeMenuItem Header="Chown" IsEnabled="False" />
+            <NativeMenuItem Header="Advanced chown" IsEnabled="False" />
+            <NativeMenuItem Header="Chattr" IsEnabled="False" />
+            <NativeMenuItem Header="Rename/Move" Command="{Binding RequestMoveCommand}" />
+            <NativeMenuItem Header="Mkdir" Command="{Binding RequestMkdirCommand}" />
+            <NativeMenuItem Header="Delete" Command="{Binding RequestDeleteCommand}" />
+            <NativeMenuItem Header="Quick cd" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Select group" Command="{Binding SelectAllCommand}" />
+            <NativeMenuItem Header="Unselect group" Command="{Binding UnselectAllCommand}" />
+            <NativeMenuItem Header="Invert selection" Command="{Binding InvertSelectionCommand}" />
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Command">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="User menu" IsEnabled="False" />
+            <NativeMenuItem Header="Directory tree" IsEnabled="False" />
+            <NativeMenuItem Header="Find file" IsEnabled="False" />
+            <NativeMenuItem Header="Swap panels" IsEnabled="False" />
+            <NativeMenuItem Header="Switch panels on/off" IsEnabled="False" />
+            <NativeMenuItem Header="Compare directories" IsEnabled="False" />
+            <NativeMenuItem Header="Compare files" IsEnabled="False" />
+            <NativeMenuItem Header="External panelize" IsEnabled="False" />
+            <NativeMenuItem Header="Show directory sizes" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Command history" IsEnabled="False" />
+            <NativeMenuItem Header="Viewed/edited files history" IsEnabled="False" />
+            <NativeMenuItem Header="Directory hotlist" IsEnabled="False" />
+            <NativeMenuItem Header="Active VFS list" IsEnabled="False" />
+            <NativeMenuItem Header="Background jobs" IsEnabled="False" />
+            <NativeMenuItem Header="Screen list" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Edit extension file" IsEnabled="False" />
+            <NativeMenuItem Header="Edit menu file" IsEnabled="False" />
+            <NativeMenuItem Header="Edit highlighting group file" IsEnabled="False" />
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Options">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Configuration..." IsEnabled="False" />
+            <NativeMenuItem Header="Layout..." IsEnabled="False" />
+            <NativeMenuItem Header="Panel options..." IsEnabled="False" />
+            <NativeMenuItem Header="Confirmation..." IsEnabled="False" />
+            <NativeMenuItem Header="Appearance..." IsEnabled="False" />
+            <NativeMenuItem Header="Learn keys..." IsEnabled="False" />
+            <NativeMenuItem Header="Virtual FS..." IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Save setup" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="About..." IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Theme">
+              <NativeMenuItem.Menu>
+                <NativeMenu>
+                  <NativeMenuItem Header="System" ToggleType="Radio" IsChecked="{Binding IsSystemThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.System}" />
+                  <NativeMenuItem Header="Light" ToggleType="Radio" IsChecked="{Binding IsLightThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Light}" />
+                  <NativeMenuItem Header="Dark" ToggleType="Radio" IsChecked="{Binding IsDarkThemeChecked}" Command="{Binding SetThemeCommand}" CommandParameter="{x:Static vm:ThemePreference.Dark}" />
+                </NativeMenu>
+              </NativeMenuItem.Menu>
+            </NativeMenuItem>
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Right">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="File listing" IsEnabled="False" />
+            <NativeMenuItem Header="Quick view" IsEnabled="False" />
+            <NativeMenuItem Header="Info" IsEnabled="False" />
+            <NativeMenuItem Header="Tree" IsEnabled="False" />
+            <NativeMenuItem Header="Panelize" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Listing format..." IsEnabled="False" />
+            <NativeMenuItem Header="Sort order..." IsEnabled="False" />
+            <NativeMenuItem Header="Filter..." IsEnabled="False" />
+            <NativeMenuItem Header="Encoding..." IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="FTP link..." IsEnabled="False" />
+            <NativeMenuItem Header="Shell link..." IsEnabled="False" />
+            <NativeMenuItem Header="SFTP link..." IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Rescan" Command="{Binding RescanActivePanelCommand}" />
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+    </NativeMenu>
+  </NativeMenu.Menu>
   <Grid RowDefinitions="Auto,*,Auto">
     <Menu Grid.Row="0" x:Name="MainMenu">
       <MenuItem Header="_Left">

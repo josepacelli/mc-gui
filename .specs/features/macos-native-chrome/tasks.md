@@ -89,7 +89,7 @@ T3 → T4 → T5 → T6
 
 ---
 
-### T2: Mirror in-window menu into the native macOS menu bar
+### T2: Mirror in-window menu into the native macOS menu bar ✅ Done
 
 **What**: Add `<NativeMenu.Menu>` to `MainWindow.axaml` with a `NativeMenuItem` tree that mirrors every header/item of the existing in-window `Menu` (`_Left`, `_File`, `_Command`, `_Options`, `_Right`), reusing the exact same `Command`/`CommandParameter`/`IsEnabled` bindings. Add a text-based structure test proving parity (headers present in order, every bound item's `Command` matches its in-window counterpart, every `IsEnabled="False"` item mirrored as disabled).
 **Where**: `src/McGui.App/MainWindow.axaml` (add), `tests/McGui.App.Tests/MainWindowNativeMenuTests.cs` (new)
