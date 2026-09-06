@@ -12,6 +12,10 @@
       <SolidColorBrush x:Key="TextWarningBrush" Color="#C2410C" />
       <SolidColorBrush x:Key="FolderIconBrush" Color="#1967D2" />
       <SolidColorBrush x:Key="FileIconBrush" Color="#5F6368" />
+      <SolidColorBrush x:Key="NativeListHoverBrush" Color="#E8E8E8" />
+      <SolidColorBrush x:Key="NativeListSelectedBrush" Color="#D0E2FF" />
+      <SolidColorBrush x:Key="NativeToolbarBackgroundBrush" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="NativeToolbarButtonForegroundBrush" Color="#1D1D1F" />
     </ResourceDictionary>
     <ResourceDictionary x:Key="Dark">
       <SolidColorBrush x:Key="PanelBorderBrush" Color="#4D4D4D" />
@@ -24,6 +28,10 @@
       <SolidColorBrush x:Key="TextWarningBrush" Color="#FFB74D" />
       <SolidColorBrush x:Key="FolderIconBrush" Color="#8AB4F8" />
       <SolidColorBrush x:Key="FileIconBrush" Color="#9AA0A6" />
+      <SolidColorBrush x:Key="NativeListHoverBrush" Color="#3A3A3C" />
+      <SolidColorBrush x:Key="NativeListSelectedBrush" Color="#0A84FF" />
+      <SolidColorBrush x:Key="NativeToolbarBackgroundBrush" Color="#2C2C2E" />
+      <SolidColorBrush x:Key="NativeToolbarButtonForegroundBrush" Color="#F5F5F7" />
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

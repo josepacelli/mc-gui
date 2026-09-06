@@ -22,6 +22,10 @@ public class ThemeResourcesTests
         "TextWarningBrush",
         "FolderIconBrush",
         "FileIconBrush",
+        "NativeListHoverBrush",
+        "NativeListSelectedBrush",
+        "NativeToolbarBackgroundBrush",
+        "NativeToolbarButtonForegroundBrush",
     ];
 
     private static readonly Regex HexColor = new(@"#[0-9A-Fa-f]{6,8}", RegexOptions.Compiled);

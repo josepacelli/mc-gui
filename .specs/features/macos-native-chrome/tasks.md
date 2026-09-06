@@ -118,7 +118,7 @@ T3 → T4 → T5 → T6
 
 ---
 
-### T3: Add native brush tokens to Themes.axaml
+### T3: Add native brush tokens to Themes.axaml ✅ Done
 
 **What**: Add `NativeListHoverBrush`, `NativeListSelectedBrush`, `NativeToolbarBackgroundBrush`, `NativeToolbarButtonForegroundBrush` `SolidColorBrush` keys to both `Light` and `Dark` dictionaries in `Themes.axaml`. Extend `ThemeResourcesTests.ExpectedTokens` with the four new keys (existing parametrized test already asserts both-theme presence + valid color format for every listed token).
 **Where**: `src/McGui.App/Themes.axaml` (modify), `tests/McGui.App.Tests/Theming/ThemeResourcesTests.cs` (modify `ExpectedTokens`)
