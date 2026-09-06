@@ -15,6 +15,7 @@ public static class CompositionRoot
         services.AddSingleton<IFileSystemService, MacFileSystemService>();
         services.AddSingleton<ITrashService, MacTrashService>();
         services.AddSingleton<IPathHistoryStore, MacPathHistoryStore>();
+        services.AddSingleton<IViewerService, MacViewerService>();
         services.AddTransient<MainWindowViewModel>();
 
         return services.BuildServiceProvider();
