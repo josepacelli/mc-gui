@@ -428,4 +428,15 @@ public class PanelViewModelTests
         Assert.Equal("/left-new", saved.LeftPanelPath);
         Assert.Equal("/right-original", saved.RightPanelPath);
     }
+
+    [Fact]
+    public void IsMacOS_MatchesOperatingSystemCheck()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left", File("a.txt", "/left"));
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new PanelViewModel(fs, history, PanelSide.Left, fallbackHomeDirectory: "/home");
+
+        Assert.Equal(OperatingSystem.IsMacOS(), vm.IsMacOS);
+    }
 }

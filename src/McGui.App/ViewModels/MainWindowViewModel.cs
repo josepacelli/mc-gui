@@ -50,6 +50,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public event EventHandler<MkdirDialogViewModel>? MkdirRequested;
 
+    public bool IsMacOS => OperatingSystem.IsMacOS();
+
     public bool IsSystemThemeChecked => CurrentTheme == ThemePreference.System;
 
     public bool IsLightThemeChecked => CurrentTheme == ThemePreference.Light;

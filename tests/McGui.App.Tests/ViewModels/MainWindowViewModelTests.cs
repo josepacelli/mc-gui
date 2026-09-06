@@ -327,4 +327,13 @@ public class MainWindowViewModelTests
         Assert.Contains(nameof(vm.IsLightThemeChecked), changed);
         Assert.Contains(nameof(vm.IsSystemThemeChecked), changed);
     }
+
+    [Fact]
+    public void IsMacOS_MatchesOperatingSystemCheck()
+    {
+        var (fs, trash, history) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history);
+
+        Assert.Equal(OperatingSystem.IsMacOS(), vm.IsMacOS);
+    }
 }

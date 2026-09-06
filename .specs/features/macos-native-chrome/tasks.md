@@ -145,7 +145,7 @@ T3 → T4 → T5 → T6
 
 ---
 
-### T4: Expose `IsMacOS` on PanelViewModel and MainWindowViewModel
+### T4: Expose `IsMacOS` on PanelViewModel and MainWindowViewModel ✅ Done
 
 **What**: Add a read-only `bool IsMacOS => OperatingSystem.IsMacOS();` property to `PanelViewModel` and to `MainWindowViewModel`. Pure platform check, no other state.
 **Where**: `src/McGui.App/ViewModels/PanelViewModel.cs`, `src/McGui.App/ViewModels/MainWindowViewModel.cs`

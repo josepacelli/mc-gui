@@ -33,6 +33,8 @@ public sealed partial class PanelViewModel : ObservableObject
     [ObservableProperty]
     private string? directoryErrorMessage;
 
+    public bool IsMacOS => OperatingSystem.IsMacOS();
+
     public PanelViewModel(
         IFileSystemService fileSystemService,
         IPathHistoryStore pathHistoryStore,
