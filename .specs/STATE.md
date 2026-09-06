@@ -12,12 +12,13 @@
 
 ## Handoff
 
-- **Feature**: `macos-installer` (`.specs/features/macos-installer/`) — **DONE**.
-- **Execute**: T1-T4 + Verifier independente **PASS** (13/13, sensor 3/3) — `dbfe690`..`7d9b625`. Release `v0.1.0` criada no GitHub com asset `mc-gui-0.1.0-arm64.dmg`.
-- **Completed**: 180 testes (17 Core + 31 Infra + 132 App). Working tree limpo, branch `main`; origin atualizado (push + tag v0.1.0 feitos c/ go-ahead).
-- **Entregue**: `packaging/build-macos.sh` (publish self-contained osx-arm64 → bundle `Midnight Commander GUI.app` → DMG drag-to-install), `packaging/Info.plist` (id `mcgui.jpmo.dev.br`, CFBundleName `MC GUI` ≤15, CFBundleDisplayName `Midnight Commander GUI`, versão por arg), `packaging/make-icon.sh` (icns de PNG commitado em `packaging/icon-asset/`, sem PIL p/ CI), `.github/workflows/build-macos.yml` (macos-14; DMG artifact + release em tag `v*`, prefixo `v` removido). Título da janela → "Midnight Commander GUI".
-- **Decisões**: sem assinatura/notarização (dev; Gatekeeper pede clique-direito+Abrir); só arm64; ícone commitado (PIL removido — spec atualizado); DMG 0.1.0 padrão, versão por `$1`.
+- **Feature**: `macos-native-chrome` (`.specs/features/macos-native-chrome/`) — **DONE**.
+- **Execute**: T1-T9 (6 tasks originais + 3 fix tasks pós-Verifier) + Verifier independente **PASS** na 3ª rodada (14/14 ACs, 11 verified + 3 accepted gaps; gate 218/218; sensor 5/5) — `e52ff58`..`699daca`.
+- **Completed**: 218 testes (17 Core + 31 Infra + 170 App, +38 desde a feature anterior). Working tree limpo, branch `main` (não pushed — sem go-ahead pedido/dado pro push nesta sessão).
+- **Entregue**: título estendido com semáforo inline (`ApplyMacChrome()` em `MainWindow.axaml.cs`, guardado por `OperatingSystem.IsMacOS()`); `NativeMenu.Menu` espelhando a `Menu` in-window (mesmos `Command`/`CommandParameter`/`IsEnabled`); brushes nativos em `Themes.axaml` (`NativeListHoverBrush`, `NativeListSelectedBrush`, `NativeToolbarBackgroundBrush`, `NativeToolbarButtonForegroundBrush`); `IsMacOS` em `PanelViewModel`/`MainWindowViewModel` gating `Classes.native`/`Classes.fkey` na lista de arquivos e barra F1-F10.
+- **Bug real pego em produção**: durante a 1ª rodada de Verifier, o usuário testou o app e reportou ao vivo (via screenshot) que estender a área do cliente sem reservar faixa de arraste quebrou o drag da janela e sobrepôs o menu aos semáforos. Corrigido reservando um `Border` (`Grid.Row="0"`, 28px, `WindowDecorationProperties.ElementRole="TitleBar"`) só no macOS, mesmo padrão `Classes.x="{Binding IsMacOS}"` do resto da feature. Confirmado visualmente pelo usuário rodando `dotnet run --project src/McGui.App`.
+- **Decisões**: sem projeto `Infrastructure` novo (Avalonia já abstrai `ExtendClientAreaToDecorationsHint`/`NativeMenu`/`WindowDecorationProperties` por SO — não viola AD-001); sem zebra-striping na lista (só hover/seleção via `Style Selector` já existente); altura de 28px da faixa de título é estimativa não confirmada por API do Avalonia (lição `L-009` registrada em `.specs/LESSONS.md`).
 - **Next step**: aguardando próxima feature do usuário. Backlog MC: viewer F3, editor F4, chmod/chown, links, VFS/FTP, hotlist, usermenu F2; refinamento do ícone (design); assinatura/notarização p/ distribuição pública; installers Win/Linux.
 - **Blockers**: none
 - **Uncommitted files**: este `STATE.md` (handoff atual).
-- **Branch**: main (origin/main sincronizado; tag v0.1.0 no origin).
+- **Branch**: main (local à frente de origin/main — feature inteira não empurrada; pedir go-ahead antes de push).
