@@ -18,6 +18,9 @@
     <Style Selector="Button.fkey:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource NativeListHoverBrush}" />
     </Style>
+    <Style Selector="Border.macTitleBar">
+      <Setter Property="Height" Value="28" />
+    </Style>
   </Window.Styles>
   <NativeMenu.Menu>
     <NativeMenu>
@@ -147,8 +150,9 @@
       </NativeMenuItem>
     </NativeMenu>
   </NativeMenu.Menu>
-  <Grid RowDefinitions="Auto,*,Auto">
-    <Menu Grid.Row="0" x:Name="MainMenu">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <Border Grid.Row="0" Background="{DynamicResource NativeToolbarBackgroundBrush}" Classes.macTitleBar="{Binding IsMacOS}" WindowDecorationProperties.ElementRole="TitleBar" />
+    <Menu Grid.Row="1" x:Name="MainMenu">
       <MenuItem Header="_Left">
         <MenuItem Header="File listing" IsEnabled="False" />
         <MenuItem Header="Quick view" IsEnabled="False" />
@@ -253,12 +257,12 @@
       </MenuItem>
     </Menu>
 
-    <Grid Grid.Row="1" ColumnDefinitions="*,*">
+    <Grid Grid.Row="2" ColumnDefinitions="*,*">
       <views:PanelView Grid.Column="0" DataContext="{Binding LeftPanel}" />
       <views:PanelView Grid.Column="1" DataContext="{Binding RightPanel}" />
     </Grid>
 
-    <Grid Grid.Row="2">
+    <Grid Grid.Row="3">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="*" />

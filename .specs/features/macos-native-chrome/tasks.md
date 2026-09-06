@@ -248,6 +248,18 @@ T3 → T4 → T5 → T6
 **Gate**: full
 **Commit**: `test(app): cover native theme menu items' command parameter parity`
 
+### T9: Fix window-drag/traffic-lights overlap regression (MACUI-01/MACUI-03) ✅ Done
+
+**What**: Verifier round 1 caught a live, user-reported regression: `ApplyMacChrome()` extends the client area but never reserves a draggable title-bar band, so the in-window `Menu` (`Grid.Row="0"`) sat directly under/against the macOS traffic lights, breaking window dragging and visually crowding the menu. Fix: reserve a blank `Border` row above the `Menu`, marked `WindowDecorationProperties.ElementRole="TitleBar"` (Avalonia's documented mechanism for a native-draggable custom title-bar region even with `WindowDecorations="Full"`), sized only on macOS via the same `Classes.x="{Binding IsMacOS}"` pattern used elsewhere in this feature (0 height / no-op on Windows/Linux).
+**Where**: `src/McGui.App/MainWindow.axaml` (new top row + `Border.macTitleBar` style), `tests/McGui.App.Tests/McMenuDefinitionsTests.cs` (2 new facts), `tests/McGui.App.Tests/MainWindowNativeMenuTests.cs` (1 assertion updated - no longer hardcodes the Menu's row number)
+**Requirement**: MACUI-01, MACUI-03
+**Tests**: unit (text-based)
+**Gate**: full
+
+**Known limitation (flagged, not silently assumed):** the drag-strip height (28px) is a standard macOS title-bar height estimate, not a value confirmed by an Avalonia API (no such API was found via Context7/docs - flagged per the Knowledge Verification Chain's step 5 rather than presented as fact). This still requires a **manual macOS UAT pass** (drag by the empty strip above the menu; confirm no visual overlap with the traffic lights) before the feature can be marked fully done - this fix closes the reported symptom but was not visually re-confirmed by a human.
+
+**Commit**: `fix(app): reserve draggable title-bar strip above the in-window menu`
+
 ---
 
 ## Phase Execution Map

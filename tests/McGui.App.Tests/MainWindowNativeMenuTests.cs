@@ -92,7 +92,7 @@ public class MainWindowNativeMenuTests
     public void NativeMenu_DoesNotDuplicateInWindowMenuCommands()
     {
         var content = File.ReadAllText(MainWindowAxaml);
-        var inWindowMenuStart = content.IndexOf("<Menu Grid.Row=\"0\"", StringComparison.Ordinal);
-        Assert.True(inWindowMenuStart > 0, "in-window Menu must still be declared");
+        var inWindowMenuStart = content.IndexOf("<Menu ", StringComparison.Ordinal);
+        Assert.True(inWindowMenuStart > 0 && content.Contains("x:Name=\"MainMenu\""), "in-window Menu must still be declared");
     }
 }

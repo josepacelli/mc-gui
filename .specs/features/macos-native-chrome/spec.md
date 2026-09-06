@@ -109,9 +109,9 @@ Explicitamente excluído. Documentado para prevenir scope creep.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| MACUI-01 | P1: Barra de título estendida | T1 | Implementing |
+| MACUI-01 | P1: Barra de título estendida | T1, T9 | Implementing |
 | MACUI-02 | P1: Barra de título estendida | T1 | Implementing |
-| MACUI-03 | P1: Barra de título estendida | T1 | Implementing |
+| MACUI-03 | P1: Barra de título estendida | T1, T9 | Implementing |
 | MACUI-04 | P1: Barra de título estendida | T1, T7 | Implementing |
 | MACUI-05 | P2: Menu nativo | T2 | Implementing |
 | MACUI-06 | P2: Menu nativo | T2, T8 | Implementing |

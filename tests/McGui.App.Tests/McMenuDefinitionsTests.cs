@@ -159,6 +159,20 @@ public class MainWindowMenuBarStructureTests
     }
 
     [Fact]
+    public void TitleBarDragStrip_IsReservedAboveTheMenuAndMacOnly()
+    {
+        var content = File.ReadAllText(MainWindowAxaml);
+
+        var dragStripStart = content.IndexOf(
+            "<Border Grid.Row=\"0\" Background=\"{DynamicResource NativeToolbarBackgroundBrush}\" Classes.macTitleBar=\"{Binding IsMacOS}\" WindowDecorationProperties.ElementRole=\"TitleBar\" />",
+            StringComparison.Ordinal);
+        var menuStart = content.IndexOf("<Menu Grid.Row=\"1\" x:Name=\"MainMenu\">", StringComparison.Ordinal);
+
+        Assert.True(dragStripStart >= 0, "title-bar drag strip must be declared with WindowDecorationProperties.ElementRole=\"TitleBar\"");
+        Assert.True(menuStart > dragStripStart, "Menu must sit below the reserved title-bar drag strip, not overlap it");
+    }
+
+    [Fact]
     public void WindowTitle_IsUnchanged()
     {
         var content = File.ReadAllText(MainWindowAxaml);
@@ -250,5 +264,15 @@ public class MainWindowMenuBarStructureTests
         var block = xaml[start..(start + 300)];
         Assert.Contains("{DynamicResource NativeToolbarBackgroundBrush}", block);
         Assert.Contains("{DynamicResource NativeToolbarButtonForegroundBrush}", block);
+    }
+
+    [Fact]
+    public void MacTitleBarStyle_ReservesNonZeroHeightOnlyOnMac()
+    {
+        var xaml = File.ReadAllText(MainWindowAxaml);
+        Assert.Contains("Selector=\"Border.macTitleBar\"", xaml);
+        var start = xaml.IndexOf("Selector=\"Border.macTitleBar\"", StringComparison.Ordinal);
+        var block = xaml[start..(start + 150)];
+        Assert.Contains("Property=\"Height\" Value=\"28\"", block);
     }
 }
