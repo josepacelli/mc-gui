@@ -12,11 +12,13 @@ public interface IFileSystemService
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct);
+        CancellationToken ct,
+        CopyMoveOptions options = default(CopyMoveOptions));
 
     Task<OperationResult> MoveAsync(
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct);
+        CancellationToken ct,
+        CopyMoveOptions options = default(CopyMoveOptions));
 }

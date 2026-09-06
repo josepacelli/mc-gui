@@ -47,21 +47,24 @@ public sealed class MacFileSystemService : IFileSystemService
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct) =>
-        Task.Run(() => ExecuteCopy(plan, progress, resolveConflict, ct), CancellationToken.None);
+        CancellationToken ct,
+        CopyMoveOptions options = default(CopyMoveOptions)) =>
+        Task.Run(() => ExecuteCopy(plan, progress, resolveConflict, ct, options ?? CopyMoveOptions.Default), CancellationToken.None);
 
     public Task<OperationResult> MoveAsync(
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct) =>
-        Task.Run(() => ExecuteMove(plan, progress, resolveConflict, ct), CancellationToken.None);
+        CancellationToken ct,
+        CopyMoveOptions options = default(CopyMoveOptions)) =>
+        Task.Run(() => ExecuteMove(plan, progress, resolveConflict, ct, options ?? CopyMoveOptions.Default), CancellationToken.None);
 
     private OperationResult ExecuteCopy(
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct)
+        CancellationToken ct,
+        CopyMoveOptions options)
     {
         EnsureSufficientSpace(plan);
 
@@ -156,7 +159,8 @@ public sealed class MacFileSystemService : IFileSystemService
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct)
+        CancellationToken ct,
+        CopyMoveOptions options)
     {
         EnsureSufficientSpace(plan);
 

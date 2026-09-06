@@ -153,13 +153,13 @@ public sealed partial class CopyMoveDialogViewModel : ObservableObject, IComplet
         _applyToAllResolution = null;
         var progress = new SynchronousProgress<OperationProgress>(ReportProgress);
 
-        try
-        {
-            LastResult = Mode == OperationMode.Copy
-                ? await _fileSystemService.CopyAsync(plan, progress, ResolveConflict, cts.Token)
-                : await _fileSystemService.MoveAsync(plan, progress, ResolveConflict, cts.Token);
-            IsCompleted = true;
-        }
+try
+            {
+                LastResult = Mode == OperationMode.Copy
+                    ? await _fileSystemService.CopyAsync(plan, progress, ResolveConflict, cts.Token, CopyMoveOptions.Default)
+                    : await _fileSystemService.MoveAsync(plan, progress, ResolveConflict, cts.Token, CopyMoveOptions.Default);
+                IsCompleted = true;
+            }
         catch (InsufficientDiskSpaceException ex)
         {
             ErrorMessage = ex.Message;

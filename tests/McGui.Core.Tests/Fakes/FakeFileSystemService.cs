@@ -18,13 +18,15 @@ public sealed class FakeFileSystemService : IFileSystemService
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct) =>
+        CancellationToken ct,
+        CopyMoveOptions options = default(CopyMoveOptions)) =>
         throw new NotSupportedException();
 
     public Task<OperationResult> MoveAsync(
         CopyMovePlan plan,
         IProgress<OperationProgress> progress,
         Func<string, FileConflictResolution> resolveConflict,
-        CancellationToken ct) =>
+        CancellationToken ct,
+        CopyMoveOptions options = default(CopyMoveOptions)) =>
         throw new NotSupportedException();
 }
