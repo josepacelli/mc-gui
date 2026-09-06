@@ -200,7 +200,7 @@ T3 → T4 → T5 → T6
 
 ---
 
-### T6: Native toolbar styling on the F1-F10 button bar (macOS only)
+### T6: Native toolbar styling on the F1-F10 button bar (macOS only) ✅ Done
 
 **What**: In `MainWindow.axaml`, bind `Classes.fkey="{Binding IsMacOS}"` on each of the ten F1-F10 `Button` elements (Command/CommandParameter/IsEnabled untouched), and add a `<Window.Styles>` `Style Selector=".fkey"` / `.fkey:pointerover"` using `NativeToolbarBackgroundBrush`/`NativeToolbarButtonForegroundBrush`. Add a runtime-reapply check: because `Classes.fkey` is bound to a VM property (not raised on theme change), confirm brushes are `DynamicResource` so `ApplyTheme` picks them up automatically (no new reapply code needed - reuses existing `OnViewModelPropertyChanged`/`ApplyTheme` hook). Extend the existing `MainWindowMenuBarStructureTests`-style text assertions with checks for the ten `Classes.fkey` bindings and unchanged `Command`/`CommandParameter`/`IsEnabled` per button.
 **Where**: `src/McGui.App/MainWindow.axaml` (modify), `tests/McGui.App.Tests/McMenuDefinitionsTests.cs` (modify - add facts to `MainWindowMenuBarStructureTests`)

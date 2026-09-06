@@ -209,4 +209,39 @@ public class MainWindowMenuBarStructureTests
         Assert.Contains("<MenuItem Header=\"Rescan\" Command=\"{Binding RescanActivePanelCommand}\"", content);
         Assert.Contains("<MenuItem Header=\"Exit\" Click=\"OnExitClick\"", content);
     }
+
+    [Theory]
+    [InlineData("F1 Help", "IsEnabled=\"True\"")]
+    [InlineData("F2 Menu", "IsEnabled=\"True\"")]
+    [InlineData("F3 View", "IsEnabled=\"False\"")]
+    [InlineData("F4 Edit", "IsEnabled=\"False\"")]
+    [InlineData("F5 Copy", "Command=\"{Binding RequestCopyCommand}\"")]
+    [InlineData("F6 Move", "Command=\"{Binding RequestMoveCommand}\"")]
+    [InlineData("F7 Mkdir", "Command=\"{Binding RequestMkdirCommand}\"")]
+    [InlineData("F8 Delete", "Command=\"{Binding RequestDeleteCommand}\"")]
+    [InlineData("F9 PullDn", "IsEnabled=\"True\"")]
+    [InlineData("F10 Quit", "IsEnabled=\"True\"")]
+    public void FKeyButton_KeepsExistingCommandOrEnabledStateAndGainsNativeClass(string content, string preservedAttribute)
+    {
+        var xaml = File.ReadAllText(MainWindowAxaml);
+        var buttonStart = xaml.IndexOf($"Content=\"{content}\"", StringComparison.Ordinal);
+        Assert.True(buttonStart >= 0, $"missing button {content}");
+
+        var lineEnd = xaml.IndexOf("/>", buttonStart, StringComparison.Ordinal);
+        var buttonTag = xaml[buttonStart..lineEnd];
+
+        Assert.Contains(preservedAttribute, buttonTag);
+        Assert.Contains("Classes.fkey=\"{Binding IsMacOS}\"", buttonTag);
+    }
+
+    [Fact]
+    public void FKeyStyle_UsesNativeToolbarBrushes()
+    {
+        var xaml = File.ReadAllText(MainWindowAxaml);
+        Assert.Contains("Selector=\"Button.fkey\"", xaml);
+        var start = xaml.IndexOf("Selector=\"Button.fkey\"", StringComparison.Ordinal);
+        var block = xaml[start..(start + 300)];
+        Assert.Contains("{DynamicResource NativeToolbarBackgroundBrush}", block);
+        Assert.Contains("{DynamicResource NativeToolbarButtonForegroundBrush}", block);
+    }
 }

@@ -8,6 +8,17 @@
         x:Class="McGui.App.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Midnight Commander GUI">
+  <Window.Styles>
+    <Style Selector="Button.fkey">
+      <Setter Property="Background" Value="{DynamicResource NativeToolbarBackgroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource NativeToolbarButtonForegroundBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="Button.fkey:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource NativeListHoverBrush}" />
+    </Style>
+  </Window.Styles>
   <NativeMenu.Menu>
     <NativeMenu>
       <NativeMenuItem Header="Left">
@@ -260,16 +271,16 @@
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <Button Grid.Column="0" Content="F1 Help" IsEnabled="True" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="1" Content="F2 Menu" IsEnabled="True" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="2" Content="F3 View" IsEnabled="False" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="3" Content="F4 Edit" IsEnabled="False" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="4" Content="F5 Copy" Command="{Binding RequestCopyCommand}" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="5" Content="F6 Move" Command="{Binding RequestMoveCommand}" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="6" Content="F7 Mkdir" Command="{Binding RequestMkdirCommand}" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="7" Content="F8 Delete" Command="{Binding RequestDeleteCommand}" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="8" Content="F9 PullDn" IsEnabled="True" HorizontalAlignment="Stretch" />
-      <Button Grid.Column="9" Content="F10 Quit" IsEnabled="True" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="0" Content="F1 Help" IsEnabled="True" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="1" Content="F2 Menu" IsEnabled="True" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="2" Content="F3 View" IsEnabled="False" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="3" Content="F4 Edit" IsEnabled="False" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="4" Content="F5 Copy" Command="{Binding RequestCopyCommand}" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="5" Content="F6 Move" Command="{Binding RequestMoveCommand}" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="6" Content="F7 Mkdir" Command="{Binding RequestMkdirCommand}" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="7" Content="F8 Delete" Command="{Binding RequestDeleteCommand}" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="8" Content="F9 PullDn" IsEnabled="True" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
+      <Button Grid.Column="9" Content="F10 Quit" IsEnabled="True" HorizontalAlignment="Stretch" Classes.fkey="{Binding IsMacOS}" />
     </Grid>
   </Grid>
 </Window>
