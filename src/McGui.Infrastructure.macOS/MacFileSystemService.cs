@@ -203,13 +203,13 @@ try
                             return new OperationResult(false, skipped);
                         case FileConflictResolution.Rename:
                             destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
-                            MoveEntry(entry, destinationPath);
+                            MoveEntry(entry, destinationPath, options, skipped);
                             break;
                         case FileConflictResolution.Update:
                             if (entry.IsDirectory)
                             {
                                 DeleteExisting(destinationPath);
-                                MoveEntry(entry, destinationPath);
+                                MoveEntry(entry, destinationPath, options, skipped);
                             }
                             else
                             {
@@ -218,7 +218,7 @@ try
                                 if (sourceModified > destModified)
                                 {
                                     DeleteExisting(destinationPath);
-                                    MoveEntry(entry, destinationPath);
+                                    MoveEntry(entry, destinationPath, options, skipped);
                                 }
                                 else
                                 {
@@ -231,13 +231,13 @@ try
                         case FileConflictResolution.Overwrite:
                         default:
                             DeleteExisting(destinationPath);
-                            MoveEntry(entry, destinationPath);
+                            MoveEntry(entry, destinationPath, options, skipped);
                             break;
                     }
                 }
                 else
                 {
-                    MoveEntry(entry, destinationPath);
+                    MoveEntry(entry, destinationPath, options, skipped);
                 }
 
                 bytesDone += entrySize;
@@ -254,7 +254,7 @@ try
         return new OperationResult(true, skipped);
     }
 
-    private static void MoveEntry(FileEntry entry, string destinationPath)
+    private static void MoveEntry(FileEntry entry, string destinationPath, CopyMoveOptions options, List<(string Path, string Reason)> skipped)
     {
         if (entry.IsDirectory)
         {
@@ -264,7 +264,7 @@ try
             }
             catch (IOException)
             {
-                CopyDirectoryRecursively(entry.FullPath, destinationPath);
+                CopyDirectoryRecursively(entry.FullPath, destinationPath, options, skipped);
                 Directory.Delete(entry.FullPath, recursive: true);
             }
         }
@@ -276,23 +276,30 @@ try
             }
             catch (IOException)
             {
-                File.Copy(entry.FullPath, destinationPath, overwrite: false);
+                var tempEntry = entry with { Name = Path.GetFileName(destinationPath) };
+                CopySingleFile(tempEntry, destinationPath, options, skipped);
                 File.Delete(entry.FullPath);
             }
         }
     }
 
-    private static void CopyDirectoryRecursively(string sourceDir, string destinationDir)
+    private static void CopyDirectoryRecursively(
+        string sourceDir,
+        string destinationDir,
+        CopyMoveOptions options,
+        List<(string Path, string Reason)> skipped)
     {
         Directory.CreateDirectory(destinationDir);
         foreach (var filePath in Directory.EnumerateFiles(sourceDir))
         {
-            File.Copy(filePath, Path.Combine(destinationDir, Path.GetFileName(filePath)), overwrite: false);
+            var entry = BuildEntry(filePath);
+            var destPath = Path.Combine(destinationDir, Path.GetFileName(filePath));
+            CopySingleFile(entry, destPath, options, skipped);
         }
 
         foreach (var subDir in Directory.EnumerateDirectories(sourceDir))
         {
-            CopyDirectoryRecursively(subDir, Path.Combine(destinationDir, Path.GetFileName(subDir)));
+            CopyDirectoryRecursively(subDir, Path.Combine(destinationDir, Path.GetFileName(subDir)), options, skipped);
         }
     }
 
