@@ -62,6 +62,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: spec.md:38,95
 - last seen: 2026-09-05T22:55:01Z
 
+### L-009 - When a UI dimension has no Avalonia sizing API to confirm it (e.g. a native title-bar height estimate), pick a literal value, flag it as an unverified assumption, and treat human visual UAT as a non-blocking follow-up once the underlying mechanism is structurally tested - not as a blocking code defect.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `Avalonia window chrome` · harmful: 0
+- features: macos-native-chrome
+- evidence: P1 AC3 (.specs/features/macos-native-chrome/validation.md round 3) (Avalonia window chrome)
+- last seen: 2026-09-06T11:34:50Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

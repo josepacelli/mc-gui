@@ -6,10 +6,10 @@ MC GUI hoje abre com chrome padrão do Avalonia: barra de título do SO separada
 
 ## Goals
 
-- [ ] No macOS, a janela usa barra de título estendida com semáforo (círculos vermelho/amarelo/verde) inline, no estilo de apps nativos.
-- [ ] No macOS, os mesmos comandos do menu hoje disponíveis na `Menu` da janela também aparecem no menu bar nativo do sistema.
-- [ ] No macOS, lista de arquivos dos painéis e barra de botões F1-F10 recebem acabamento visual nativo (linhas alternadas/hover, botões estilo toolbar), sem mudar nenhum comando ou binding existente.
-- [ ] Windows e Linux mantêm o chrome atual, inalterado.
+- [x] No macOS, a janela usa barra de título estendida com semáforo (círculos vermelho/amarelo/verde) inline, no estilo de apps nativos.
+- [x] No macOS, os mesmos comandos do menu hoje disponíveis na `Menu` da janela também aparecem no menu bar nativo do sistema.
+- [x] No macOS, lista de arquivos dos painéis e barra de botões F1-F10 recebem acabamento visual nativo (linhas alternadas/hover, botões estilo toolbar), sem mudar nenhum comando ou binding existente.
+- [x] Windows e Linux mantêm o chrome atual, inalterado.
 
 ## Out of Scope
 
@@ -109,33 +109,33 @@ Explicitamente excluído. Documentado para prevenir scope creep.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| MACUI-01 | P1: Barra de título estendida | T1, T9 | Implementing |
-| MACUI-02 | P1: Barra de título estendida | T1 | Implementing |
-| MACUI-03 | P1: Barra de título estendida | T1, T9 | Implementing |
-| MACUI-04 | P1: Barra de título estendida | T1, T7 | Implementing |
-| MACUI-05 | P2: Menu nativo | T2 | Implementing |
-| MACUI-06 | P2: Menu nativo | T2, T8 | Implementing |
-| MACUI-07 | P2: Menu nativo | T2 | Implementing |
-| MACUI-08 | P2: Menu nativo | T2 | Implementing |
-| MACUI-09 | P2: Menu nativo | T2 | Implementing |
-| MACUI-10 | P3: Acabamento nativo | T3, T5, T6 | Implementing |
-| MACUI-11 | P3: Acabamento nativo | T3, T5 | Implementing |
-| MACUI-12 | P3: Acabamento nativo | T4, T6 | Implementing |
-| MACUI-13 | P3: Acabamento nativo | T4, T5 | Implementing |
-| MACUI-14 | P3: Acabamento nativo | T4, T6 | Implementing |
+| MACUI-01 | P1: Barra de título estendida | T1, T9 | ✅ Verified |
+| MACUI-02 | P1: Barra de título estendida | T1 | ⚠️ Accepted gap (untestable: no headless multi-OS harness) |
+| MACUI-03 | P1: Barra de título estendida | T1, T9 | ✅ Verified |
+| MACUI-04 | P1: Barra de título estendida | T1, T7 | ✅ Verified |
+| MACUI-05 | P2: Menu nativo | T2 | ✅ Verified |
+| MACUI-06 | P2: Menu nativo | T2, T8 | ✅ Verified |
+| MACUI-07 | P2: Menu nativo | T2 | ✅ Verified |
+| MACUI-08 | P2: Menu nativo | T2 | ⚠️ Accepted gap (framework-reliant, untestable) |
+| MACUI-09 | P2: Menu nativo | T2 | ✅ Verified |
+| MACUI-10 | P3: Acabamento nativo | T3, T5, T6 | ✅ Verified |
+| MACUI-11 | P3: Acabamento nativo | T3, T5 | ✅ Verified |
+| MACUI-12 | P3: Acabamento nativo | T4, T6 | ✅ Verified |
+| MACUI-13 | P3: Acabamento nativo | T4, T5 | ⚠️ Accepted gap (cross-platform class-absence untested by construction only) |
+| MACUI-14 | P3: Acabamento nativo | T4, T6 | ✅ Verified |
 
 **ID format:** `MACUI-[NUMBER]`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped ✅
+**Coverage:** 14 total, 14 mapped to tasks, 0 unmapped ✅ — 11/14 ✅ Verified, 3/14 ⚠️ accepted architectural spec-precision gaps (this repo has no `Avalonia.Headless`, so Windows/Linux non-activation claims cannot be exercised in CI; see `validation.md`). 0 open Blockers or Needs-Fix.
 
 ---
 
 ## Success Criteria
 
-- [ ] No macOS, janela abre com semáforo inline na área de título estendida (P1).
-- [ ] No macOS, menu bar do sistema mostra os mesmos headers/itens/estados da `Menu` in-window e executa os mesmos comandos (P2).
-- [ ] No macOS, lista de arquivos e barra F1-F10 mudam de acabamento junto com a troca de tema, sem quebrar nenhum comando existente (P3).
-- [ ] Em Windows/Linux, nenhuma mudança de comportamento ou aparência é observável (regressão zero).
-- [ ] Suite de testes existente (180 testes) continua passando; novos testes cobrem a checagem de plataforma (macOS vs. não-macOS) para chrome/menu/estilos.
+- [x] No macOS, janela abre com semáforo inline na área de título estendida, com faixa de arraste reservada acima do menu - confirmado por teste estrutural e por UAT manual do usuário (P1).
+- [x] No macOS, menu bar do sistema mostra os mesmos headers/itens/estados da `Menu` in-window e executa os mesmos comandos (P2).
+- [x] No macOS, lista de arquivos e barra F1-F10 mudam de acabamento junto com a troca de tema, sem quebrar nenhum comando existente (P3).
+- [x] Em Windows/Linux, nenhuma mudança de comportamento ou aparência é observável (regressão zero) - por construção (`IsMacOS` guard), não testado em CI multi-SO (accepted gap, ver `validation.md`).
+- [x] Suite de testes existente (180 testes) continua passando; suite final tem 218 testes (17 Core + 31 Infra + 170 App), +38 novos cobrindo a checagem de plataforma (macOS vs. não-macOS) para chrome/menu/estilos.

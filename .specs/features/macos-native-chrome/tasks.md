@@ -256,7 +256,9 @@ T3 → T4 → T5 → T6
 **Tests**: unit (text-based)
 **Gate**: full
 
-**Known limitation (flagged, not silently assumed):** the drag-strip height (28px) is a standard macOS title-bar height estimate, not a value confirmed by an Avalonia API (no such API was found via Context7/docs - flagged per the Knowledge Verification Chain's step 5 rather than presented as fact). This still requires a **manual macOS UAT pass** (drag by the empty strip above the menu; confirm no visual overlap with the traffic lights) before the feature can be marked fully done - this fix closes the reported symptom but was not visually re-confirmed by a human.
+**Known limitation (flagged, not silently assumed):** the drag-strip height (28px) is a standard macOS title-bar height estimate, not a value confirmed by an Avalonia API (no such API was found via Context7/docs - flagged per the Knowledge Verification Chain's step 5 rather than presented as fact).
+
+**Manual macOS UAT**: ✅ Confirmed by the user on 2026-09-06, running the app directly (`dotnet run --project src/McGui.App`) - dragging and the traffic-lights overlap both work correctly now ("deu certo").
 
 **Commit**: `fix(app): reserve draggable title-bar strip above the in-window menu`
 
