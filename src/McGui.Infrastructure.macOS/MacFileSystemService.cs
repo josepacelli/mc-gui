@@ -113,6 +113,20 @@ public sealed class MacFileSystemService : IFileSystemService
                             destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
                             File.Copy(entry.FullPath, destinationPath, overwrite: false);
                             break;
+                        case FileConflictResolution.Update:
+                            var sourceModified = entry.ModifiedUtc.UtcDateTime;
+                            var destModified = File.GetLastWriteTimeUtc(destinationPath);
+                            if (sourceModified > destModified)
+                            {
+                                File.Copy(entry.FullPath, destinationPath, overwrite: true);
+                            }
+                            else
+                            {
+                                filesDone++;
+                                progress.Report(new OperationProgress(entry.Name, filesDone, filesTotal, bytesDone, bytesTotal, IsCancelled: false));
+                                continue;
+                            }
+                            break;
                         case FileConflictResolution.Overwrite:
                         default:
                             File.Copy(entry.FullPath, destinationPath, overwrite: true);
@@ -186,6 +200,29 @@ public sealed class MacFileSystemService : IFileSystemService
                         case FileConflictResolution.Rename:
                             destinationPath = NamingCollisionResolver.ResolveCollision(destinationPath);
                             MoveEntry(entry, destinationPath);
+                            break;
+                        case FileConflictResolution.Update:
+                            if (entry.IsDirectory)
+                            {
+                                DeleteExisting(destinationPath);
+                                MoveEntry(entry, destinationPath);
+                            }
+                            else
+                            {
+                                var sourceModified = entry.ModifiedUtc.UtcDateTime;
+                                var destModified = File.GetLastWriteTimeUtc(destinationPath);
+                                if (sourceModified > destModified)
+                                {
+                                    DeleteExisting(destinationPath);
+                                    MoveEntry(entry, destinationPath);
+                                }
+                                else
+                                {
+                                    filesDone++;
+                                    progress.Report(new OperationProgress(entry.Name, filesDone, filesTotal, bytesDone, bytesTotal, IsCancelled: false));
+                                    continue;
+                                }
+                            }
                             break;
                         case FileConflictResolution.Overwrite:
                         default:

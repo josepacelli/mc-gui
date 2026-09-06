@@ -206,6 +206,112 @@ public class MacFileSystemServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CopyAsync_NameConflictWithUpdate_SourceNewer_OverwritesDestination()
+    {
+        var source = _temp.NewSubdir("update-newer-src");
+        var filePath = WriteFile(source, "dup.txt", "new-content");
+        var destination = _temp.NewSubdir("update-newer-dst");
+        var destFile = WriteFile(destination, "dup.txt", "old-content");
+        var sourceTime = new DateTime(2024, 1, 1, 12, 0, 10, DateTimeKind.Utc);
+        var destTime = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        File.SetLastWriteTimeUtc(filePath, sourceTime);
+        File.SetLastWriteTimeUtc(destFile, destTime);
+
+        var sourceEntry = new FileEntry(
+            "dup.txt",
+            filePath,
+            false,
+            new FileInfo(filePath).Length,
+            new DateTimeOffset(sourceTime),
+            false,
+            false);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Update), CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal("new-content", File.ReadAllText(Path.Combine(destination, "dup.txt")));
+    }
+
+    [Fact]
+    public async Task CopyAsync_NameConflictWithUpdate_SourceOlder_SkipsDestination()
+    {
+        var source = _temp.NewSubdir("update-older-src");
+        var filePath = WriteFile(source, "dup.txt", "new-content");
+        var destination = _temp.NewSubdir("update-older-dst");
+        var destFile = WriteFile(destination, "dup.txt", "old-content");
+        var sourceTime = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        var destTime = new DateTime(2024, 1, 1, 12, 0, 10, DateTimeKind.Utc);
+        File.SetLastWriteTimeUtc(filePath, sourceTime);
+        File.SetLastWriteTimeUtc(destFile, destTime);
+
+        var sourceEntry = new FileEntry(
+            "dup.txt",
+            filePath,
+            false,
+            new FileInfo(filePath).Length,
+            new DateTimeOffset(sourceTime),
+            false,
+            false);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Update), CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal("old-content", File.ReadAllText(Path.Combine(destination, "dup.txt")));
+    }
+
+    [Fact]
+    public async Task CopyAsync_NameConflictWithUpdate_SourceEqual_SkipsDestination()
+    {
+        var source = _temp.NewSubdir("update-equal-src");
+        var filePath = WriteFile(source, "dup.txt", "new-content");
+        var destination = _temp.NewSubdir("update-equal-dst");
+        var destFile = WriteFile(destination, "dup.txt", "old-content");
+        var sameTime = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        File.SetLastWriteTimeUtc(filePath, sameTime);
+        File.SetLastWriteTimeUtc(destFile, sameTime);
+
+        var sourceEntry = new FileEntry(
+            "dup.txt",
+            filePath,
+            false,
+            new FileInfo(filePath).Length,
+            new DateTimeOffset(sameTime),
+            false,
+            false);
+        var plan = new CopyMovePlan([sourceEntry], destination, OperationMode.Copy);
+
+        var result = await _sut.CopyAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Update), CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal("old-content", File.ReadAllText(Path.Combine(destination, "dup.txt")));
+    }
+
+    [Fact]
+    public async Task MoveAsync_DirectoryNameConflictWithUpdate_BehavesLikeOverwrite()
+    {
+        var source = _temp.NewSubdir("move-update-dir-src");
+        var subDir = Directory.CreateDirectory(Path.Combine(source, "sub")).FullName;
+        WriteFile(subDir, "nested.txt", "new-content");
+        var destination = _temp.NewSubdir("move-update-dir-dst");
+        // Conflict on the same name as the source directory (top-level entry)
+        var existingDir = Directory.CreateDirectory(Path.Combine(destination, "move-update-dir-src")).FullName;
+        WriteFile(existingDir, "nested.txt", "old-content");
+
+        var plan = new CopyMovePlan(
+            [ToEntry(source, true), ToEntry(subDir, true), ToEntry(Path.Combine(subDir, "nested.txt"), false)],
+            destination,
+            OperationMode.Move);
+
+        var result = await _sut.MoveAsync(plan, new Progress<OperationProgress>(), AlwaysReturn(FileConflictResolution.Update), CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.False(Directory.Exists(source));
+        Assert.Equal("new-content", File.ReadAllText(Path.Combine(destination, "move-update-dir-src", "sub", "nested.txt")));
+    }
+
+    [Fact]
     public async Task CopyAsync_InsufficientSpace_ThrowsBeforeCopyingAnyFile()
     {
         var source = _temp.NewSubdir("space-src");
