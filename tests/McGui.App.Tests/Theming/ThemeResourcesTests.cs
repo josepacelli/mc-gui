@@ -26,6 +26,18 @@ public class ThemeResourcesTests
         "NativeListSelectedBrush",
         "NativeToolbarBackgroundBrush",
         "NativeToolbarButtonForegroundBrush",
+        "NativeToolbarButtonHoverBackgroundBrush",
+        "NativeToolbarButtonPressedBackgroundBrush",
+        "NativeToolbarBorderBrush",
+        "SearchBarBackgroundBrush",
+        "SearchBarBorderBrush",
+        "ViewerBackgroundBrush",
+        "StatusBarBackgroundBrush",
+        "StatusBarBorderBrush",
+        "TextForegroundBrush",
+        "TextMutedBrush",
+        "ThemeBackgroundBrush",
+        "MonospaceFontFamily",
     ];
 
     private static readonly Regex HexColor = new(@"#[0-9A-Fa-f]{6,8}", RegexOptions.Compiled);

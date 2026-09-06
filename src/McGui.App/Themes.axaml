@@ -16,6 +16,18 @@
       <SolidColorBrush x:Key="NativeListSelectedBrush" Color="#D0E2FF" />
       <SolidColorBrush x:Key="NativeToolbarBackgroundBrush" Color="#F0F0F0" />
       <SolidColorBrush x:Key="NativeToolbarButtonForegroundBrush" Color="#1D1D1F" />
+      <SolidColorBrush x:Key="NativeToolbarButtonHoverBackgroundBrush" Color="#E0E0E0" />
+      <SolidColorBrush x:Key="NativeToolbarButtonPressedBackgroundBrush" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="NativeToolbarBorderBrush" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="SearchBarBackgroundBrush" Color="#F5F5F5" />
+      <SolidColorBrush x:Key="SearchBarBorderBrush" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="ViewerBackgroundBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#F5F5F5" />
+      <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="TextForegroundBrush" Color="#1D1D1F" />
+      <SolidColorBrush x:Key="TextMutedBrush" Color="#8E8E93" />
+      <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="MonospaceFontFamily" Color="#000000" />
     </ResourceDictionary>
     <ResourceDictionary x:Key="Dark">
       <SolidColorBrush x:Key="PanelBorderBrush" Color="#4D4D4D" />
@@ -32,6 +44,18 @@
       <SolidColorBrush x:Key="NativeListSelectedBrush" Color="#0A84FF" />
       <SolidColorBrush x:Key="NativeToolbarBackgroundBrush" Color="#2C2C2E" />
       <SolidColorBrush x:Key="NativeToolbarButtonForegroundBrush" Color="#F5F5F7" />
+      <SolidColorBrush x:Key="NativeToolbarButtonHoverBackgroundBrush" Color="#3A3A3C" />
+      <SolidColorBrush x:Key="NativeToolbarButtonPressedBackgroundBrush" Color="#48484A" />
+      <SolidColorBrush x:Key="NativeToolbarBorderBrush" Color="#3A3A3C" />
+      <SolidColorBrush x:Key="SearchBarBackgroundBrush" Color="#2C2C2E" />
+      <SolidColorBrush x:Key="SearchBarBorderBrush" Color="#3A3A3C" />
+      <SolidColorBrush x:Key="ViewerBackgroundBrush" Color="#1E1E1E" />
+      <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#2C2C2E" />
+      <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#3A3A3C" />
+      <SolidColorBrush x:Key="TextForegroundBrush" Color="#F5F5F7" />
+      <SolidColorBrush x:Key="TextMutedBrush" Color="#98989D" />
+      <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#1E1E1E" />
+      <SolidColorBrush x:Key="MonospaceFontFamily" Color="#FFFFFF" />
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
