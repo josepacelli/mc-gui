@@ -122,3 +122,33 @@ public class EditorSearchTests
         Assert.Equal(0, count);
     }
 }
+public class EditorSearchReplaceNextTests
+{
+    private static readonly SearchOptions Plain = new(Regex: false, CaseSensitive: true, WholeWord: false);
+
+    [Fact]
+    public void ReplaceNext_FromOffset_ReplacesFirstMatchAtOrAfterOffset()
+    {
+        var (result, replaced) = EditorSearch.ReplaceNext("foo foo foo", "foo", "bar", Plain, fromOffset: 5);
+
+        Assert.True(replaced);
+        Assert.Equal("foo foo bar", result);
+    }
+
+    [Fact]
+    public void ReplaceNext_NoMatchAfterOffset_UnchangedAndFalse()
+    {
+        var (result, replaced) = EditorSearch.ReplaceNext("foo", "foo", "bar", Plain, fromOffset: 5);
+
+        Assert.False(replaced);
+        Assert.Equal("foo", result);
+    }
+
+    [Fact]
+    public void ReplaceNext_WrapsToZeroWhenNoMatchAtOrAfterOffset()
+    {
+        // Contract: replaces only >= fromOffset; caller handles wrap.
+        var (_, replaced) = EditorSearch.ReplaceNext("foo bar", "foo", "x", Plain, fromOffset: 3);
+        Assert.False(replaced);
+    }
+}

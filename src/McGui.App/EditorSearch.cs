@@ -55,6 +55,35 @@ public static class EditorSearch
         return (result, count);
     }
 
+    /// <summary>
+    /// Replaces the first match whose start offset is &gt;= <paramref name="fromOffset"/>.
+    /// Returns the new text and whether a replacement happened.
+    /// </summary>
+    public static (string Text, bool Replaced) ReplaceNext(string text, string pattern, string replacement, SearchOptions options, int fromOffset)
+    {
+        if (string.IsNullOrEmpty(pattern) || text.Length == 0)
+        {
+            return (text, false);
+        }
+
+        var regex = BuildRegex(pattern, options);
+        foreach (Match m in regex.Matches(text))
+        {
+            if (options.WholeWord && !IsWholeWord(text, m.Index, m.Length))
+            {
+                continue;
+            }
+
+            if (m.Index >= fromOffset)
+            {
+                var replaced = m.Result(replacement);
+                return (text.Remove(m.Index, m.Length).Insert(m.Index, replaced), true);
+            }
+        }
+
+        return (text, false);
+    }
+
     private static Regex BuildRegex(string pattern, SearchOptions options)
     {
         var regexOptions = RegexOptions.None;
