@@ -88,6 +88,8 @@ public partial class MainWindow : Window
             await ShowUntilCompletedAsync(new DeleteConfirmDialog(), dialogViewModel, RefreshBothPanelsAsync);
         viewModel.MkdirRequested += async (_, dialogViewModel) =>
             await ShowUntilCompletedAsync(new MkdirDialog(), dialogViewModel, RefreshActivePanelAsync);
+        viewModel.ViewRequested += async (_, viewerViewModel) =>
+            await ShowUntilCompletedAsync(new ViewerWindow(), viewerViewModel, () => Task.CompletedTask);
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -229,6 +231,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.Quit:
                 Close();
+                break;
+            case GestureAction.View:
+                viewModel.RequestViewCommand.Execute(null);
                 break;
             default:
                 return;

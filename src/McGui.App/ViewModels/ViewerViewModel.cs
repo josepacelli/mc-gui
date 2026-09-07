@@ -15,7 +15,7 @@ using McGui.Core.Models;
 
 namespace McGui.App.ViewModels;
 
-public sealed partial class ViewerViewModel : ObservableObject
+public sealed partial class ViewerViewModel : ObservableObject, ICompletable
 {
     private readonly IViewerService _viewerService;
     private CancellationTokenSource? _loadCts;
@@ -62,6 +62,9 @@ public sealed partial class ViewerViewModel : ObservableObject
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _isCompleted;
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;

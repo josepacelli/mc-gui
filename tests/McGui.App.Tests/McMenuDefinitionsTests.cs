@@ -85,7 +85,7 @@ public class McMenuDefinitionsTests
     public void EnabledFileItems_AreTheExpectedOperations()
     {
         Assert.Equal(
-            ["Copy", "Rename/Move", "Mkdir", "Delete", "Select group", "Unselect group", "Invert selection", "Exit"],
+            ["View", "Copy", "Rename/Move", "Mkdir", "Delete", "Select group", "Unselect group", "Invert selection", "Exit"],
             EnabledTexts(McMenuDefinitions.ForMenu("File")));
     }
 
@@ -109,7 +109,6 @@ public class McMenuDefinitionsTests
     }
 
     [Theory]
-    [InlineData("File", "View")]
     [InlineData("File", "Edit")]
     [InlineData("File", "Chmod")]
     [InlineData("File", "Link")]

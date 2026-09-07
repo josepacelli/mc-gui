@@ -44,9 +44,8 @@ public class KeyGestureMapTests
     {
         Assert.Contains(GestureAction.Help, KeyGestureMap.DisabledActions);
         Assert.Contains(GestureAction.UserMenu, KeyGestureMap.DisabledActions);
-        Assert.Contains(GestureAction.View, KeyGestureMap.DisabledActions);
         Assert.Contains(GestureAction.Edit, KeyGestureMap.DisabledActions);
-        Assert.Equal(4, KeyGestureMap.DisabledActions.Count);
+        Assert.Equal(3, KeyGestureMap.DisabledActions.Count);
     }
 
     [Fact]

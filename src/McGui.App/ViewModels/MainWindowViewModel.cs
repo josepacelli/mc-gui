@@ -16,6 +16,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private readonly IFileSystemService _fileSystemService;
     private readonly ITrashService _trashService;
     private readonly CopyMovePlanner _planner;
+    private readonly IViewerService _viewerService;
 
     [ObservableProperty]
     private PanelViewModel activePanel;
@@ -26,11 +27,12 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsDarkThemeChecked))]
     private ThemePreference currentTheme = ThemePreference.System;
 
-    public MainWindowViewModel(IFileSystemService fileSystemService, ITrashService trashService, IPathHistoryStore pathHistoryStore)
+    public MainWindowViewModel(IFileSystemService fileSystemService, ITrashService trashService, IPathHistoryStore pathHistoryStore, IViewerService viewerService)
     {
         _fileSystemService = fileSystemService;
         _trashService = trashService;
         _planner = new CopyMovePlanner(fileSystemService);
+        _viewerService = viewerService;
         ConflictPrompt = new AutoSkipConflictPrompt();
         LeftPanel = new PanelViewModel(fileSystemService, pathHistoryStore, PanelSide.Left);
         RightPanel = new PanelViewModel(fileSystemService, pathHistoryStore, PanelSide.Right);
@@ -49,6 +51,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public event EventHandler<DeleteConfirmDialogViewModel>? DeleteRequested;
 
     public event EventHandler<MkdirDialogViewModel>? MkdirRequested;
+
+    public event EventHandler<ViewerViewModel>? ViewRequested;
 
     public bool IsMacOS => OperatingSystem.IsMacOS();
 
@@ -167,5 +171,27 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         public Task<ConflictPromptResult> PromptAsync(string destinationPath) =>
             Task.FromResult(new ConflictPromptResult(FileConflictResolution.Skip, ApplyToAll: true));
+    }
+
+    [RelayCommand]
+    public void RequestView()
+    {
+        var sources = GetOperationSources(ActivePanel);
+        if (sources.Count == 0)
+        {
+            return;
+        }
+
+        // Only allow viewing files, not directories
+        var fileEntry = sources.FirstOrDefault(e => !e.IsDirectory);
+        if (fileEntry == null)
+        {
+            return;
+        }
+
+        var viewerViewModel = new ViewerViewModel(_viewerService);
+        viewerViewModel.FilePath = fileEntry.FullPath;
+        
+        ViewRequested?.Invoke(this, viewerViewModel);
     }
 }

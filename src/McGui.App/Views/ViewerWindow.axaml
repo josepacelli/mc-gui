@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:McGui.App.ViewModels"
-        xmlns:views="using:McGui.App.Views"
+        xmlns:conv="using:McGui.App.Converters"
         mc:Ignorable="d"
         x:Class="McGui.App.Views.ViewerWindow"
         x:DataType="vm:ViewerViewModel"
@@ -12,6 +12,10 @@
         Title="{Binding Title, StringFormat='Viewer - {0}'}"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource ThemeBackgroundBrush}">
+
+  <Window.Resources>
+    <conv:BoolToWrapConverter x:Key="BoolToWrapConverter" />
+  </Window.Resources>
 
   <Window.Styles>
     <Style Selector="Button.fkey">
@@ -96,7 +100,13 @@
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="{DynamicResource ViewerBackgroundBrush}">
-      <ContentControl x:Name="ContentPresenter" Content="{Binding Mode, Converter={StaticResource ModeToContentConverter}}" />
+      <TextBlock x:Name="ContentTextBlock"
+                 Text="{Binding Content}"
+                 TextWrapping="{Binding WordWrap, Converter={StaticResource BoolToWrapConverter}}"
+                 FontFamily="{DynamicResource MonospaceFontFamily}"
+                 FontSize="13"
+                 TextTrimming="CharacterEllipsis"
+                 Margin="8" />
     </ScrollViewer>
 
     <!-- Status Bar -->

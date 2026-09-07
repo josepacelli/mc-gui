@@ -63,7 +63,7 @@ public static class McMenuDefinitions
 
     private static IReadOnlyList<McMenuItem> FileItems() =>
     [
-        McMenuItem.Item("&View"),
+        McMenuItem.Item("&View", "View"),
         McMenuItem.Item("Vie&w file..."),
         McMenuItem.Item("&Filtered view"),
         McMenuItem.Item("&Edit"),
