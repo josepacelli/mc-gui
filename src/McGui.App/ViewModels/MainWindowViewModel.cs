@@ -17,6 +17,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private readonly ITrashService _trashService;
     private readonly CopyMovePlanner _planner;
     private readonly IViewerService _viewerService;
+    private readonly IEditorService _editorService;
 
     [ObservableProperty]
     private PanelViewModel activePanel;
@@ -27,13 +28,20 @@ public sealed partial class MainWindowViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsDarkThemeChecked))]
     private ThemePreference currentTheme = ThemePreference.System;
 
-    public MainWindowViewModel(IFileSystemService fileSystemService, ITrashService trashService, IPathHistoryStore pathHistoryStore, IViewerService viewerService)
+    public MainWindowViewModel(
+        IFileSystemService fileSystemService,
+        ITrashService trashService,
+        IPathHistoryStore pathHistoryStore,
+        IViewerService viewerService,
+        IEditorService editorService)
     {
         _fileSystemService = fileSystemService;
         _trashService = trashService;
         _planner = new CopyMovePlanner(fileSystemService);
         _viewerService = viewerService;
+        _editorService = editorService;
         ConflictPrompt = new AutoSkipConflictPrompt();
+        SaveChangesPrompt = new AutoSaveChangesPrompt();
         LeftPanel = new PanelViewModel(fileSystemService, pathHistoryStore, PanelSide.Left);
         RightPanel = new PanelViewModel(fileSystemService, pathHistoryStore, PanelSide.Right);
         LeftPanel.IsActive = true;
@@ -46,6 +54,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public IConflictPrompt ConflictPrompt { get; set; }
 
+    public ISaveChangesPrompt SaveChangesPrompt { get; set; }
+
     public event EventHandler<CopyMoveDialogViewModel>? CopyMoveRequested;
 
     public event EventHandler<DeleteConfirmDialogViewModel>? DeleteRequested;
@@ -53,6 +63,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public event EventHandler<MkdirDialogViewModel>? MkdirRequested;
 
     public event EventHandler<ViewerViewModel>? ViewRequested;
+
+    public event EventHandler<EditorWindowViewModel>? EditRequested;
 
     public bool IsMacOS => OperatingSystem.IsMacOS();
 
@@ -171,6 +183,30 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         public Task<ConflictPromptResult> PromptAsync(string destinationPath) =>
             Task.FromResult(new ConflictPromptResult(FileConflictResolution.Skip, ApplyToAll: true));
+    }
+
+    private sealed class AutoSaveChangesPrompt : ISaveChangesPrompt
+    {
+        public Task<SaveChangesResult> PromptAsync(string fileName) =>
+            Task.FromResult(SaveChangesResult.Discard);
+    }
+
+    [RelayCommand]
+    public void RequestEdit()
+    {
+        var entries = GetOperationSources(ActivePanel)
+            .Where(e => !e.IsDirectory)
+            .ToList();
+        if (entries.Count == 0)
+        {
+            return;
+        }
+
+        var editorViewModel = new EditorWindowViewModel(_editorService, SaveChangesPrompt)
+        {
+            InitialOpenPaths = entries.Select(e => e.FullPath).ToList(),
+        };
+        EditRequested?.Invoke(this, editorViewModel);
     }
 
     [RelayCommand]

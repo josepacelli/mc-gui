@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -82,6 +83,7 @@ public partial class MainWindow : Window
         ApplyTheme(viewModel.CurrentTheme);
 
         viewModel.ConflictPrompt = new WindowConflictPrompt(this);
+        viewModel.SaveChangesPrompt = new WindowSaveChangesPrompt(this);
         viewModel.CopyMoveRequested += async (_, dialogViewModel) =>
             await ShowUntilCompletedAsync(new CopyMoveDialog(), dialogViewModel, RefreshBothPanelsAsync);
         viewModel.DeleteRequested += async (_, dialogViewModel) =>
@@ -90,6 +92,18 @@ public partial class MainWindow : Window
             await ShowUntilCompletedAsync(new MkdirDialog(), dialogViewModel, RefreshActivePanelAsync);
         viewModel.ViewRequested += async (_, viewerViewModel) =>
             await ShowUntilCompletedAsync(new ViewerWindow(), viewerViewModel, () => Task.CompletedTask);
+        viewModel.EditRequested += async (_, editorViewModel) =>
+        {
+            if (editorViewModel.InitialOpenPaths is { } paths)
+            {
+                foreach (var path in paths)
+                {
+                    await editorViewModel.OpenFileAsync(path, CancellationToken.None);
+                }
+            }
+
+            await ShowUntilCompletedAsync(new EditorWindow(), editorViewModel, () => Task.CompletedTask);
+        };
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -234,6 +248,9 @@ public partial class MainWindow : Window
                 break;
             case GestureAction.View:
                 viewModel.RequestViewCommand.Execute(null);
+                break;
+            case GestureAction.Edit:
+                viewModel.RequestEditCommand.Execute(null);
                 break;
             default:
                 return;

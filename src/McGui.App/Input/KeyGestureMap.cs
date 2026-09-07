@@ -32,6 +32,5 @@ public static class KeyGestureMap
     {
         GestureAction.Help,
         GestureAction.UserMenu,
-        GestureAction.Edit,
     };
 }

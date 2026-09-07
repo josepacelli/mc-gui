@@ -66,7 +66,7 @@ public static class McMenuDefinitions
         McMenuItem.Item("&View", "View"),
         McMenuItem.Item("Vie&w file..."),
         McMenuItem.Item("&Filtered view"),
-        McMenuItem.Item("&Edit"),
+        McMenuItem.Item("&Edit", "Edit"),
         McMenuItem.Item("&Copy", "Copy"),
         McMenuItem.Item("C&hmod"),
         McMenuItem.Item("&Link"),

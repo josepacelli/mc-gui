@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ public sealed partial class EditorWindowViewModel : ObservableObject, ICompletab
     }
 
     public ObservableCollection<EditorTabViewModel> Tabs { get; } = new();
+
+    public IReadOnlyList<string>? InitialOpenPaths { get; init; }
 
     [ObservableProperty]
     private EditorTabViewModel? selectedTab;

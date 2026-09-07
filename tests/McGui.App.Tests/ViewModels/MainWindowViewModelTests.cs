@@ -6,21 +6,21 @@ namespace McGui.App.Tests.ViewModels;
 
 public class MainWindowViewModelTests
 {
-    private static (FakeFileSystemService FileSystem, FakeTrashService Trash, FakePathHistoryStore History, FakeViewerService Viewer) BuildDependencies()
+    private static (FakeFileSystemService FileSystem, FakeTrashService Trash, FakePathHistoryStore History, FakeViewerService Viewer, FakeEditorService Editor) BuildDependencies()
     {
         var fs = new FakeFileSystemService();
         fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        return (fs, new FakeTrashService(), history, new FakeViewerService());
+        return (fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
     }
 
     [Fact]
     public void Constructor_LeftPanelIsActiveByDefault()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
 
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         Assert.Same(vm.LeftPanel, vm.ActivePanel);
         Assert.True(vm.LeftPanel.IsActive);
@@ -30,8 +30,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void SwitchActivePanel_TogglesFromLeftToRight()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         vm.SwitchActivePanel();
 
@@ -43,8 +43,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void SwitchActivePanel_CalledTwice_ReturnsToLeftPanel()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         vm.SwitchActivePanel();
         vm.SwitchActivePanel();
@@ -57,8 +57,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void RequestCopy_WithCursorEntry_PrefillsOppositePanelAsDestination()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         CopyMoveDialogViewModel? requested = null;
         vm.CopyMoveRequested += (_, dialog) => requested = dialog;
 
@@ -74,8 +74,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void RequestMove_SingleMarkedEntry_PrefillsSourceOwnDirectoryToEnableRename()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         vm.ActivePanel.ToggleMark(0);
         CopyMoveDialogViewModel? requested = null;
         vm.CopyMoveRequested += (_, dialog) => requested = dialog;
@@ -98,7 +98,7 @@ public class MainWindowViewModelTests
             new FileEntry("b.txt", "/left/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         fs.AddDirectory("/right", new FileEntry("c.txt", "/right/c.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService());
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
         vm.ActivePanel.ToggleMark(1);
         vm.ActivePanel.ToggleMark(2);
         CopyMoveDialogViewModel? requested = null;
@@ -119,7 +119,7 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/left");
         fs.AddDirectory("/right");
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService());
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
         var raised = false;
         vm.CopyMoveRequested += (_, _) => raised = true;
 
@@ -135,7 +135,7 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService());
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
         vm.ActivePanel.MoveCursorTo(0);
         var raised = false;
         vm.CopyMoveRequested += (_, _) => raised = true;
@@ -152,7 +152,7 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/left", new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         fs.AddDirectory("/right", new FileEntry("b.txt", "/right/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false));
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService());
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
         vm.ActivePanel.ToggleMark(1);
         CopyMoveDialogViewModel? requested = null;
         vm.CopyMoveRequested += (_, dialog) => requested = dialog;
@@ -171,7 +171,7 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/left");
         fs.AddDirectory("/right");
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService());
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
         var raised = false;
         vm.CopyMoveRequested += (_, _) => raised = true;
 
@@ -183,8 +183,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void RequestDelete_WithCursorEntry_RaisesDeleteRequestedWithSelectedEntries()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         DeleteConfirmDialogViewModel? requested = null;
         vm.DeleteRequested += (_, dialog) => requested = dialog;
 
@@ -202,7 +202,7 @@ public class MainWindowViewModelTests
         fs.AddDirectory("/left");
         fs.AddDirectory("/right");
         var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
-        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService());
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
         var raised = false;
         vm.DeleteRequested += (_, _) => raised = true;
 
@@ -214,8 +214,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void RequestMkdir_RaisesMkdirRequestedForActivePanelDirectory()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         MkdirDialogViewModel? requested = null;
         vm.MkdirRequested += (_, dialog) => requested = dialog;
 
@@ -228,8 +228,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void Constructor_CurrentThemeDefaultsToSystem()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         Assert.Equal(ThemePreference.System, vm.CurrentTheme);
         Assert.True(vm.IsSystemThemeChecked);
@@ -240,8 +240,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void SetTheme_ForEachPreference_UpdatesCurrentThemeAndCheckState()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         vm.SetTheme(ThemePreference.Light);
 
@@ -266,8 +266,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void CycleTheme_FromSystem_MovesToLight()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         vm.CycleTheme();
 
@@ -277,8 +277,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void CycleTheme_FromLight_MovesToDark()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         vm.SetTheme(ThemePreference.Light);
 
         vm.CycleTheme();
@@ -289,8 +289,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void CycleTheme_FromDark_ReturnsToSystem()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         vm.SetTheme(ThemePreference.Dark);
 
         vm.CycleTheme();
@@ -302,8 +302,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void CycleTheme_ThreeTimes_ReturnsToSystem()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         vm.CycleTheme();
         vm.CycleTheme();
@@ -315,8 +315,8 @@ public class MainWindowViewModelTests
     [Fact]
     public void SetTheme_RaisesPropertyChangedForCurrentThemeAndCheckStates()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
         var changed = new List<string?>();
         vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
 
@@ -331,9 +331,65 @@ public class MainWindowViewModelTests
     [Fact]
     public void IsMacOS_MatchesOperatingSystemCheck()
     {
-        var (fs, trash, history, viewer) = BuildDependencies();
-        var vm = new MainWindowViewModel(fs, trash, history, viewer);
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
 
         Assert.Equal(OperatingSystem.IsMacOS(), vm.IsMacOS);
+    }
+
+    [Fact]
+    public void RequestEdit_WithCursorFile_RaisesEditRequestedWithPath()
+    {
+        var (fs, trash, history, viewer, editor) = BuildDependencies();
+        var vm = new MainWindowViewModel(fs, trash, history, viewer, editor);
+        EditorWindowViewModel? requested = null;
+        vm.EditRequested += (_, editorVm) => requested = editorVm;
+
+        vm.RequestEdit();
+
+        Assert.NotNull(requested);
+        Assert.NotNull(requested!.InitialOpenPaths);
+        Assert.Equal("/left/a.txt", Assert.Single(requested.InitialOpenPaths));
+    }
+
+    [Fact]
+    public void RequestEdit_CursorOnDirectory_DoesNotRaiseEditRequested()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left", new FileEntry("adir", "/left/adir", true, 0, DateTimeOffset.UnixEpoch, false, false));
+        fs.AddDirectory("/right");
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
+        vm.ActivePanel.MoveCursorTo(0);
+        var raised = false;
+        vm.EditRequested += (_, _) => raised = true;
+
+        vm.RequestEdit();
+
+        Assert.False(raised);
+    }
+
+    [Fact]
+    public void RequestEdit_MarkedFiles_OpensAllNonDirectories()
+    {
+        var fs = new FakeFileSystemService();
+        fs.AddDirectory("/left",
+            new FileEntry("a.txt", "/left/a.txt", false, 1, DateTimeOffset.UnixEpoch, false, false),
+            new FileEntry("b.txt", "/left/b.txt", false, 1, DateTimeOffset.UnixEpoch, false, false),
+            new FileEntry("adir", "/left/adir", true, 0, DateTimeOffset.UnixEpoch, false, false));
+        fs.AddDirectory("/right");
+        var history = new FakePathHistoryStore { History = new PanelPathHistory("/left", "/right") };
+        var vm = new MainWindowViewModel(fs, new FakeTrashService(), history, new FakeViewerService(), new FakeEditorService());
+        vm.ActivePanel.ToggleMark(1);
+        vm.ActivePanel.ToggleMark(2);
+        EditorWindowViewModel? requested = null;
+        vm.EditRequested += (_, editorVm) => requested = editorVm;
+
+        vm.RequestEdit();
+
+        Assert.NotNull(requested);
+        Assert.Equal(2, requested!.InitialOpenPaths!.Count);
+        Assert.Contains("/left/a.txt", requested.InitialOpenPaths);
+        Assert.Contains("/left/b.txt", requested.InitialOpenPaths);
     }
 }

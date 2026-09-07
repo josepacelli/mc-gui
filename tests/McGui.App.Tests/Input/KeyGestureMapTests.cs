@@ -44,17 +44,25 @@ public class KeyGestureMapTests
     {
         Assert.Contains(GestureAction.Help, KeyGestureMap.DisabledActions);
         Assert.Contains(GestureAction.UserMenu, KeyGestureMap.DisabledActions);
-        Assert.Contains(GestureAction.Edit, KeyGestureMap.DisabledActions);
-        Assert.Equal(3, KeyGestureMap.DisabledActions.Count);
+        Assert.Equal(2, KeyGestureMap.DisabledActions.Count);
     }
 
     [Fact]
-    public void F1F2F3AndF4_MapToDisabledActions()
+    public void F1AndF2_MapToDisabledActions()
     {
         Assert.Equal(GestureAction.Help, KeyGestureMap.Gestures[new KeyGesture(Key.F1)]);
         Assert.Equal(GestureAction.UserMenu, KeyGestureMap.Gestures[new KeyGesture(Key.F2)]);
+        Assert.Contains(GestureAction.Help, KeyGestureMap.DisabledActions);
+        Assert.Contains(GestureAction.UserMenu, KeyGestureMap.DisabledActions);
+    }
+
+    [Fact]
+    public void F3AndF4_MapToEnabledActions()
+    {
         Assert.Equal(GestureAction.View, KeyGestureMap.Gestures[new KeyGesture(Key.F3)]);
         Assert.Equal(GestureAction.Edit, KeyGestureMap.Gestures[new KeyGesture(Key.F4)]);
+        Assert.DoesNotContain(GestureAction.View, KeyGestureMap.DisabledActions);
+        Assert.DoesNotContain(GestureAction.Edit, KeyGestureMap.DisabledActions);
     }
 
     [Fact]
