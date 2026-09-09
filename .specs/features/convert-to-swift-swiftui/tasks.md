@@ -706,8 +706,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Holds the selected files and a confirm action that calls `TrashService`
-- [ ] Unit tests cover single file, multiple files, empty selection guard
+- [x] Holds the selected files and a confirm action that calls `TrashService`
+- [x] Unit tests cover single file, multiple files, empty selection guard
 
 **Tests**: unit
 **Gate**: quick

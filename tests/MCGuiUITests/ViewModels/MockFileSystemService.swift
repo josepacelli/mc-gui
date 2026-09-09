@@ -47,6 +47,21 @@ struct MockError: LocalizedError {
     var errorDescription: String? { message }
 }
 
+/// A `TrashService` test double with an injectable `trash` behavior.
+struct MockTrashService: TrashService {
+    var trashImpl: @Sendable ([URL]) async throws -> OperationResult
+
+    init(trashImpl: @escaping @Sendable ([URL]) async throws -> OperationResult = { urls in
+        OperationResult(success: true, errorMessage: nil, processedCount: urls.count, failedItems: [])
+    }) {
+        self.trashImpl = trashImpl
+    }
+
+    func trash(_ urls: [URL]) async throws -> OperationResult {
+        try await trashImpl(urls)
+    }
+}
+
 func makeTestEntry(
     name: String,
     size: Int64 = 0,
