@@ -120,9 +120,9 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] All fields from design.md `FileEntry` data model present with correct types
-- [ ] `FilePermissions` OptionSet round-trips through `Codable`
-- [ ] Unit tests cover: symlink target present/absent, hidden flag, each `FileType` case
+- [x] All fields from design.md `FileEntry` data model present with correct types
+- [x] `FilePermissions` OptionSet round-trips through `Codable`
+- [x] Unit tests cover: symlink target present/absent, hidden flag, each `FileType` case
 
 **Tests**: unit
 **Gate**: quick
