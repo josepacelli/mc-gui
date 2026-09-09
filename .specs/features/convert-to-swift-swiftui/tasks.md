@@ -798,9 +798,9 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Holds destination path and `CopyMoveOptions` (preserveAttributes, followSymlinks, updateOnly)
-- [ ] Delegates conflict resolution to T27's ViewModel
-- [ ] Unit tests cover copy mode, move mode, options toggling
+- [x] Holds destination path and `CopyMoveOptions` (preserveAttributes, followSymlinks, updateOnly)
+- [x] Delegates conflict resolution to T27's ViewModel
+- [x] Unit tests cover copy mode, move mode, options toggling
 
 **Tests**: unit
 **Gate**: quick
