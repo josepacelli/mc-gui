@@ -401,9 +401,9 @@ T16
 - Skill: NONE
 
 **Done when**:
-- [ ] Copy preserves timestamps/permissions when `preserveAttributes: true`
-- [ ] Move renames within a volume, copy+deletes across volumes
-- [ ] Integration tests cover: same-volume move, cross-volume move, overwrite, skip, EBUSY-simulated retry, ENOSPC-simulated failure
+- [x] Copy preserves timestamps/permissions when `preserveAttributes: true`
+- [x] Move renames within a volume, copy+deletes across volumes
+- [x] Integration tests cover: same-volume move, cross-volume move, overwrite, skip, EBUSY-simulated retry, ENOSPC-simulated failure
 
 **Tests**: integration
 **Gate**: full
