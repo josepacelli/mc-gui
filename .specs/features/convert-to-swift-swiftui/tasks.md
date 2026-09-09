@@ -448,8 +448,8 @@ T16
 - Skill: NONE
 
 **Done when**:
-- [ ] Trashing a file moves it to macOS Trash (not permanent delete)
-- [ ] Integration tests cover single file, multiple files, already-trashed-name collision
+- [x] Trashing a file moves it to macOS Trash (not permanent delete)
+- [x] Integration tests cover single file, multiple files, already-trashed-name collision
 
 **Tests**: integration
 **Gate**: full
