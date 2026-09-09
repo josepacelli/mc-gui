@@ -11,7 +11,12 @@ import MCGuiCore
 @MainActor
 @Observable
 public final class PanelViewModel {
-    private let fileSystemService: FileSystemService
+    // SPEC_DEVIATION (T33): exposed as `public` (was `private`) so `PanelView` can wire
+    // F5/F6/F7/F8 file operations (FO-01, FO-02, FO-10, FO-12) directly against the same
+    // `FileSystemService` instance this panel already loads through - no new dependency,
+    // just visibility, since MCGuiUI has no other way to obtain a `FileSystemService`
+    // (MCGuiUI does not depend on MCGuiMacOS, so it cannot construct one itself).
+    public let fileSystemService: FileSystemService
     private var rawEntries: [FileEntry] = []
 
     public private(set) var currentPath: URL

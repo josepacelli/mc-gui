@@ -900,9 +900,9 @@ T33
 - Skill: NONE
 
 **Done when**:
-- [ ] F5/F6/F7/F8 open the correct dialog for the current selection
-- [ ] A failed operation shows the specific file + reason (FO-15)
-- [ ] XCUITest covers the full copy, move, mkdir, delete flows end-to-end from key press to filesystem result
+- [x] F5/F6/F7/F8 open the correct dialog for the current selection
+- [x] A failed operation shows the specific file + reason (FO-15)
+- [ ] XCUITest covers the full copy, move, mkdir, delete flows end-to-end from key press to filesystem result - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. The dispatch/formatting logic (`PanelView.makeCopyMoveDialog`, `.makeMkdirDialog`, `.makeDeleteDialog`, `.fo15Message`) is unit-tested in `PanelViewFileOperationsTests`; `PanelView.body`'s F5/F6/F7/F8 key binding and sheet presentation are thin declarative glue over those functions, with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
