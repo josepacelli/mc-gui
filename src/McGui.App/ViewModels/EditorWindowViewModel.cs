@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using McGui.Core.Interfaces;
@@ -23,6 +25,16 @@ public sealed partial class EditorWindowViewModel : ObservableObject, ICompletab
     public ObservableCollection<EditorTabViewModel> Tabs { get; } = new();
 
     public IReadOnlyList<string>? InitialOpenPaths { get; init; }
+
+    public ICommand SaveAsCommand => new RelayCommand<EditorTabViewModel>(async tab =>
+    {
+        if (tab == null || SaveAsPathProvider == null) return;
+        var newPath = await SaveAsPathProvider(tab.FilePath);
+        if (newPath == null) return;
+        await tab.SaveAsAsync(newPath, CancellationToken.None);
+    });
+
+    public Func<string, Task<string?>>? SaveAsPathProvider { get; set; }
 
     [ObservableProperty]
     private EditorTabViewModel? selectedTab;
@@ -124,7 +136,7 @@ public sealed partial class EditorWindowViewModel : ObservableObject, ICompletab
     }
 
     [RelayCommand]
-    private async Task QuitAsync()
+    public async Task QuitAsync()
     {
         if (!HasDirtyTabs)
         {

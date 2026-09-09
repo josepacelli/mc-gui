@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -23,6 +24,7 @@ public partial class EditorWindow : Window
         _textMateRegistry = new RegistryOptions(ThemeName.LightPlus);
         DataContextChanged += OnDataContextChanged;
         KeyDown += OnKeyDown;
+        Closing += OnWindowClosing;
     }
 
     private EditorWindowViewModel? ViewModel => DataContext as EditorWindowViewModel;
@@ -342,6 +344,18 @@ public partial class EditorWindow : Window
         }
     }
 
+    private async void OnWindowClosing(object? sender, global::Avalonia.Controls.WindowClosingEventArgs e)
+    {
+        if (ViewModel is { } vm)
+        {
+            await vm.QuitAsync();
+            if (!vm.IsCompleted)
+            {
+                e.Cancel = true;
+            }
+        }
+    }
+
     private async void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (ViewModel is not { } vm)
@@ -354,7 +368,20 @@ public partial class EditorWindow : Window
 
         if (e.Key == Key.F2 || (ctrl && e.Key == Key.S))
         {
-            await vm.SaveCommand.ExecuteAsync(null);
+            var tab = vm.SelectedTab;
+            if (tab is { } and { IsReadOnly: true })
+            {
+                // F2 on read-only tab → Save As
+                var newPath = await vm.SaveAsPathProvider?.Invoke(tab.FilePath) ?? "";
+                if (!string.IsNullOrEmpty(newPath))
+                {
+                    await tab.SaveAsAsync(newPath, CancellationToken.None);
+                }
+            }
+            else
+            {
+                await vm.SaveCommand.ExecuteAsync(null);
+            }
             e.Handled = true;
         }
         else if (e.Key == Key.F3)

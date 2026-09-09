@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using McGui.Core.Interfaces;
@@ -21,7 +23,7 @@ public sealed partial class EditorTabViewModel : ObservableObject
         IsLarge = isLarge;
     }
 
-    public string FilePath { get; }
+    public string FilePath { get; set; }
 
     public string FileName => Path.GetFileName(FilePath);
 
@@ -53,5 +55,13 @@ public sealed partial class EditorTabViewModel : ObservableObject
     {
         await _editorService.SaveAsync(FilePath, DocumentText, ct);
         MarkSaved();
+    }
+
+    public async Task SaveAsAsync(string newFilePath, System.Threading.CancellationToken ct)
+    {
+        await _editorService.SaveAsync(newFilePath, DocumentText, ct);
+        FilePath = newFilePath;
+        MarkSaved();
+        OnPropertyChanged(nameof(Title));
     }
 }
