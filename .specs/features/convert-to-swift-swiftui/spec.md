@@ -396,7 +396,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | PH-02 | P2: Path History Persistence | Design | Pending |
 | PH-03 | P2: Path History Persistence | Design | Pending |
 | PH-04 | P2: Path History Persistence | Design | Pending |
-| VL-01 | P2: Volume Listing | Design | Pending |
+| VL-01 | P2: Volume Listing | Execute | Implementing |
 | VL-02 | P2: Volume Listing | Design | Pending |
 | VL-03 | P2: Volume Listing | Design | Pending |
 | VL-04 | P2: Volume Listing | Design | Pending |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 87 total, 26 mapped to tasks, 61 unmapped ⚠️
+**Coverage:** 87 total, 27 mapped to tasks, 60 unmapped ⚠️
 
 ---
 

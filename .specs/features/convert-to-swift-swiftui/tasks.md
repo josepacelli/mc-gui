@@ -425,8 +425,8 @@ T16
 - Skill: NONE
 
 **Done when**:
-- [ ] `getVolumes()` returns all mounted volumes with name and root URL
-- [ ] Integration test confirms the boot volume is always present in the result
+- [x] `getVolumes()` returns all mounted volumes with name and root URL
+- [x] Integration test confirms the boot volume is always present in the result
 
 **Tests**: integration
 **Gate**: full

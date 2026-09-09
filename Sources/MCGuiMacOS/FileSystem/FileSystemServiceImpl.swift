@@ -287,4 +287,50 @@ public final class FileSystemServiceImpl {
         }
         return error.localizedDescription
     }
+
+    // MARK: - getVolumes
+
+    public func getVolumes() -> [VolumeInfo] {
+        let keys: [URLResourceKey] = [.volumeNameKey, .volumeAvailableCapacityKey]
+        let urls = fileManager.mountedVolumeURLs(includingResourceValuesForKeys: keys, options: [.skipHiddenVolumes]) ?? []
+
+        return urls.map { url in
+            let values = try? url.resourceValues(forKeys: Set(keys))
+            let name = values?.volumeName ?? url.lastPathComponent
+            let freeSpace = Int64(values?.volumeAvailableCapacity ?? 0)
+            return VolumeInfo(name: name, mountPoint: url, freeSpace: freeSpace)
+        }
+    }
+
+    // SPEC_DEVIATION: `trash(_:)` is part of the `FileSystemService` protocol (Phase 1,
+    // frozen) and design.md lists it as a Key Method of FileSystemServiceImpl, but no
+    // task in T12-T14 owns it explicitly (the canonical, more thoroughly-tested
+    // implementation is T15's `TrashServiceImpl`, conforming to the separate
+    // `TrashService` protocol). Implemented here - minimally, using the same real
+    // `FileManager.trashItem` API, not a stub - because `FileSystemServiceImpl` cannot
+    // conform to `FileSystemService` (required for the type to be usable via the
+    // protocol, e.g. by future ViewModels) without it.
+    /// Moves `urls` to the system Trash.
+    public func trash(_ urls: [URL]) async throws -> OperationResult {
+        var failedItems: [FailedItem] = []
+        var processedCount = 0
+
+        for url in urls {
+            do {
+                try fileManager.trashItem(at: url, resultingItemURL: nil)
+                processedCount += 1
+            } catch {
+                failedItems.append(FailedItem(path: url.path, reason: error.localizedDescription))
+            }
+        }
+
+        return OperationResult(
+            success: failedItems.isEmpty,
+            errorMessage: failedItems.isEmpty ? nil : "Some items could not be moved to Trash",
+            processedCount: processedCount,
+            failedItems: failedItems
+        )
+    }
 }
+
+extension FileSystemServiceImpl: FileSystemService {}
