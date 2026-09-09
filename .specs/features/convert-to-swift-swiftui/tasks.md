@@ -869,8 +869,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Displays live progress bar and stats bound to the ViewModel
-- [ ] XCUITest covers: progress dialog appears during a multi-file copy, Cancel stops the operation
+- [x] Displays live progress bar and stats bound to the ViewModel
+- [ ] XCUITest covers: progress dialog appears during a multi-file copy, Cancel stops the operation - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. The progress-consumption and cancel-propagation logic this view binds to is unit-tested in `ProgressDialogViewModelTests` (T31); `ProgressDialog` itself is a thin declarative binding with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
