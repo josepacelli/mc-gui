@@ -369,10 +369,10 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | ED-10 | P1: Text Editor | Design | Pending |
 | KN-01 | P1: Keyboard Navigation | Design | Pending |
 | KN-02 | P1: Keyboard Navigation | Design | Pending |
-| KN-03 | P1: Keyboard Navigation | Design | Pending |
-| KN-04 | P1: Keyboard Navigation | Design | Pending |
-| KN-05 | P1: Keyboard Navigation | Design | Pending |
-| KN-06 | P1: Keyboard Navigation | Design | Pending |
+| KN-03 | P1: Keyboard Navigation | Execute | Implementing |
+| KN-04 | P1: Keyboard Navigation | Execute | Implementing |
+| KN-05 | P1: Keyboard Navigation | Execute | Implementing |
+| KN-06 | P1: Keyboard Navigation | Execute | Implementing |
 | KN-07 | P1: Keyboard Navigation | Design | Pending |
 | KN-08 | P1: Keyboard Navigation | Design | Pending |
 | KN-09 | P1: Keyboard Navigation | Design | Pending |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 87 total, 5 mapped to tasks, 82 unmapped ⚠️
+**Coverage:** 87 total, 9 mapped to tasks, 78 unmapped ⚠️
 
 ---
 

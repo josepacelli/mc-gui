@@ -295,8 +295,8 @@ T11
 - Skill: NONE
 
 **Done when**:
-- [ ] Range selection, toggle, jump-to-first/last, invert all implemented
-- [ ] Unit tests cover every selection mode + empty-list edge case
+- [x] Range selection, toggle, jump-to-first/last, invert all implemented
+- [x] Unit tests cover every selection mode + empty-list edge case
 
 **Tests**: unit
 **Gate**: quick
