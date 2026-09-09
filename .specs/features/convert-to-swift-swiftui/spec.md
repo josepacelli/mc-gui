@@ -321,7 +321,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | SWIFT-04 | P1: Project Foundation | Execute | Verified |
 | SWIFT-05 | P1: Project Foundation | Execute | Verified |
 | FS-01 | P1: File System Service | Execute | Implementing |
-| FS-02 | P1: File System Service | Design | Pending |
+| FS-02 | P1: File System Service | Execute | Implementing |
 | FS-03 | P1: File System Service | Execute | Implementing |
 | FS-04 | P1: File System Service | Execute | Implementing |
 | FS-05 | P1: File System Service | Execute | Implementing |

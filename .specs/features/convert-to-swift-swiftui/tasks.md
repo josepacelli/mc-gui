@@ -530,9 +530,9 @@ T21 → T22
 - Skill: NONE
 
 **Done when**:
-- [ ] Holds left/right `PanelViewModel` and an `activePanel` property
-- [ ] Switching active panel updates highlighting state
-- [ ] Unit tests cover default active panel and switching
+- [x] Holds left/right `PanelViewModel` and an `activePanel` property
+- [x] Switching active panel updates highlighting state
+- [x] Unit tests cover default active panel and switching
 
 **Tests**: unit
 **Gate**: quick
