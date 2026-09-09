@@ -168,9 +168,9 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] `CopyMoveOptions` has `preserveAttributes`, `followSymlinks`, `updateOnly`
-- [ ] `OperationResult` has `success`, `errorMessage`, `processedCount`, `failedItems`
-- [ ] Unit tests cover Codable round-trip for each of the 5 types
+- [x] `CopyMoveOptions` has `preserveAttributes`, `followSymlinks`, `updateOnly`
+- [x] `OperationResult` has `success`, `errorMessage`, `processedCount`, `failedItems`
+- [x] Unit tests cover Codable round-trip for each of the 5 types
 
 **Tests**: unit
 **Gate**: quick
