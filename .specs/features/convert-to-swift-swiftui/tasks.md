@@ -845,9 +845,9 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Consumes an `AsyncStream<OperationProgress>` and updates published state
-- [ ] Cancel action propagates to the running operation
-- [ ] Unit tests cover progress updates, completion, cancellation
+- [x] Consumes an `AsyncStream<OperationProgress>` and updates published state
+- [x] Cancel action propagates to the running operation
+- [x] Unit tests cover progress updates, completion, cancellation
 
 **Tests**: unit
 **Gate**: quick
