@@ -683,8 +683,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Create button disabled until name is valid
-- [ ] XCUITest covers: F7 opens dialog, valid name creates directory, Escape cancels
+- [x] Create button disabled until name is valid
+- [ ] XCUITest covers: F7 opens dialog, valid name creates directory, Escape cancels - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build` gate used instead per batch instructions. The name-validity logic this view binds to (`MkdirDialogViewModel.validate`, `confirm()`) is unit-tested in `MkdirDialogViewModelTests` (T23); `MkdirDialog` itself is a thin declarative binding with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
