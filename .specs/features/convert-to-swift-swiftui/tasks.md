@@ -660,8 +660,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Empty/invalid name is rejected with an error message
-- [ ] Unit tests cover valid name, empty name, name with `/`
+- [x] Empty/invalid name is rejected with an error message
+- [x] Unit tests cover valid name, empty name, name with `/`
 
 **Tests**: unit
 **Gate**: quick

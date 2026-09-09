@@ -1,13 +1,21 @@
 import Foundation
 import MCGuiCore
 
-/// A `FileSystemService` test double with an injectable `listDirectory` behavior.
-/// The other protocol methods aren't exercised by the ViewModel tests in this target and
-/// return trivial success values.
+/// A `FileSystemService` test double with injectable `listDirectory`/`createDirectory`
+/// behaviors. The other protocol methods aren't exercised by the ViewModel tests in this
+/// target and return trivial success values.
 struct MockFileSystemService: FileSystemService {
     var listDirectoryImpl: @Sendable (URL) async throws -> [FileEntry]
+    var createDirectoryImpl: @Sendable (URL) async throws -> Void
 
-    init(listDirectoryImpl: @escaping @Sendable (URL) async throws -> [FileEntry] = { _ in [] }) {
+    // `createDirectoryImpl` is declared before `listDirectoryImpl` so existing unlabeled
+    // trailing-closure call sites (`MockFileSystemService { ... }`) keep binding to
+    // `listDirectoryImpl`, the last parameter.
+    init(
+        createDirectoryImpl: @escaping @Sendable (URL) async throws -> Void = { _ in },
+        listDirectoryImpl: @escaping @Sendable (URL) async throws -> [FileEntry] = { _ in [] }
+    ) {
+        self.createDirectoryImpl = createDirectoryImpl
         self.listDirectoryImpl = listDirectoryImpl
     }
 
@@ -15,7 +23,9 @@ struct MockFileSystemService: FileSystemService {
         try await listDirectoryImpl(url)
     }
 
-    func createDirectory(_ url: URL) async throws {}
+    func createDirectory(_ url: URL) async throws {
+        try await createDirectoryImpl(url)
+    }
 
     func copy(_ plan: CopyMovePlan) async throws -> OperationResult {
         OperationResult(success: true, errorMessage: nil, processedCount: 0, failedItems: [])
