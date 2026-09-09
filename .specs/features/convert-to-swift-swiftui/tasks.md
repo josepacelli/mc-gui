@@ -600,10 +600,10 @@ T21 → T22
 - Skill: NONE
 
 **Done when**:
-- [ ] Renders `PanelViewModel.entries` via `FileRow`
-- [ ] Shows `LoadingOverlay` while loading and `ErrorAlert` on error
-- [ ] Focus state visually distinguishes the active panel
-- [ ] XCUITest covers: directory renders rows, loading indicator appears/disappears, error alert appears on unreadable directory
+- [x] Renders `PanelViewModel.entries` via `FileRow`
+- [x] Shows `LoadingOverlay` while loading and `ErrorAlert` on error
+- [x] Focus state visually distinguishes the active panel
+- [ ] XCUITest covers: directory renders rows, loading indicator appears/disappears, error alert appears on unreadable directory - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build` gate used instead per batch instructions. The underlying state this view renders (`entries`, `isLoading`, `errorMessage`) is unit-tested in `PanelViewModelTests` (T17); the view itself is a thin declarative binding with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
