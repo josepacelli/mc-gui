@@ -983,9 +983,9 @@ T37 → T38
 - Skill: NONE
 
 **Done when**:
-- [ ] Renders offset/hex/ASCII columns for a byte chunk
-- [ ] Virtualizes rendering so large files don't allocate all rows at once
-- [ ] Unit tests cover the formatting function: standard 16-byte row, partial last row, non-printable-byte ASCII fallback (`.`)
+- [x] Renders offset/hex/ASCII columns for a byte chunk
+- [x] Virtualizes rendering so large files don't allocate all rows at once
+- [x] Unit tests cover the formatting function: standard 16-byte row, partial last row, non-printable-byte ASCII fallback (`.`)
 
 **Tests**: unit
 **Gate**: quick
