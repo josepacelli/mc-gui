@@ -775,8 +775,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] All 4 options render as buttons and invoke the ViewModel action
-- [ ] XCUITest covers: each of Overwrite/Skip/Rename/Cancel selected in a real conflict scenario
+- [x] All 4 options render as buttons and invoke the ViewModel action
+- [ ] XCUITest covers: each of Overwrite/Skip/Rename/Cancel selected in a real conflict scenario - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build` gate used instead per batch instructions. The 4 resolution actions this view's buttons invoke are unit-tested in `ConflictDialogViewModelTests` (T27); `ConflictDialog` itself is a thin declarative binding with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
