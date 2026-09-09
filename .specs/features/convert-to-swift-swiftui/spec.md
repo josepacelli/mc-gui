@@ -316,7 +316,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | Requirement ID | Story | Phase | Status |
 |----------------|-------|-------|--------|
 | SWIFT-01 | P1: Project Foundation | Execute | Verified |
-| SWIFT-02 | P1: Project Foundation | Execute | Implementing |
+| SWIFT-02 | P1: Project Foundation | Execute | Verified |
 | SWIFT-03 | P1: Project Foundation | Design | Pending |
 | SWIFT-04 | P1: Project Foundation | Design | Pending |
 | SWIFT-05 | P1: Project Foundation | Execute | Verified |

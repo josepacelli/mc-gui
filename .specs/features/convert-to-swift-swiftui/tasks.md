@@ -192,9 +192,9 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] `ViewerContent` enum covers `text`, `image`, `hexData` cases
-- [ ] `FileConflictResolution` enum covers `overwrite`, `skip`, `rename`, `cancel`
-- [ ] Unit tests cover each `ViewerContent` and `FileConflictResolution` case
+- [x] `ViewerContent` enum covers `text`, `image`, `hexData` cases
+- [x] `FileConflictResolution` enum covers `overwrite`, `skip`, `rename`, `cancel`
+- [x] Unit tests cover each `ViewerContent` and `FileConflictResolution` case
 
 **Tests**: unit
 **Gate**: quick
