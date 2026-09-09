@@ -554,8 +554,8 @@ T21 → T22
 - Skill: NONE
 
 **Done when**:
-- [ ] All 5 components compile and accept the props described in design.md
-- [ ] `swift build` succeeds
+- [x] All 5 components compile and accept the props described in design.md
+- [x] `swift build` succeeds
 
 **Tests**: none
 **Gate**: build
