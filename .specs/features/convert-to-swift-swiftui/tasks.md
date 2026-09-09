@@ -216,8 +216,8 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Protocol method signatures match design.md `FileSystemServiceImpl` Key Methods
-- [ ] `swift build` succeeds with no conforming type yet (protocol-only compiles)
+- [x] Protocol method signatures match design.md `FileSystemServiceImpl` Key Methods
+- [x] `swift build` succeeds with no conforming type yet (protocol-only compiles)
 
 **Tests**: none
 **Gate**: build
