@@ -342,9 +342,9 @@ T11
 - Skill: NONE
 
 **Done when**:
-- [ ] Plan building detects existing-destination conflicts
-- [ ] Numeric-suffix rename produces `file (1).txt`, `file (2).txt`, ...
-- [ ] Unit tests cover no-conflict, single-conflict, multi-conflict, exhausted-suffix-search edge case
+- [x] Plan building detects existing-destination conflicts
+- [x] Numeric-suffix rename produces `file (1).txt`, `file (2).txt`, ...
+- [x] Unit tests cover no-conflict, single-conflict, multi-conflict, exhausted-suffix-search edge case
 
 **Tests**: unit
 **Gate**: quick
