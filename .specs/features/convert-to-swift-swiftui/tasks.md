@@ -822,8 +822,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Renders destination field + preserveAttributes/followSymlinks/updateOnly checkboxes
-- [ ] XCUITest covers: F5 opens in copy mode, F6 opens in move mode, confirm triggers the operation
+- [x] Renders destination field + preserveAttributes/followSymlinks/updateOnly checkboxes
+- [ ] XCUITest covers: F5 opens in copy mode, F6 opens in move mode, confirm triggers the operation - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build` gate used instead per batch instructions. The mode/options state this view binds to is unit-tested in `CopyMoveDialogViewModelTests` (T29); `CopyMoveDialog` itself is a thin declarative binding with no additional testable logic. F5/F6 key wiring and the actual copy/move invocation are Phase 6 (T33).
 
 **Tests**: e2e
 **Gate**: build
