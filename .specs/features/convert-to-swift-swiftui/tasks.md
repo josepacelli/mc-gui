@@ -377,9 +377,9 @@ T16
 - Skill: NONE
 
 **Done when**:
-- [ ] `listDirectory` returns `[FileEntry]` with name/size/dates/permissions/hidden/symlink populated
-- [ ] Permission-denied directory throws a typed error (not a generic `NSError`)
-- [ ] Integration tests cover: normal directory, empty directory, permission-denied directory, `createDirectory` success + already-exists error
+- [x] `listDirectory` returns `[FileEntry]` with name/size/dates/permissions/hidden/symlink populated
+- [x] Permission-denied directory throws a typed error (not a generic `NSError`)
+- [x] Integration tests cover: normal directory, empty directory, permission-denied directory, `createDirectory` success + already-exists error
 
 **Tests**: integration
 **Gate**: full

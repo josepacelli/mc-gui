@@ -322,12 +322,12 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | SWIFT-05 | P1: Project Foundation | Execute | Verified |
 | FS-01 | P1: File System Service | Design | Pending |
 | FS-02 | P1: File System Service | Design | Pending |
-| FS-03 | P1: File System Service | Design | Pending |
+| FS-03 | P1: File System Service | Execute | Implementing |
 | FS-04 | P1: File System Service | Design | Pending |
 | FS-05 | P1: File System Service | Design | Pending |
 | FS-06 | P1: File System Service | Design | Pending |
 | FS-07 | P1: File System Service | Design | Pending |
-| FS-08 | P1: File System Service | Design | Pending |
+| FS-08 | P1: File System Service | Execute | Implementing |
 | FS-09 | P1: File System Service | Design | Pending |
 | FS-10 | P1: File System Service | Design | Pending |
 | FS-11 | P1: File System Service | Execute | Implementing |
@@ -342,8 +342,8 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FO-07 | P1: File Operations | Design | Pending |
 | FO-08 | P1: File Operations | Execute | Implementing |
 | FO-09 | P1: File Operations | Design | Pending |
-| FO-10 | P1: File Operations | Design | Pending |
-| FO-11 | P1: File Operations | Design | Pending |
+| FO-10 | P1: File Operations | Execute | Implementing |
+| FO-11 | P1: File Operations | Execute | Implementing |
 | FO-12 | P1: File Operations | Design | Pending |
 | FO-13 | P1: File Operations | Design | Pending |
 | FO-14 | P1: File Operations | Design | Pending |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 87 total, 16 mapped to tasks, 71 unmapped ⚠️
+**Coverage:** 87 total, 20 mapped to tasks, 67 unmapped ⚠️
 
 ---
 
