@@ -934,9 +934,9 @@ T37 → T38
 - Skill: NONE
 
 **Done when**:
-- [ ] Text mode loads incrementally without blocking the main actor
-- [ ] Hex mode produces byte chunks suitable for `HexView` (T36)
-- [ ] Integration tests cover: small text file, 100MB file load time/responsiveness, unreadable file error (FV-08)
+- [x] Text mode loads incrementally without blocking the main actor
+- [x] Hex mode produces byte chunks suitable for `HexView` (T36)
+- [x] Integration tests cover: small text file, 100MB file load time/responsiveness, unreadable file error (FV-08)
 
 **Tests**: integration
 **Gate**: full

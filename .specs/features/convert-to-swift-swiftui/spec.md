@@ -350,13 +350,13 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FO-15 | P1: File Operations | Execute | Implementing |
 | FO-16 | P1: File Operations | Execute | Implementing |
 | FV-01 | P1: File Viewer | Design | Pending |
-| FV-02 | P1: File Viewer | Design | Pending |
+| FV-02 | P1: File Viewer | Execute | Implementing |
 | FV-03 | P1: File Viewer | Design | Pending |
-| FV-04 | P1: File Viewer | Design | Pending |
+| FV-04 | P1: File Viewer | Execute | Implementing |
 | FV-05 | P1: File Viewer | Design | Pending |
 | FV-06 | P1: File Viewer | Design | Pending |
-| FV-07 | P1: File Viewer | Design | Pending |
-| FV-08 | P1: File Viewer | Design | Pending |
+| FV-07 | P1: File Viewer | Execute | Implementing |
+| FV-08 | P1: File Viewer | Execute | Implementing |
 | ED-01 | P1: Text Editor | Design | Pending |
 | ED-02 | P1: Text Editor | Design | Pending |
 | ED-03 | P1: Text Editor | Design | Pending |
