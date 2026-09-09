@@ -318,9 +318,9 @@ T11
 - Skill: NONE
 
 **Done when**:
-- [ ] `back()`/`forward()` mutate past/future arrays correctly
-- [ ] Navigating to a new path after going back clears the stale forward stack
-- [ ] Unit tests cover empty history, single entry, back-then-navigate-clears-forward
+- [x] `back()`/`forward()` mutate past/future arrays correctly
+- [x] Navigating to a new path after going back clears the stale forward stack
+- [x] Unit tests cover empty history, single entry, back-then-navigate-clears-forward
 
 **Tests**: unit
 **Gate**: quick
