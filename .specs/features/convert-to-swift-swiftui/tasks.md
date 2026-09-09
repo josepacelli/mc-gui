@@ -577,8 +577,8 @@ T21 → T22
 - Skill: NONE
 
 **Done when**:
-- [ ] Renders a `FileEntry` with icon, name, size, date, permissions
-- [ ] Broken symlinks render with distinct visual (per Edge Case 3)
+- [x] Renders a `FileEntry` with icon, name, size, date, permissions
+- [x] Broken symlinks render with distinct visual (per Edge Case 3)
 
 **Tests**: none
 **Gate**: build
