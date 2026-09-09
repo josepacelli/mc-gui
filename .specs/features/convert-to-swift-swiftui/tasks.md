@@ -471,9 +471,9 @@ T16
 - Skill: NONE
 
 **Done when**:
-- [ ] `save`/`load` round-trip a `PanelPathHistory` through JSON on disk
-- [ ] History is truncated to 100 entries per panel on save
-- [ ] Integration tests cover: save+load round-trip, corrupted JSON file recovers to empty history, missing file recovers to empty history
+- [x] `save`/`load` round-trip a `PanelPathHistory` through JSON on disk
+- [x] History is truncated to 100 entries per panel on save
+- [x] Integration tests cover: save+load round-trip, corrupted JSON file recovers to empty history, missing file recovers to empty history
 
 **Tests**: integration
 **Gate**: full
