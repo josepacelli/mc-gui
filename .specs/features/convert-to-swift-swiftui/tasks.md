@@ -625,9 +625,9 @@ T21 → T22
 - Skill: NONE
 
 **Done when**:
-- [ ] Two panels render side by side via `HSplitView`
-- [ ] Clicking/tabbing into a panel updates `MainWindowViewModel.activePanel`
-- [ ] XCUITest covers: app launches with 2 panels visible, clicking each panel updates active-panel highlight
+- [x] Two panels render side by side via `HSplitView`
+- [x] Clicking/tabbing into a panel updates `MainWindowViewModel.activePanel`
+- [ ] XCUITest covers: app launches with 2 panels visible, clicking each panel updates active-panel highlight - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build` gate used instead per batch instructions. The underlying state transition (`activate(_:)`) is unit-tested in `MainWindowViewModelTests` (T18); `MainWindow`/`PanelView` are thin declarative bindings with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
