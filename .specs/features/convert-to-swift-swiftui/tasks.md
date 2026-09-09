@@ -729,8 +729,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Lists files to be deleted with a Trash-bound confirm action
-- [ ] XCUITest covers: F8 opens dialog, confirm moves file to Trash, cancel leaves file in place
+- [x] Lists files to be deleted with a Trash-bound confirm action
+- [ ] XCUITest covers: F8 opens dialog, confirm moves file to Trash, cancel leaves file in place - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build` gate used instead per batch instructions. The Trash-bound `confirm()` behavior this view binds to is unit-tested in `DeleteConfirmDialogViewModelTests` (T25); `DeleteConfirmDialog` itself is a thin declarative binding with no additional testable logic.
 
 **Tests**: e2e
 **Gate**: build
