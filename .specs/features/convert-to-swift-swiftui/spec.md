@@ -318,7 +318,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | SWIFT-01 | P1: Project Foundation | Execute | Verified |
 | SWIFT-02 | P1: Project Foundation | Execute | Verified |
 | SWIFT-03 | P1: Project Foundation | Execute | Verified |
-| SWIFT-04 | P1: Project Foundation | Design | Pending |
+| SWIFT-04 | P1: Project Foundation | Execute | Verified |
 | SWIFT-05 | P1: Project Foundation | Execute | Verified |
 | FS-01 | P1: File System Service | Design | Pending |
 | FS-02 | P1: File System Service | Design | Pending |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 87 total, 4 mapped to tasks, 83 unmapped ⚠️
+**Coverage:** 87 total, 5 mapped to tasks, 82 unmapped ⚠️
 
 ---
 

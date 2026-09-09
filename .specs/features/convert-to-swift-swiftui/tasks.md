@@ -262,8 +262,8 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] `swift test` runs and passes at least 1 test
-- [ ] `swift build --product MCGuiApp` produces a macOS executable
+- [x] `swift test` runs and passes at least 1 test
+- [x] `swift build --product MCGuiApp` produces a macOS executable
 
 **Tests**: unit
 **Gate**: build
