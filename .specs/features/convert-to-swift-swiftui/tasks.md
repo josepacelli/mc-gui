@@ -506,9 +506,9 @@ T21 → T22
 - Skill: NONE
 
 **Done when**:
-- [ ] `@Observable` (or `@Published`) state exposes entries, loading, error, sort, showHidden
-- [ ] Sorting by each column (asc/desc) produces correct order
-- [ ] Unit tests cover: load success, load failure (error state), each sort column both directions, hidden-toggle filtering
+- [x] `@Observable` (or `@Published`) state exposes entries, loading, error, sort, showHidden
+- [x] Sorting by each column (asc/desc) produces correct order
+- [x] Unit tests cover: load success, load failure (error state), each sort column both directions, hidden-toggle filtering
 
 **Tests**: unit
 **Gate**: quick
