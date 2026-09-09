@@ -239,8 +239,8 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] All 4 protocols declared with async/throws signatures per design.md Protocols section
-- [ ] `swift build` succeeds
+- [x] All 4 protocols declared with async/throws signatures per design.md Protocols section
+- [x] `swift build` succeeds
 
 **Tests**: none
 **Gate**: build
