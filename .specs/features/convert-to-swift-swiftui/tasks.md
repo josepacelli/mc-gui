@@ -144,9 +144,9 @@ T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] `PanelState` holds `currentPath`, `entries`, `selectedIndices`, `sortColumn`, `sortAscending`, `showHidden`, `history`
-- [ ] `PanelPathHistory` Codable round-trip test passes
-- [ ] Unit tests cover default/empty state and populated state
+- [x] `PanelState` holds `currentPath`, `entries`, `selectedIndices`, `sortColumn`, `sortAscending`, `showHidden`, `history`
+- [x] `PanelPathHistory` Codable round-trip test passes
+- [x] Unit tests cover default/empty state and populated state
 
 **Tests**: unit
 **Gate**: quick
