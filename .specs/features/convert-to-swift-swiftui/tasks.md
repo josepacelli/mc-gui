@@ -752,8 +752,8 @@ T31 → T32
 - Skill: NONE
 
 **Done when**:
-- [ ] Exposes the 4 resolution options and returns the chosen `FileConflictResolution`
-- [ ] Unit tests cover each of the 4 resolution paths
+- [x] Exposes the 4 resolution options and returns the chosen `FileConflictResolution`
+- [x] Unit tests cover each of the 4 resolution paths
 
 **Tests**: unit
 **Gate**: quick
