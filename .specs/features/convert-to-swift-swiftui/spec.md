@@ -351,10 +351,10 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FO-16 | P1: File Operations | Execute | Implementing |
 | FV-01 | P1: File Viewer | Design | Pending |
 | FV-02 | P1: File Viewer | Execute | Implementing |
-| FV-03 | P1: File Viewer | Design | Pending |
+| FV-03 | P1: File Viewer | Execute | Implementing |
 | FV-04 | P1: File Viewer | Execute | Implementing |
-| FV-05 | P1: File Viewer | Design | Pending |
-| FV-06 | P1: File Viewer | Design | Pending |
+| FV-05 | P1: File Viewer | Execute | Implementing |
+| FV-06 | P1: File Viewer | Execute | Implementing |
 | FV-07 | P1: File Viewer | Execute | Implementing |
 | FV-08 | P1: File Viewer | Execute | Implementing |
 | ED-01 | P1: Text Editor | Design | Pending |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 93 total, 42 mapped to tasks, 51 unmapped ⚠️
+**Coverage:** 93 total, 92 mapped to tasks, 1 unmapped (FS-06) ⚠️
 
 ---
 

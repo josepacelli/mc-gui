@@ -958,10 +958,10 @@ T37 → T38
 - Skill: NONE
 
 **Done when**:
-- [ ] Image files load as `NSImage`
-- [ ] `nextFile`/`previousFile` cycle through the panel's file list, wrapping or stopping at bounds per design
-- [ ] `search(_:)` returns match ranges for text content
-- [ ] Integration tests cover: image load, next/previous at list boundaries, search with 0/1/N matches
+- [x] Image files load as `NSImage`
+- [x] `nextFile`/`previousFile` cycle through the panel's file list, wrapping or stopping at bounds per design
+- [x] `search(_:)` returns match ranges for text content
+- [x] Integration tests cover: image load, next/previous at list boundaries, search with 0/1/N matches
 
 **Tests**: integration
 **Gate**: full
