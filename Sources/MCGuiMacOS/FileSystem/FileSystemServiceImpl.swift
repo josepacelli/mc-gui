@@ -14,6 +14,9 @@ public enum FileSystemServiceError: Error, Equatable {
     case insufficientDiskSpace
     /// The volume was disconnected mid-operation (`POSIXError.ENOTCONN`).
     case volumeDisconnected(URL)
+    /// A planned destination path exceeds the filesystem's maximum path length
+    /// (`PATH_MAX`), per spec.md's Edge Case 7.
+    case pathTooLong(URL)
 }
 
 /// macOS `FileSystemService` implementation backed by `FileManager`.
@@ -52,6 +55,18 @@ public final class FileSystemServiceImpl {
 
     // MARK: - listDirectory
 
+    // SPEC_DEVIATION (Fix 6, validation.md, Edge Case 4): spec.md asks for 10,000+-entry
+    // directories to load incrementally (pagination/virtualization); this still returns
+    // the full listing in one call. Real incremental loading needs an async/paginated
+    // `FileSystemService.listDirectory` signature (an `AsyncSequence` or a cursor-based
+    // page API) plus matching `PanelViewModel` state to accumulate pages as they arrive -
+    // a protocol-level change out of this fix pass's budget (Fix 1/3's `onProgress`
+    // pattern doesn't apply directly here: listing has no natural per-item side effect to
+    // hang a callback off before the array is built). Deliberately deferred rather than a
+    // half-measure (e.g. switching to `FileManager.enumerator` without any caller-facing
+    // change to consume it incrementally would fix nothing observable). `List` itself
+    // still renders lazily once the array is loaded, so the UI doesn't build 10,000 rows
+    // eagerly - only the initial fetch blocks on the full directory read.
     public func listDirectory(_ url: URL) async throws -> [FileEntry] {
         let keys: [URLResourceKey] = [
             .isDirectoryKey,
@@ -148,6 +163,7 @@ public final class FileSystemServiceImpl {
     /// this method - `plan.sources`/`destinationDirectory` already reflect that choice.
     public func copy(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
         try ensureSufficientSpace(for: plan)
+        try ensureValidPathLengths(for: plan)
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
@@ -167,7 +183,7 @@ public final class FileSystemServiceImpl {
                 processedCount += 1
                 onProgress(progress.recordProcessed(source))
             } catch {
-                failedItems.append(FailedItem(path: source.path.path, reason: describe(error)))
+                failedItems.append(try failedItemOrRethrowIfDisconnected(error, source: source))
             }
         }
 
@@ -191,6 +207,7 @@ public final class FileSystemServiceImpl {
     /// and checks cancellation the same way `copy(_:onProgress:)` does (FO-14, FO-16).
     public func move(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
         try ensureSufficientSpace(for: plan)
+        try ensureValidPathLengths(for: plan)
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
@@ -217,7 +234,7 @@ public final class FileSystemServiceImpl {
                 processedCount += 1
                 onProgress(progress.recordProcessed(source))
             } catch {
-                failedItems.append(FailedItem(path: source.path.path, reason: describe(error)))
+                failedItems.append(try failedItemOrRethrowIfDisconnected(error, source: source))
             }
         }
 
@@ -302,6 +319,28 @@ public final class FileSystemServiceImpl {
         if available < required {
             throw FileSystemServiceError.insufficientDiskSpace
         }
+    }
+
+    /// Edge Case 7: throws `.pathTooLong` before starting the operation if any planned
+    /// destination path would exceed the filesystem's `PATH_MAX`.
+    private func ensureValidPathLengths(for plan: CopyMovePlan) throws {
+        for source in plan.sources {
+            let destination = plan.destinationDirectory.appendingPathComponent(plan.renames[source.id] ?? source.name)
+            if destination.path.utf8.count > Int(PATH_MAX) {
+                throw FileSystemServiceError.pathTooLong(destination)
+            }
+        }
+    }
+
+    /// Edge Case 6: a disconnected volume mid-operation (`POSIXError.ENOTCONN`) aborts
+    /// the whole batch rather than being recorded as one more per-file failure - there's
+    /// no point continuing to copy/move to or from a volume that just vanished. Any other
+    /// error becomes a normal `FailedItem`, same as before.
+    private func failedItemOrRethrowIfDisconnected(_ error: Error, source: FileEntry) throws -> FailedItem {
+        if let posixError = error as? POSIXError, posixError.code == .ENOTCONN {
+            throw FileSystemServiceError.volumeDisconnected(source.path)
+        }
+        return FailedItem(path: source.path.path, reason: describe(error))
     }
 
     private func describe(_ error: Error) -> String {

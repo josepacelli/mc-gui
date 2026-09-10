@@ -280,6 +280,77 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("b.txt").path) == false)
     }
 
+    // MARK: - path length / volume disconnection (Edge Cases 7, 6)
+
+    @Test("copy throws a typed pathTooLong error when the destination path exceeds PATH_MAX")
+    func copyFailsWithPathTooLong() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        try writeFile(named: "a.txt", content: "hi", in: srcDir)
+
+        let service = FileSystemServiceImpl()
+        let sourceEntry = try #require(try await service.listDirectory(srcDir).first)
+        // a rename long enough to push the destination path past PATH_MAX regardless of
+        // where the temp directory happens to live
+        let hugeName = String(repeating: "a", count: 5_000) + ".txt"
+
+        do {
+            _ = try await service.copy(
+                plan(sources: [sourceEntry], destination: dstDir, mode: .copy, renames: [sourceEntry.id: hugeName])
+            )
+            Issue.record("Expected FileSystemServiceError.pathTooLong to be thrown")
+        } catch let error as FileSystemServiceError {
+            guard case .pathTooLong = error else {
+                Issue.record("Expected .pathTooLong, got \(error)")
+                return
+            }
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+
+        #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent(hugeName).path) == false)
+    }
+
+    @Test("copy throws a typed volumeDisconnected error on ENOTCONN and aborts the rest of the batch")
+    func copyFailsWithVolumeDisconnected() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        try writeFile(named: "a.txt", content: "hi", in: srcDir)
+        try writeFile(named: "b.txt", content: "hi", in: srcDir)
+        let sources = try await FileSystemServiceImpl().listDirectory(srcDir).sorted { $0.name < $1.name }
+
+        let recorder = CallRecorder()
+        let service = FileSystemServiceImpl(copyItem: { _, _ in
+            recorder.copyCalls += 1
+            throw POSIXError(.ENOTCONN)
+        })
+
+        do {
+            _ = try await service.copy(plan(sources: sources, destination: dstDir, mode: .copy))
+            Issue.record("Expected FileSystemServiceError.volumeDisconnected to be thrown")
+        } catch let error as FileSystemServiceError {
+            guard case .volumeDisconnected = error else {
+                Issue.record("Expected .volumeDisconnected, got \(error)")
+                return
+            }
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+
+        // aborted after the first source - the second was never attempted
+        #expect(recorder.copyCalls == 1)
+    }
+
     // MARK: - EBUSY-simulated retry
 
     @Test("copy retries a transient EBUSY failure and succeeds once the file is free")
