@@ -780,6 +780,12 @@ private struct PanelPrimaryKeys: ViewModifier {
 /// send it) - "+" mirrors Insert (toggle current row and advance), "-" clears the whole
 /// selection, the natural opposite of "*"/select-all. Cmd+I inverts the selection - the
 /// classic mc "*" behavior, given its own key since "*" itself became select-all.
+///
+/// Ctrl+A/Ctrl+U/Ctrl+T/Ctrl+I are a third, fully keyboard-navigable set of aliases for
+/// the same four selection commands (per user request) - select-all/deselect-all/toggle/
+/// invert, mnemonic on the letter (Select/Unselect/Toggle/Invert). Scoped to this list's
+/// key handling only, so they never shadow a text field's own Ctrl+A "move to start of
+/// line" (a focused `TextField` owns its key events before this modifier ever sees them).
 private struct PanelSelectionKeys: ViewModifier {
     let insertKey: KeyEquivalent
     let onJumpFirst: () -> Void
@@ -803,8 +809,18 @@ private struct PanelSelectionKeys: ViewModifier {
                 return .handled
             }
             .onKeyPress(keys: ["i"]) { press in
-                guard press.modifiers.contains(.command) else { return .ignored }
+                guard press.modifiers.contains(.command) || press.modifiers.contains(.control) else { return .ignored }
                 onInvertSelection()
+                return .handled
+            }
+            .onKeyPress(keys: ["a", "u", "t"]) { press in
+                guard press.modifiers.contains(.control) else { return .ignored }
+                switch press.key {
+                case "a": onSelectAll()
+                case "u": onDeselectAll()
+                case "t": onToggleAndAdvance()
+                default: return .ignored
+                }
                 return .handled
             }
             .onKeyPress(keys: [.space, insertKey, "+"]) { press in
