@@ -6,15 +6,21 @@ import MCGuiCore
 public struct CopyMoveDialog: View {
     @Bindable public var viewModel: CopyMoveDialogViewModel
     public var onConfirm: () -> Void
+    // FO-14 (classic mc parity): the original always shows the progress dialog on a
+    // normal OK - "Segundo plano" is the one explicit opt-in that runs silently instead,
+    // per user request ("mc original so usa a opcao segundo plano quando pedido").
+    public var onConfirmBackground: () -> Void
     public var onCancel: () -> Void
 
     public init(
         viewModel: CopyMoveDialogViewModel,
         onConfirm: @escaping () -> Void = {},
+        onConfirmBackground: @escaping () -> Void = {},
         onCancel: @escaping () -> Void = {}
     ) {
         self.viewModel = viewModel
         self.onConfirm = onConfirm
+        self.onConfirmBackground = onConfirmBackground
         self.onCancel = onCancel
     }
 
@@ -41,6 +47,7 @@ public struct CopyMoveDialog: View {
                 Spacer()
                 Button("Cancel", role: .cancel, action: onCancel)
                     .keyboardShortcut(.cancelAction)
+                Button("Background", action: onConfirmBackground)
                 Button(title, action: onConfirm)
                     .keyboardShortcut(.defaultAction)
             }

@@ -171,7 +171,8 @@ public struct PanelView: View {
             if let copyMoveViewModel {
                 CopyMoveDialog(
                     viewModel: copyMoveViewModel,
-                    onConfirm: { Task { await performCopyMove(copyMoveViewModel) } },
+                    onConfirm: { Task { await performCopyMove(copyMoveViewModel, background: false) } },
+                    onConfirmBackground: { Task { await performCopyMove(copyMoveViewModel, background: true) } },
                     onCancel: { self.copyMoveViewModel = nil }
                 )
             }
@@ -476,7 +477,7 @@ public struct PanelView: View {
 
     /// FO-05..FO-09: resolves every destination-name conflict (one dialog at a time) before
     /// running the copy/move, then applies the batch with whatever the user chose per file.
-    private func performCopyMove(_ dialogViewModel: CopyMoveDialogViewModel) async {
+    private func performCopyMove(_ dialogViewModel: CopyMoveDialogViewModel, background: Bool) async {
         copyMoveViewModel = nil
         operationErrorMessage = nil
 
@@ -512,7 +513,7 @@ public struct PanelView: View {
                 options: dialogViewModel.options,
                 renames: renames
             )
-            await runWithProgress(plan, mode: dialogViewModel.mode)
+            await runWithProgress(plan, mode: dialogViewModel.mode, background: background)
             await viewModel.load()
             onOperationCompleted()
         }
@@ -524,7 +525,12 @@ public struct PanelView: View {
     /// usable while it runs - its Cancel button wires to `operationTask.cancel()`, and
     /// `fileSystemService.copy`/`move` check for cancellation between sources
     /// (`FileSystemServiceImpl`) - already-processed files stay in place.
-    private func runWithProgress(_ plan: CopyMovePlan, mode: OperationMode) async {
+    ///
+    /// Classic mc parity: the progress dialog is shown by default (`background == false`,
+    /// the normal OK button) - `background == true` is the explicit "Segundo plano" opt-in
+    /// from `CopyMoveDialog`, which runs the exact same operation but never opens a
+    /// window for it.
+    private func runWithProgress(_ plan: CopyMovePlan, mode: OperationMode, background: Bool) async {
         var continuation: AsyncStream<OperationProgress>.Continuation!
         let stream = AsyncStream<OperationProgress> { continuation = $0 }
 
@@ -537,7 +543,9 @@ public struct PanelView: View {
         operationTask = task
 
         let progressViewModel = ProgressDialogViewModel(onCancel: { task.cancel() })
-        onShowProgress(progressViewModel)
+        if !background {
+            onShowProgress(progressViewModel)
+        }
         async let consuming: Void = progressViewModel.consume(stream)
 
         do {
