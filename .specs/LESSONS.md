@@ -68,6 +68,42 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: P1 AC3 (.specs/features/macos-native-chrome/validation.md round 3) (Avalonia window chrome)
 - last seen: 2026-09-06T11:34:50Z
 
+### L-010 - Before marking a UI flow verified, grep the source tree for real callers of its ViewModel/dialog outside its own file and tests - a fully unit-tested component with zero callers in the shipped app is not wired, regardless of test coverage.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `swiftui-viewmodel-wiring` · harmful: 0
+- features: convert-to-swift-swiftui
+- evidence: FO-05 (swiftui-viewmodel-wiring)
+- last seen: 2026-09-10T01:07:45Z
+
+### L-011 - Do not mark a requirement Verified in the traceability table until the specific described behavior is confirmed present in source - a sibling feature working is not evidence that this one exists.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `requirement-traceability` · harmful: 0
+- features: convert-to-swift-swiftui
+- evidence: FV-02 (requirement-traceability)
+- last seen: 2026-09-10T01:07:45Z
+
+### L-012 - When spec.md asks for an explicit user-facing 'offer to retry' action, an automatic internal retry-then-fail is not equivalent - implement or flag the missing retry affordance separately.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `error-handling` · harmful: 0
+- features: convert-to-swift-swiftui
+- evidence: Edge Cases 1-2 (error-handling)
+- last seen: 2026-09-10T01:07:45Z
+
+### L-013 - When two key bindings share one handler closure, verify each key's full spec-required behavior is implemented, not just the behavior the keys have in common.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `keyboard-handling` · harmful: 0
+- features: convert-to-swift-swiftui
+- evidence: KN-06 (validation.md) (keyboard-handling)
+- last seen: 2026-09-10T16:07:28Z
+
+### L-014 - When fixing a gap would require a protocol-level signature change out of the current fix pass's budget, defer it explicitly with a SPEC_DEVIATION comment rather than applying a half-measure that changes nothing observable.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `fix-cycle-scoping` · harmful: 0
+- features: convert-to-swift-swiftui
+- evidence: Edge Case 4 (FileSystemServiceImpl.swift:58-69) (fix-cycle-scoping)
+- last seen: 2026-09-10T16:07:28Z
+
+### L-015 - Private SwiftUI view glue (key-dispatch closures, cursor-state helpers) survives targeted mutation with no XCUITest harness in place - treat it as an accepted coverage gap only when the pure function it calls is independently unit-tested; otherwise wire a real regression test.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `swiftui-view-glue` · harmful: 0
+- features: convert-to-swift-swiftui
+- evidence: PanelView.swift:365-370,701-708 (validation.md iteration 2) (swiftui-view-glue)
+- last seen: 2026-09-10T16:19:44Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
