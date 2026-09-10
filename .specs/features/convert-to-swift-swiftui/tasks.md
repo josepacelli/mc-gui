@@ -1213,8 +1213,8 @@ T44 → T45
 - Skill: NONE
 
 **Done when**:
-- [ ] Tab switches active panel; arrows move selection; Shift+Arrow extends range; Cmd+Arrow jumps to first/last; Space toggles; Insert toggles + moves down
-- [ ] XCUITest covers each of the 6 KN-01..06 behaviors
+- [x] Tab switches active panel; arrows move selection; Shift+Arrow extends range; Cmd+Arrow jumps to first/last; Space toggles; Insert toggles + moves down - Tab (KN-01) needs no new logic: `MainWindowViewModel.switchActivePanel()` (T18) already implements and unit-tests it. Arrows/Shift+Arrow/Cmd+Arrow/Space/Insert (KN-02..06) are implemented in `PanelCommands` as pure functions bridging `PanelView`'s `Set<FileEntry.ID>` selection to `SelectionService`'s `Set<Int>` index space.
+- [ ] XCUITest covers each of the 6 KN-01..06 behaviors - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. Wiring-level unit tests in `PanelCommandsTests` cover KN-02..06 (each confirms the right `SelectionService` call/result after UUID<->index translation: move/clamp, range-extend/shrink, jump-to-first/last, toggle, toggle-and-advance-with-clamp). KN-01 needs no dedicated test here since it calls straight through to `MainWindowViewModelTests`' already-covered `switchActivePanel()` (T18). Physically hooking these functions into `PanelView`'s `.onKeyPress` is wiring left for a future task - `PanelView.swift` is not in this task's `Where` field (mirrors T38/T43's F3/F4 cross-target-wiring deferral).
 
 **Tests**: e2e
 **Gate**: build
