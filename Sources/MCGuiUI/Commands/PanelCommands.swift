@@ -103,4 +103,14 @@ public enum PanelCommands {
     public static func deselectAll() -> Set<FileEntry.ID> {
         []
     }
+
+    /// Inverts the whole selection (Cmd+I - the classic mc "*" behavior, moved to a
+    /// dedicated key once "*" itself became select-all per user request), via
+    /// `SelectionService.invert`: every currently unselected entry becomes selected and
+    /// vice versa.
+    public static func invertSelection(_ selection: Set<FileEntry.ID>, entries: [FileEntry]) -> Set<FileEntry.ID> {
+        let indices = Set(selection.compactMap { index(of: $0, in: entries) })
+        let inverted = SelectionService.invert(indices, count: entries.count)
+        return Set(inverted.map { entries[$0].id })
+    }
 }

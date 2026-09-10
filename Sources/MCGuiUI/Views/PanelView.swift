@@ -246,6 +246,7 @@ public struct PanelView: View {
             onToggleAndAdvance: toggleAndAdvanceSelection,
             onSelectAll: selectAllEntries,
             onDeselectAll: deselectAllEntries,
+            onInvertSelection: invertSelection,
             onEscape: handleEscape
         ))
     }
@@ -457,6 +458,12 @@ public struct PanelView: View {
     /// physical Delete key (per user report), and the natural opposite of "*"/select-all.
     private func deselectAllEntries() {
         selection = PanelCommands.deselectAll()
+    }
+
+    /// Cmd+I: inverts the whole selection - the classic mc "*" behavior, moved to its own
+    /// key once "*" itself became select-all (per user request).
+    private func invertSelection() {
+        selection = PanelCommands.invertSelection(selection, entries: viewModel.entries)
     }
 
     /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state. Progress
@@ -771,7 +778,8 @@ private struct PanelPrimaryKeys: ViewModifier {
 /// "+"/"-" are secondary keys for Insert/deselect-all (per user report: Mac keyboards
 /// often have no dedicated Insert key at all, and this user's keyboard doesn't reliably
 /// send it) - "+" mirrors Insert (toggle current row and advance), "-" clears the whole
-/// selection, the natural opposite of "*"/select-all.
+/// selection, the natural opposite of "*"/select-all. Cmd+I inverts the selection - the
+/// classic mc "*" behavior, given its own key since "*" itself became select-all.
 private struct PanelSelectionKeys: ViewModifier {
     let insertKey: KeyEquivalent
     let onJumpFirst: () -> Void
@@ -780,6 +788,7 @@ private struct PanelSelectionKeys: ViewModifier {
     let onToggleAndAdvance: () -> Void
     let onSelectAll: () -> Void
     let onDeselectAll: () -> Void
+    let onInvertSelection: () -> Void
     let onEscape: () -> Void
 
     func body(content: Content) -> some View {
@@ -791,6 +800,11 @@ private struct PanelSelectionKeys: ViewModifier {
                 } else {
                     onJumpLast()
                 }
+                return .handled
+            }
+            .onKeyPress(keys: ["i"]) { press in
+                guard press.modifiers.contains(.command) else { return .ignored }
+                onInvertSelection()
                 return .handled
             }
             .onKeyPress(keys: [.space, insertKey, "+"]) { press in

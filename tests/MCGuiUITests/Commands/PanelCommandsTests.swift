@@ -147,4 +147,41 @@ struct PanelCommandsTests {
 
         #expect(result.isEmpty)
     }
+
+    // MARK: - invertSelection (Cmd+I), via SelectionService.invert
+
+    @Test("invertSelection from an empty selection selects everything")
+    func invertSelectionFromEmptySelectsAll() {
+        let result = PanelCommands.invertSelection([], entries: entries)
+
+        #expect(result == Set(entries.map(\.id)))
+    }
+
+    @Test("invertSelection from everything selected deselects everything")
+    func invertSelectionFromAllDeselectsAll() {
+        let all = Set(entries.map(\.id))
+
+        let result = PanelCommands.invertSelection(all, entries: entries)
+
+        #expect(result.isEmpty)
+    }
+
+    @Test("invertSelection flips a partial selection entry by entry")
+    func invertSelectionFlipsPartialSelection() {
+        let partial = Set([entries[0].id])
+
+        let result = PanelCommands.invertSelection(partial, entries: entries)
+
+        #expect(result == Set([entries[1].id, entries[2].id]))
+    }
+
+    @Test("invertSelection twice in a row returns to the original selection")
+    func invertSelectionTwiceReturnsToOriginal() {
+        let original = Set([entries[1].id])
+
+        let onceInverted = PanelCommands.invertSelection(original, entries: entries)
+        let twiceInverted = PanelCommands.invertSelection(onceInverted, entries: entries)
+
+        #expect(twiceInverted == original)
+    }
 }
