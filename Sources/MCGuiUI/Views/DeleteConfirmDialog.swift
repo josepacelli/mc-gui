@@ -14,8 +14,17 @@ public struct DeleteConfirmDialog: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Move \(viewModel.count) item\(viewModel.count == 1 ? "" : "s") to Trash?")
-                .font(.headline)
+            Text(
+                String(
+                    format: NSLocalizedString(
+                        viewModel.count == 1 ? "deleteConfirm.header.singular" : "deleteConfirm.header.plural",
+                        bundle: .module,
+                        comment: "F8 delete-confirmation header. %1$d is the item count."
+                    ),
+                    viewModel.count
+                )
+            )
+            .font(.headline)
 
             List(viewModel.entries) { entry in
                 Text(entry.name)
@@ -30,9 +39,9 @@ public struct DeleteConfirmDialog: View {
 
             HStack {
                 Spacer()
-                Button("Cancel", role: .cancel, action: onCancel)
+                Button(String(localized: "deleteConfirm.button.cancel", bundle: .module, comment: "Cancel button"), role: .cancel, action: onCancel)
                     .keyboardShortcut(.cancelAction)
-                Button("Move to Trash") {
+                Button(String(localized: "deleteConfirm.button.confirm", bundle: .module, comment: "Move to Trash confirm button")) {
                     Task { await viewModel.confirm() }
                 }
                 .keyboardShortcut(.defaultAction)

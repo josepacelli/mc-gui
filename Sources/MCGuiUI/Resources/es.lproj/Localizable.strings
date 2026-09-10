@@ -28,3 +28,9 @@
 "mkdir.field.name" = "Nombre de la Carpeta";
 "mkdir.button.cancel" = "Cancelar";
 "mkdir.button.create" = "Crear";
+
+/* DeleteConfirmDialog.swift (T10) */
+"deleteConfirm.header.singular" = "¿Mover %1$d elemento a la Papelera?";
+"deleteConfirm.header.plural" = "¿Mover %1$d elementos a la Papelera?";
+"deleteConfirm.button.cancel" = "Cancelar";
+"deleteConfirm.button.confirm" = "Mover a la Papelera";

@@ -388,6 +388,15 @@ text - none needed updating. `swift test`: 318 passed, 0 failed.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 4 keys extracted (singular/plural header, Cancel/Move-to-Trash buttons),
+same singular/plural `.strings`-template pattern as T7/T6. Spanish header keys carry the
+opening "¿" per Spanish question-punctuation convention. Left
+`DeleteConfirmDialogViewModel.swift`'s own "No files selected." error literal untouched -
+out of this task's `Where:` scope (`DeleteConfirmDialog.swift` only); same gap class as
+T9's Mkdir note. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T11: Extract `SaveChangesDialog.swift`

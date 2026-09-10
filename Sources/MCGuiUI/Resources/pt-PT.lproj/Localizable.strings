@@ -28,3 +28,9 @@
 "mkdir.field.name" = "Nome da Pasta";
 "mkdir.button.cancel" = "Cancelar";
 "mkdir.button.create" = "Criar";
+
+/* DeleteConfirmDialog.swift (T10) */
+"deleteConfirm.header.singular" = "Mover %1$d item para o Lixo?";
+"deleteConfirm.header.plural" = "Mover %1$d itens para o Lixo?";
+"deleteConfirm.button.cancel" = "Cancelar";
+"deleteConfirm.button.confirm" = "Mover para o Lixo";
