@@ -1319,8 +1319,8 @@ T49 → T50
 - Skill: NONE
 
 **Done when**:
-- [ ] `showMainWindow`, `showViewer(for:panel:)`, `showEditor(for:)`, `showDialog(content:)` implemented
-- [ ] Window menu (Minimize/Zoom/Viewer/Editor) operates on the correct window instances
+- [x] `showMainWindow`, `showViewer(for:panel:)`, `showEditor(for:)`, `showDialog(content:)` implemented
+- [x] Window menu (Minimize/Zoom/Viewer/Editor) operates on the correct window instances - `bringViewerToFront`/`bringEditorToFront` track the most recently opened window per kind; `AppCommands`' Minimize/Zoom act on `NSApp.keyWindow` directly (T48). `showMainWindow` itself only accepts `viewModel: MainWindowViewModel` here - wiring F3/F4 through to `showViewer`/`showEditor` requires extending `MainWindow`'s/`PanelView`'s initializers, done as part of T50 (AppEntry), which is where the full app - and therefore this closure wiring - comes together.
 
 **Tests**: none
 **Gate**: build
