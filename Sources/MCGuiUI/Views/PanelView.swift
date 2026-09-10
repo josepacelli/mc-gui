@@ -189,7 +189,12 @@ public struct PanelView: View {
                 .contextMenu {
                     Text(entry.name)
                 }
-                .onTapGesture(count: 2) { activate(entry) }
+                // `.simultaneousGesture` (not `.onTapGesture`/`.gesture`, which claim
+                // exclusive priority) so this double-click recognizer runs *alongside*
+                // the List's own native single-click-to-select handling instead of
+                // racing/blocking it - user-reported: single click sometimes failed to
+                // select a row once a competing `.onTapGesture(count: 2)` was attached.
+                .simultaneousGesture(TapGesture(count: 2).onEnded { activate(entry) })
         }
         .focusable()
         .focused($isFocused)

@@ -30,6 +30,11 @@ public struct FileRow: View {
                 .foregroundStyle(.secondary)
             PermissionBadge(permissions: entry.permissions)
         }
+        // Without this, only the icon/text/badge themselves are tappable - the Spacer's
+        // expanded gap and any other empty space in the row hit-tests as nothing, so a
+        // click/double-click there is silently ignored (user-reported: "double-click
+        // doesn't grab the whole line"). This makes the entire row rect tappable.
+        .contentShape(Rectangle())
     }
 
     private var sizeText: String {
