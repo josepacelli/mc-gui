@@ -47,3 +47,25 @@
 "progress.label.of" = "de";
 "progress.label.etaRemaining" = "%1$ds restantes";
 "progress.button.cancel" = "Cancelar";
+
+/* TopBar.swift (T13) */
+"topBar.menu.left" = "Esquerda";
+"topBar.menu.file" = "Arquivo";
+"topBar.menu.command" = "Comando";
+"topBar.menu.options" = "Opções";
+"topBar.menu.right" = "Direita";
+"topBar.menu.rescan" = "Atualizar";
+"topBar.file.newFolder" = "Nova Pasta";
+"topBar.file.copy" = "Copiar";
+"topBar.file.move" = "Mover";
+"topBar.file.delete" = "Excluir";
+"topBar.file.view" = "Ver";
+"topBar.file.edit" = "Editar";
+"topBar.file.quit" = "Sair";
+"topBar.command.refresh" = "Atualizar";
+"topBar.command.back" = "Voltar";
+"topBar.command.forward" = "Avançar";
+"topBar.command.bookmarks" = "Favoritos…";
+"topBar.command.userMenu" = "Menu do Usuário…";
+"topBar.options.showHiddenFiles" = "Mostrar Arquivos Ocultos";
+"topBar.options.theme" = "Tema";

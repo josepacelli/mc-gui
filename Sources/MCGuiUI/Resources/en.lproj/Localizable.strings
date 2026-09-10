@@ -47,3 +47,25 @@
 "progress.label.of" = "of";
 "progress.label.etaRemaining" = "%1$ds remaining";
 "progress.button.cancel" = "Cancel";
+
+/* TopBar.swift (T13) */
+"topBar.menu.left" = "Left";
+"topBar.menu.file" = "File";
+"topBar.menu.command" = "Command";
+"topBar.menu.options" = "Options";
+"topBar.menu.right" = "Right";
+"topBar.menu.rescan" = "Rescan";
+"topBar.file.newFolder" = "New Folder";
+"topBar.file.copy" = "Copy";
+"topBar.file.move" = "Move";
+"topBar.file.delete" = "Delete";
+"topBar.file.view" = "View";
+"topBar.file.edit" = "Edit";
+"topBar.file.quit" = "Quit";
+"topBar.command.refresh" = "Refresh";
+"topBar.command.back" = "Back";
+"topBar.command.forward" = "Forward";
+"topBar.command.bookmarks" = "Bookmarks…";
+"topBar.command.userMenu" = "User Menu…";
+"topBar.options.showHiddenFiles" = "Show Hidden Files";
+"topBar.options.theme" = "Theme";

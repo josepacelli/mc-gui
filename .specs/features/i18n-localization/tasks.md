@@ -475,6 +475,17 @@ target×language pairs pass key-set parity.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 20 keys extracted (5 top-level menu titles, "Rescan" shared between the
+Left/Right menus, 7 File-menu items, 5 Command-menu items, 2 Options-menu items). Volume
+names (`volume.name`) are macOS-reported volume labels, not app UI text - left as-is.
+"View" (File-menu/verb, open in viewer) has no direct glossary row; translated as
+Ver/Ver/Ver (no divergence) to match the Viewer feature's action verb, distinct from the
+glossary's "View (native menu)" row (that one names `AppCommands.swift`'s native View
+menu, out of this task's scope, T20). No existing test asserted this file's view text -
+none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T14: Extract `ButtonBar.swift`
