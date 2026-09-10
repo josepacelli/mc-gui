@@ -19,6 +19,68 @@ public enum FileSystemServiceError: Error, Equatable {
     case pathTooLong(URL)
 }
 
+extension FileSystemServiceError: LocalizedError {
+    /// Localized, user-facing message per case (I18N-01..04), backed by MCGuiMacOS's
+    /// own `Localizable.strings` (AD-005) - never MCGuiUI's, keeping AD-002's boundary
+    /// intact (MCGuiUI never imports MCGuiMacOS; it only calls `error.localizedDescription`
+    /// on the `Error` it already has).
+    public var errorDescription: String? {
+        switch self {
+        case .permissionDenied(let url):
+            return String(
+                format: NSLocalizedString(
+                    "fileSystemError.permissionDenied",
+                    bundle: .module,
+                    comment: "Directory/file read permission denied. %1$@ is the file path."
+                ),
+                url.path
+            )
+        case .alreadyExists(let url):
+            return String(
+                format: NSLocalizedString(
+                    "fileSystemError.alreadyExists",
+                    bundle: .module,
+                    comment: "createDirectory target already exists. %1$@ is the file path."
+                ),
+                url.path
+            )
+        case .fileInUse(let url):
+            return String(
+                format: NSLocalizedString(
+                    "fileSystemError.fileInUse",
+                    bundle: .module,
+                    comment: "File is locked/in use by another process. %1$@ is the file path."
+                ),
+                url.path
+            )
+        case .insufficientDiskSpace:
+            return NSLocalizedString(
+                "fileSystemError.insufficientDiskSpace",
+                bundle: .module,
+                comment: "Not enough free space at the destination."
+            )
+        case .volumeDisconnected(let url):
+            return String(
+                format: NSLocalizedString(
+                    "fileSystemError.volumeDisconnected",
+                    bundle: .module,
+                    comment: "The volume was disconnected mid-operation. %1$@ is the file path that was on that volume."
+                ),
+                url.path
+            )
+        case .pathTooLong(let url):
+            return String(
+                format: NSLocalizedString(
+                    "fileSystemError.pathTooLong",
+                    bundle: .module,
+                    comment: "A planned destination path exceeds PATH_MAX. %1$@ is the destination path."
+                ),
+                url.path
+            )
+        }
+    }
+}
+
 /// macOS `FileSystemService` implementation backed by `FileManager`.
 public final class FileSystemServiceImpl {
     private let fileManager: FileManager
@@ -480,7 +542,7 @@ public final class FileSystemServiceImpl {
 
     private func describe(_ error: Error) -> String {
         if let typed = error as? FileSystemServiceError {
-            return String(describing: typed)
+            return typed.errorDescription ?? typed.localizedDescription
         }
         return error.localizedDescription
     }

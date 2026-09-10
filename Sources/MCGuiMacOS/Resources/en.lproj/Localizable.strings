@@ -1,2 +1,10 @@
 /* Placeholder key confirming Bundle.module resource resolution (T1). Replaced by real FileSystemServiceError keys in T5. */
 "app.placeholder" = "placeholder";
+
+/* FileSystemServiceError.errorDescription (T5). %1$@ is a file/directory path. */
+"fileSystemError.permissionDenied" = "Permission denied: “%1$@”.";
+"fileSystemError.alreadyExists" = "“%1$@” already exists.";
+"fileSystemError.fileInUse" = "“%1$@” is in use by another process.";
+"fileSystemError.insufficientDiskSpace" = "Not enough disk space to complete the operation.";
+"fileSystemError.volumeDisconnected" = "The volume for “%1$@” was disconnected.";
+"fileSystemError.pathTooLong" = "The destination path “%1$@” is too long.";

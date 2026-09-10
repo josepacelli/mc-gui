@@ -487,7 +487,11 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(result.processedCount == 0)
         #expect(recorder.copyCalls == 3)
         #expect(result.failedItems.count == 1)
-        #expect(result.failedItems.first?.reason.contains("fileInUse") == true)
+        // FileSystemServiceError.fileInUse now has a localized errorDescription (T5)
+        // instead of a raw `String(describing:)` dump of the enum case - assert the
+        // failure reason matches that typed error's own message for this exact source
+        // path, not the old case-name substring.
+        #expect(result.failedItems.first?.reason == FileSystemServiceError.fileInUse(sourceEntry.path).errorDescription)
         #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("a.txt").path) == false)
     }
 

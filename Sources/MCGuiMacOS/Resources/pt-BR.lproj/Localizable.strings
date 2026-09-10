@@ -1,2 +1,10 @@
 /* Placeholder key confirming Bundle.module resource resolution (T1/T4). Replaced by real UI keys in a later phase. */
 "app.placeholder" = "espaço reservado";
+
+/* FileSystemServiceError.errorDescription (T5). %1$@ é um caminho de arquivo/pasta. */
+"fileSystemError.permissionDenied" = "Permissão negada: “%1$@”.";
+"fileSystemError.alreadyExists" = "“%1$@” já existe.";
+"fileSystemError.fileInUse" = "“%1$@” está sendo usado por outro processo.";
+"fileSystemError.insufficientDiskSpace" = "Espaço em disco insuficiente para concluir a operação.";
+"fileSystemError.volumeDisconnected" = "O volume de “%1$@” foi desconectado.";
+"fileSystemError.pathTooLong" = "O caminho de destino “%1$@” é muito longo.";

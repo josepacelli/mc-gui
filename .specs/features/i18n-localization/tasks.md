@@ -231,13 +231,33 @@ per case; add the 6 keys (`.permissionDenied`, `.alreadyExists`, `.fileInUse`,
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] All 6 cases have a localized `errorDescription` in all 4 languages
-- [ ] `describe(_:)` no longer calls `String(describing: typed)` for `FileSystemServiceError`
-- [ ] `FileSystemServiceErrorLocalizationTests.swift` asserts each case's exact text per locale by loading that language's `.lproj` sub-bundle directly
-- [ ] `swift test` passes (306+ existing tests still pass, plus the new ones)
+- [x] All 6 cases have a localized `errorDescription` in all 4 languages
+- [x] `describe(_:)` no longer calls `String(describing: typed)` for `FileSystemServiceError`
+- [x] `FileSystemServiceErrorLocalizationTests.swift` asserts each case's exact text per locale by loading that language's `.lproj` sub-bundle directly
+- [x] `swift test` passes (306+ existing tests still pass, plus the new ones)
 
 **Tests**: unit
 **Gate**: full
+
+**Confirmed / deviation notes**:
+- SPM's resource processing lowercases the region subtag of `.lproj` directory names
+  on disk (`pt-BR.lproj` -> `pt-br.lproj`, `pt-PT.lproj` -> `pt-pt.lproj`); `Bundle`'s
+  own runtime language negotiation (used by `errorDescription`'s
+  `NSLocalizedString(bundle: .module, ...)`) matches locale identifiers
+  case-insensitively regardless, so production behavior is unaffected - only the
+  test's direct-path lookup (`Bundle.module.path(forResource: "pt-BR", ofType: "lproj")`)
+  needed a lowercase fallback. Also found empirically: a `Bundle(path:)` rooted at a
+  bare `.lproj` directory resolves `localizedString(forKey:)` back to the base/English
+  table rather than that directory's own table - the test instead reads
+  `Localizable.strings` directly via `NSDictionary(contentsOfFile:)` for a
+  deterministic, locale-independent lookup.
+- Fixed 1 pre-existing test broken by this task's change:
+  `FileSystemServiceImplCopyMoveTests.swift`'s "copy reports a typed fileInUse
+  failure..." asserted `reason.contains("fileInUse")` (the old case-name dump);
+  updated to compare against `FileSystemServiceError.fileInUse(sourceEntry.path)
+  .errorDescription` (behavior-focused, not text-focused).
+
+**Status**: ✅ Complete
 
 ---
 

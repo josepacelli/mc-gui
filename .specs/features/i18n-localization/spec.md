@@ -112,10 +112,10 @@ without this - it's a maintainability guarantee, not user-visible runtime behavi
 
 | Requirement ID | Story                            | Phase  | Status  |
 | --------------- | --------------------------------- | ------ | ------- |
-| I18N-01         | P1: Full app in the user's language | Design | Pending |
-| I18N-02         | P1: Full app in the user's language | Design | Pending |
-| I18N-03         | P1: Full app in the user's language | Design | Pending |
-| I18N-04         | P1: Full app in the user's language | Design | Pending |
+| I18N-01         | P1: Full app in the user's language | Tasks | Implementing |
+| I18N-02         | P1: Full app in the user's language | Tasks | Implementing |
+| I18N-03         | P1: Full app in the user's language | Tasks | Implementing |
+| I18N-04         | P1: Full app in the user's language | Tasks | Implementing |
 | I18N-05         | P1: Full app in the user's language | Design | Pending |
 | I18N-06         | P1: Full app in the user's language | Design | Pending |
 | I18N-07         | P1: Full app in the user's language | Design | Pending |
