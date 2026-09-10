@@ -34,3 +34,8 @@
 "deleteConfirm.header.plural" = "¿Mover %1$d elementos a la Papelera?";
 "deleteConfirm.button.cancel" = "Cancelar";
 "deleteConfirm.button.confirm" = "Mover a la Papelera";
+
+/* SaveChangesDialog.swift (T11) */
+"saveChanges.button.cancel" = "Cancelar";
+"saveChanges.button.dontSave" = "No Guardar";
+"saveChanges.button.save" = "Guardar";

@@ -413,6 +413,15 @@ T9's Mkdir note. `swift test`: 318 passed, 0 failed.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 3 keys extracted (Cancel/Don't Save/Save buttons). Left
+`SaveChangesDialogViewModel.swift`'s own `message` literal ("Save changes to
+\"<file>\" before closing?") untouched - out of this task's `Where:` scope
+(`SaveChangesDialog.swift` only); same gap class as T9/T10's notes.
+`SaveChangesDialogViewModelTests` only asserts `.contains("notes.txt")`, so this gap
+doesn't currently show up as a test failure either. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T12: Extract `ProgressDialog.swift`

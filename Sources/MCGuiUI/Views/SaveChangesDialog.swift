@@ -15,11 +15,11 @@ public struct SaveChangesDialog: View {
                 .font(.headline)
 
             HStack {
-                Button("Cancel", role: .cancel) { viewModel.chooseCancel() }
+                Button(String(localized: "saveChanges.button.cancel", bundle: .module, comment: "Cancel button"), role: .cancel) { viewModel.chooseCancel() }
                     .keyboardShortcut(.cancelAction)
                 Spacer()
-                Button("Don't Save", role: .destructive) { viewModel.chooseDiscard() }
-                Button("Save") { viewModel.chooseSave() }
+                Button(String(localized: "saveChanges.button.dontSave", bundle: .module, comment: "Don't Save (discard changes) button"), role: .destructive) { viewModel.chooseDiscard() }
+                Button(String(localized: "saveChanges.button.save", bundle: .module, comment: "Save button")) { viewModel.chooseSave() }
                     .keyboardShortcut(.defaultAction)
             }
         }

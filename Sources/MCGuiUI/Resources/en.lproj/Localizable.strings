@@ -34,3 +34,8 @@
 "deleteConfirm.header.plural" = "Move %1$d items to Trash?";
 "deleteConfirm.button.cancel" = "Cancel";
 "deleteConfirm.button.confirm" = "Move to Trash";
+
+/* SaveChangesDialog.swift (T11) */
+"saveChanges.button.cancel" = "Cancel";
+"saveChanges.button.dontSave" = "Don't Save";
+"saveChanges.button.save" = "Save";
