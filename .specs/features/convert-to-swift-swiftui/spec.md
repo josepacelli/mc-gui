@@ -325,7 +325,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FS-03 | P1: File System Service | Execute | Implementing |
 | FS-04 | P1: File System Service | Execute | Implementing |
 | FS-05 | P1: File System Service | Execute | Implementing |
-| FS-06 | P1: File System Service | Design | Pending |
+| FS-06 | P1: File System Service | Execute | Verified |
 | FS-07 | P1: File System Service | Execute | Implementing |
 | FS-08 | P1: File System Service | Execute | Implementing |
 | FS-09 | P1: File System Service | Execute | Implementing |
@@ -349,7 +349,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FO-14 | P1: File Operations | Execute | Implementing |
 | FO-15 | P1: File Operations | Execute | Implementing |
 | FO-16 | P1: File Operations | Execute | Implementing |
-| FV-01 | P1: File Viewer | Design | Pending |
+| FV-01 | P1: File Viewer | Execute | Verified |
 | FV-02 | P1: File Viewer | Execute | Implementing |
 | FV-03 | P1: File Viewer | Execute | Implementing |
 | FV-04 | P1: File Viewer | Execute | Implementing |
@@ -357,7 +357,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FV-06 | P1: File Viewer | Execute | Implementing |
 | FV-07 | P1: File Viewer | Execute | Implementing |
 | FV-08 | P1: File Viewer | Execute | Implementing |
-| ED-01 | P1: Text Editor | Execute | Implementing |
+| ED-01 | P1: Text Editor | Execute | Verified |
 | ED-02 | P1: Text Editor | Execute | Implementing |
 | ED-03 | P1: Text Editor | Execute | Implementing |
 | ED-04 | P1: Text Editor | Execute | Implementing |
@@ -385,12 +385,12 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | TH-04 | P1: Theme Support | Execute | Verified |
 | TH-05 | P1: Theme Support | Execute | Verified |
 | TH-06 | P1: Theme Support | Execute | Verified |
-| MB-01 | P1: Menu Bar | Execute | Implementing |
+| MB-01 | P1: Menu Bar | Execute | Verified |
 | MB-02 | P1: Menu Bar | Execute | Verified |
 | MB-03 | P1: Menu Bar | Execute | Verified |
 | MB-04 | P1: Menu Bar | Execute | Verified |
 | MB-05 | P1: Menu Bar | Execute | Verified |
-| MB-06 | P1: Menu Bar | Execute | Implementing |
+| MB-06 | P1: Menu Bar | Execute | Verified |
 | MB-07 | P1: Menu Bar | Execute | Verified |
 | PH-01 | P2: Path History Persistence | Execute | Implementing |
 | PH-02 | P2: Path History Persistence | Execute | Implementing |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 93 total, 92 mapped to tasks, 1 unmapped (FS-06) ⚠️
+**Coverage:** 93 total, 92 mapped to tasks, 1 unmapped to a task's `Requirement` field (FS-06) - functionally covered as of T50 (Cmd+Up in `AppCommands`' Go menu, wired to real parent-directory navigation in `AppEntry`), though no task explicitly cites it.
 
 ---
 

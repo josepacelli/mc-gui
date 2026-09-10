@@ -13,6 +13,13 @@ public struct PanelView: View {
     public let viewModel: PanelViewModel
     public let isActive: Bool
     public var onActivate: () -> Void
+    // WindowManager gap closure (T50): F3/F4 need to construct and present a real
+    // ViewerWindow/EditorWindow backed by a concrete ViewerServiceImpl/EditorServiceImpl
+    // (MCGuiMacOS), which PanelView (MCGuiUI) cannot reach directly - MCGuiUI does not
+    // depend on MCGuiMacOS. These closures let the caller (MainWindow -> WindowManager,
+    // MCGuiApp) supply that behavior, mirroring `onActivate`'s existing pattern.
+    public var onViewFile: (FileEntry) -> Void
+    public var onEditFile: (FileEntry) -> Void
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
@@ -22,17 +29,27 @@ public struct PanelView: View {
     @State private var deleteViewModel: DeleteConfirmDialogViewModel?
     @State private var operationErrorMessage: String?
 
-    public init(viewModel: PanelViewModel, isActive: Bool, onActivate: @escaping () -> Void = {}) {
+    public init(
+        viewModel: PanelViewModel,
+        isActive: Bool,
+        onActivate: @escaping () -> Void = {},
+        onViewFile: @escaping (FileEntry) -> Void = { _ in },
+        onEditFile: @escaping (FileEntry) -> Void = { _ in }
+    ) {
         self.viewModel = viewModel
         self.isActive = isActive
         self.onActivate = onActivate
+        self.onViewFile = onViewFile
+        self.onEditFile = onEditFile
     }
 
-    // MARK: - F-key handling (FO-01, FO-02, FO-10, FO-12)
+    // MARK: - F-key handling (FV-01, ED-01, FO-01, FO-02, FO-10, FO-12)
 
-    // NSF5FunctionKey..NSF8FunctionKey are AppKit's Unicode private-use-area scalars for
-    // the physical F5-F8 keys; SwiftUI's `KeyEquivalent` has no dedicated function-key
+    // NSF3FunctionKey..NSF8FunctionKey are AppKit's Unicode private-use-area scalars for
+    // the physical F3-F8 keys; SwiftUI's `KeyEquivalent` has no dedicated function-key
     // constants, so this is the standard technique for binding to them via `.onKeyPress`.
+    private static let f3Key = KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!))
+    private static let f4Key = KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!))
     private static let f5Key = KeyEquivalent(Character(UnicodeScalar(NSF5FunctionKey)!))
     private static let f6Key = KeyEquivalent(Character(UnicodeScalar(NSF6FunctionKey)!))
     private static let f7Key = KeyEquivalent(Character(UnicodeScalar(NSF7FunctionKey)!))
@@ -62,7 +79,7 @@ public struct PanelView: View {
                 if focused { onActivate() }
             }
             .onTapGesture { onActivate() }
-            .onKeyPress(keys: [Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key]) { press in
+            .onKeyPress(keys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key]) { press in
                 handleFunctionKey(press.key)
                 return .handled
             }
@@ -117,12 +134,28 @@ public struct PanelView: View {
 
     private func handleFunctionKey(_ key: KeyEquivalent) {
         switch key.character {
+        case Self.f3Key.character: beginView()
+        case Self.f4Key.character: beginEdit()
         case Self.f5Key.character: beginCopyOrMove(.copy)
         case Self.f6Key.character: beginCopyOrMove(.move)
         case Self.f7Key.character: beginMkdir()
         case Self.f8Key.character: beginDelete()
         default: break
         }
+    }
+
+    /// F3: opens the viewer on the first selected entry (FV-01). A no-op with nothing
+    /// selected.
+    private func beginView() {
+        guard let entry = Self.targetEntry(selection: selectedEntries) else { return }
+        onViewFile(entry)
+    }
+
+    /// F4: opens the editor on the first selected entry (ED-01). A no-op with nothing
+    /// selected.
+    private func beginEdit() {
+        guard let entry = Self.targetEntry(selection: selectedEntries) else { return }
+        onEditFile(entry)
     }
 
     private func beginCopyOrMove(_ mode: OperationMode) {
@@ -172,6 +205,13 @@ public struct PanelView: View {
     }
 
     // MARK: - Pure helpers (unit-tested; the body above is thin declarative glue)
+
+    /// The entry F3/F4 should act on (FV-01, ED-01): the first selected entry, or `nil`
+    /// when nothing is selected - F3/F4 with an empty selection is a no-op, mirroring
+    /// F5/F6/F8's existing empty-selection precedent above.
+    static func targetEntry(selection: [FileEntry]) -> FileEntry? {
+        selection.first
+    }
 
     /// Builds the F5/F6 copy/move dialog's ViewModel for `selection` (FO-01, FO-02).
     /// `nil` when there is nothing selected - F5/F6 with an empty selection is a no-op.

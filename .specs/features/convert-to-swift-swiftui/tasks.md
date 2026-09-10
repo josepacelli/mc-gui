@@ -1342,8 +1342,10 @@ T49 → T50
 - Skill: NONE
 
 **Done when**:
-- [ ] `swift run` launches the app to a visible dual-pane window with menu bar
-- [ ] XCUITest covers: app launch, main window visible, menu bar present
+- [x] `swift run` launches the app to a visible dual-pane window with menu bar - verified by launching the built `MCGuiApp` binary directly and querying it via `osascript`/System Events: the process registers as a GUI app, its window is named "MCGui", and its menu bar reports 8 top-level items (Apple + App + File/Edit/View/Go/Window/Help = 8), then terminated cleanly on `kill`.
+- [ ] XCUITest covers: app launch, main window visible, menu bar present - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` plus a manual `swift run`-equivalent launch check (above) used instead per batch instructions.
+
+**F3/F4 gap closure (beyond this task's literal `Where` field, per batch instructions)**: `AppEntry.swift`/`WindowManager.swift` alone cannot make F3/F4 work end-to-end without `PanelView`/`MainWindow` exposing hooks to construct and present `ViewerWindow`/`EditorWindow` with a real `ViewerServiceImpl`/`EditorServiceImpl` - closing this required also touching `Sources/MCGuiUI/Views/PanelView.swift` (F3/F4 key bindings, `onViewFile`/`onEditFile` closures, `targetEntry` pure helper), `Sources/MCGuiUI/Views/MainWindow.swift` (threading those closures through per panel side), and `Sources/MCGuiApp/WindowManager.swift` (`showMainWindow` now accepts and forwards them). Bundled into this commit rather than T49's, since this is genuinely where the pieces come together end-to-end.
 
 **Tests**: e2e
 **Gate**: build

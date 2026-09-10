@@ -24,8 +24,14 @@ public final class WindowManager {
     public init() {}
 
     /// Shows the single main window (MB-01, FS-01), creating it on first call and simply
-    /// re-activating it on any later call.
-    public func showMainWindow(viewModel: MainWindowViewModel) {
+    /// re-activating it on any later call. `onViewFile`/`onEditFile` close the F3/F4 gap
+    /// `ViewerWindow`/`EditorWindow` (T38, T43) left open: they're forwarded straight into
+    /// `MainWindow`, which forwards them into each `PanelView` (T50).
+    public func showMainWindow(
+        viewModel: MainWindowViewModel,
+        onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
+        onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in }
+    ) {
         mainViewModel = viewModel
 
         if let mainWindow {
@@ -33,7 +39,7 @@ public final class WindowManager {
             return
         }
 
-        let content = MainWindow(viewModel: viewModel)
+        let content = MainWindow(viewModel: viewModel, onViewFile: onViewFile, onEditFile: onEditFile)
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.title = "MCGui"
         window.setContentSize(NSSize(width: 1024, height: 640))

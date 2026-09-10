@@ -13,6 +13,33 @@ struct PanelViewFileOperationsTests {
 
     private let directory = URL(fileURLWithPath: "/tmp/dest")
 
+    // MARK: - targetEntry (FV-01, ED-01 - F3/F4 target selection)
+
+    @Test("targetEntry returns the first selected entry when the selection is non-empty")
+    func targetEntryReturnsFirstSelectedEntry() {
+        let entries = [makeTestEntry(name: "a.txt"), makeTestEntry(name: "b.txt")]
+
+        let target = PanelView.targetEntry(selection: entries)
+
+        #expect(target == entries[0])
+    }
+
+    @Test("targetEntry returns a single selected entry")
+    func targetEntryReturnsSingleSelectedEntry() {
+        let entry = makeTestEntry(name: "only.txt")
+
+        let target = PanelView.targetEntry(selection: [entry])
+
+        #expect(target == entry)
+    }
+
+    @Test("targetEntry with an empty selection returns nil (F3/F4 no-op)")
+    func targetEntryEmptySelectionReturnsNil() {
+        let target = PanelView.targetEntry(selection: [])
+
+        #expect(target == nil)
+    }
+
     // MARK: - makeCopyMoveDialog (FO-01, FO-02)
 
     @Test("makeCopyMoveDialog with a non-empty selection builds a dialog in copy mode")
