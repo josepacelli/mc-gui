@@ -102,6 +102,10 @@ StyleCopReport.xml
 *.vspscc
 *.vssscc
 .builds
+
+# Swift Package Manager
+.build/
+.swiftpm/
 *.pidb
 *.svclog
 *.scc
