@@ -1,0 +1,2 @@
+/* Placeholder key confirming Bundle.module resource resolution (T1). Replaced by real UI keys starting in Phase 4 (WindowManager). */
+"app.placeholder" = "placeholder";

@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "MCGui",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
@@ -19,15 +20,18 @@ let package = Package(
         ),
         .target(
             name: "MCGuiUI",
-            dependencies: ["MCGuiCore"]
+            dependencies: ["MCGuiCore"],
+            resources: [.process("Resources")]
         ),
         .target(
             name: "MCGuiMacOS",
-            dependencies: ["MCGuiCore"]
+            dependencies: ["MCGuiCore"],
+            resources: [.process("Resources")]
         ),
         .executableTarget(
             name: "MCGuiApp",
-            dependencies: ["MCGuiUI", "MCGuiMacOS"]
+            dependencies: ["MCGuiUI", "MCGuiMacOS"],
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "MCGuiCoreTests",

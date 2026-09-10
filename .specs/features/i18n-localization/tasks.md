@@ -110,12 +110,23 @@ on it (Risk 3 in design.md).
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] All 3 targets declare `resources: [.process("Resources")]`
-- [ ] `swift build` succeeds and produces one `MCGui_<Target>.bundle` per target next to the executable
-- [ ] A one-line note in this task's commit message (or a code comment) records the actual observed bundle name/path, confirming or correcting design.md's assumption
+- [x] All 3 targets declare `resources: [.process("Resources")]`
+- [x] `swift build` succeeds and produces one `MCGui_<Target>.bundle` per target next to the executable
+- [x] A one-line note in this task's commit message (or a code comment) records the actual observed bundle name/path, confirming or correcting design.md's assumption
 
 **Tests**: none (infra scaffolding, no logic yet)
 **Gate**: build
+
+**Confirmed (empirically observed)**: `swift build --show-bin-path` →
+`.build/arm64-apple-macosx/debug`. Each target produces `MCGui_<TargetName>.bundle`
+flat in that directory (`MCGui_MCGuiUI.bundle`, `MCGui_MCGuiApp.bundle`,
+`MCGui_MCGuiMacOS.bundle`), matching design.md's assumption exactly. Each bundle
+contains `en.lproj/Localizable.strings` + a generated `Info.plist`. `swift build`
+also required `defaultLocalization: "en"` on the package manifest (SPM error otherwise:
+`manifest property 'defaultLocalization' not set; it is required in the presence of
+localized resources`) - not called out in design.md, added in this task.
+
+**Status**: ✅ Complete
 
 ---
 
