@@ -1190,8 +1190,8 @@ T44 → T45
 - Skill: NONE
 
 **Done when**:
-- [ ] Every shortcut in KN-07..KN-12 is declared and routes to the correct action
-- [ ] XCUITest covers each shortcut firing its bound action once
+- [x] Every shortcut in KN-07..KN-12 is declared and routes to the correct action
+- [ ] XCUITest covers each shortcut firing its bound action once - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. `KeyboardShortcuts` is pure declarative routing (each shortcut calls exactly one injected `KeyboardShortcutActions` closure, with no branching/dispatch logic like `PanelView.handleFunctionKey`'s switch) - there is no extractable ViewModel-level logic to unit test, so no test file was added for this task, per the batch's explicit guidance not to force artificial tests here.
 
 **Tests**: e2e
 **Gate**: build
