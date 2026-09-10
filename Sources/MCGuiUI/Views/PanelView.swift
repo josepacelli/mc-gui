@@ -37,11 +37,6 @@ public struct PanelView: View {
     @State private var selection: Set<UUID> = []
     // KN-05/KN-06: the row Space/Insert last acted on - see `currentRowID`.
     @State private var cursorID: FileEntry.ID?
-    // Double-click detection (mouse): the last single-selected row and when it was
-    // selected, so a second click on the same row within `NSEvent.doubleClickInterval`
-    // is recognized as a double-click purely from `selection` changes - see the
-    // `.onChange(of: selection)` in `entryList`.
-    @State private var lastRowClick: (id: FileEntry.ID, time: Date)?
 
     @State private var copyMoveViewModel: CopyMoveDialogViewModel?
     // FO-05..FO-09: the conflict dialog shown for each destination-name collision found
@@ -194,35 +189,23 @@ public struct PanelView: View {
                 .contextMenu {
                     Text(entry.name)
                 }
+                // FS-04, KN-11: real `NSTableView.doubleAction`, not a SwiftUI gesture.
+                // Two prior attempts both broke single-click selection to some degree:
+                // `.onTapGesture(count: 2)`/`.simultaneousGesture(TapGesture(count: 2))`
+                // made AppKit hold every click to see whether a second one follows before
+                // committing the List's native selection (single-click became unreliable,
+                // user-reported); detecting a double-click purely from `selection` changes
+                // never fired at all, because clicking an *already*-selected row a second
+                // time doesn't change `selection` (no `onChange` to observe). Installing
+                // the table's own `doubleAction` runs independently of - and never delays -
+                // its native single-click selection, because it's the same mechanism
+                // AppKit itself uses to distinguish click counts.
+                .background(TableDoubleClickInstaller(entries: displayEntries, onDoubleClick: activate))
         }
         .focusable()
         .focused($isFocused)
         .onChange(of: isFocused) { _, focused in
             if focused { onActivate() }
-        }
-        // Double-click detection previously used a `.onTapGesture`/`.simultaneousGesture`
-        // TapGesture(count: 2) attached to each row, but *any* extra gesture recognizer
-        // on a List row - simultaneous or not - still makes AppKit hold every click to
-        // see whether a second one follows before it commits the native single-click
-        // selection, which is exactly why single-click selection stayed unreliable even
-        // after switching to `.simultaneousGesture` (user-reported). Detecting the
-        // double-click from `selection` itself - two single clicks on the same row within
-        // the system's own double-click interval - uses nothing but the List's already-
-        // reliable native selection, so it can't compete with it.
-        .onChange(of: selection) { _, newSelection in
-            guard newSelection.count == 1, let id = newSelection.first else {
-                lastRowClick = nil
-                return
-            }
-            let now = Date()
-            if let lastRowClick, lastRowClick.id == id,
-               now.timeIntervalSince(lastRowClick.time) <= NSEvent.doubleClickInterval,
-               let entry = displayEntries.first(where: { $0.id == id }) {
-                self.lastRowClick = nil
-                activate(entry)
-            } else {
-                lastRowClick = (id, now)
-            }
         }
         .modifier(PanelPrimaryKeys(
             functionKeys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key],
@@ -746,5 +729,62 @@ private struct PanelSelectionKeys: ViewModifier {
                 onEscape()
                 return .handled
             }
+    }
+}
+
+/// Installs a real `NSTableView.doubleAction` for double-click-to-activate (FS-04,
+/// KN-11) by walking up from an invisible helper view placed inside each row's content -
+/// a genuine descendant of the `List`'s backing `NSTableView`, unlike a `.background()`/
+/// `.overlay()` attached to the `List` itself, which SwiftUI may render as a sibling
+/// rather than a descendant. Harmless to attach per-row: `List` only ever instantiates
+/// the handful of currently-visible rows regardless of how many entries there are.
+private struct TableDoubleClickInstaller: NSViewRepresentable {
+    let entries: [FileEntry]
+    let onDoubleClick: (FileEntry) -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(entries: entries, onDoubleClick: onDoubleClick)
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView(frame: .zero)
+        DispatchQueue.main.async { [weak view] in
+            guard let tableView = view?.enclosingTableView else { return }
+            tableView.target = context.coordinator
+            tableView.doubleAction = #selector(Coordinator.handleDoubleClick(_:))
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        context.coordinator.entries = entries
+        context.coordinator.onDoubleClick = onDoubleClick
+    }
+
+    final class Coordinator: NSObject {
+        var entries: [FileEntry]
+        var onDoubleClick: (FileEntry) -> Void
+
+        init(entries: [FileEntry], onDoubleClick: @escaping (FileEntry) -> Void) {
+            self.entries = entries
+            self.onDoubleClick = onDoubleClick
+        }
+
+        @objc func handleDoubleClick(_ sender: NSTableView) {
+            let row = sender.clickedRow
+            guard entries.indices.contains(row) else { return }
+            onDoubleClick(entries[row])
+        }
+    }
+}
+
+private extension NSView {
+    var enclosingTableView: NSTableView? {
+        var view: NSView? = self
+        while let current = view {
+            if let tableView = current as? NSTableView { return tableView }
+            view = current.superview
+        }
+        return nil
     }
 }
