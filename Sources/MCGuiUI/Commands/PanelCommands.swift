@@ -90,14 +90,17 @@ public enum PanelCommands {
         return (newSelection, nextCursor)
     }
 
-    /// Inverts the whole selection ("*"), via `SelectionService.invert`: every currently
-    /// unselected entry becomes selected and vice versa. Starting from an empty selection
-    /// selects everything; starting from everything selected deselects everything -
-    /// pressing "*" twice in a row with nothing else changing returns to the original
-    /// selection.
-    public static func invertSelection(_ selection: Set<FileEntry.ID>, entries: [FileEntry]) -> Set<FileEntry.ID> {
-        let indices = Set(selection.compactMap { index(of: $0, in: entries) })
-        let inverted = SelectionService.invert(indices, count: entries.count)
-        return Set(inverted.map { entries[$0].id })
+    /// Selects every entry ("*"). Bugfix: "*" used to invert the selection (classic mc's
+    /// actual behavior), but that deselected whatever was already marked instead of adding
+    /// to it - per user report/request, "*" now always selects everything, regardless of
+    /// what was selected before.
+    public static func selectAll(entries: [FileEntry]) -> Set<FileEntry.ID> {
+        Set(entries.map(\.id))
+    }
+
+    /// Clears the whole selection ("-", a secondary key for keyboards without a working
+    /// physical Delete/Insert - see `deselectAllEntries` in `PanelView`).
+    public static func deselectAll() -> Set<FileEntry.ID> {
+        []
     }
 }

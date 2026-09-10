@@ -244,7 +244,8 @@ public struct PanelView: View {
             onJumpLast: { jumpToEdge(first: false) },
             onToggle: toggleCurrentSelection,
             onToggleAndAdvance: toggleAndAdvanceSelection,
-            onInvertAll: invertSelection,
+            onSelectAll: selectAllEntries,
+            onDeselectAll: deselectAllEntries,
             onEscape: handleEscape
         ))
     }
@@ -445,11 +446,17 @@ public struct PanelView: View {
         cursorID ?? selection.first ?? displayEntries.first?.id
     }
 
-    /// "*": inverts the whole selection via `PanelCommands.invertSelection`. Deliberately
-    /// scoped to `viewModel.entries` (not `displayEntries`) so the synthetic ".." row is
-    /// never selected by this - a batch operation over ".." would be meaningless.
-    private func invertSelection() {
-        selection = PanelCommands.invertSelection(selection, entries: viewModel.entries)
+    /// "*": selects every entry via `PanelCommands.selectAll`. Deliberately scoped to
+    /// `viewModel.entries` (not `displayEntries`) so the synthetic ".." row is never
+    /// selected by this - a batch operation over ".." would be meaningless.
+    private func selectAllEntries() {
+        selection = PanelCommands.selectAll(entries: viewModel.entries)
+    }
+
+    /// "-": clears the whole selection - a secondary key for keyboards with no working
+    /// physical Delete key (per user report), and the natural opposite of "*"/select-all.
+    private func deselectAllEntries() {
+        selection = PanelCommands.deselectAll()
     }
 
     /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state. Progress
@@ -756,17 +763,23 @@ private struct PanelPrimaryKeys: ViewModifier {
     }
 }
 
-/// KN-04 (Cmd+Left/Right jump), KN-05/KN-06 (Space/Insert toggle), "*" (invert/select-all,
-/// see `PanelView.invertSelection`), KN-12/SF-04 (Escape) - the other half of
+/// KN-04 (Cmd+Left/Right jump), KN-05/KN-06 (Space/Insert toggle), "*" (select all, see
+/// `PanelView.selectAllEntries`), KN-12/SF-04 (Escape) - the other half of
 /// `PanelView.entryList`'s keyboard handling, split for the same reason as
 /// `PanelPrimaryKeys` above.
+///
+/// "+"/"-" are secondary keys for Insert/deselect-all (per user report: Mac keyboards
+/// often have no dedicated Insert key at all, and this user's keyboard doesn't reliably
+/// send it) - "+" mirrors Insert (toggle current row and advance), "-" clears the whole
+/// selection, the natural opposite of "*"/select-all.
 private struct PanelSelectionKeys: ViewModifier {
     let insertKey: KeyEquivalent
     let onJumpFirst: () -> Void
     let onJumpLast: () -> Void
     let onToggle: () -> Void
     let onToggleAndAdvance: () -> Void
-    let onInvertAll: () -> Void
+    let onSelectAll: () -> Void
+    let onDeselectAll: () -> Void
     let onEscape: () -> Void
 
     func body(content: Content) -> some View {
@@ -780,16 +793,20 @@ private struct PanelSelectionKeys: ViewModifier {
                 }
                 return .handled
             }
-            .onKeyPress(keys: [.space, insertKey]) { press in
-                if press.key == insertKey {
-                    onToggleAndAdvance()
-                } else {
+            .onKeyPress(keys: [.space, insertKey, "+"]) { press in
+                if press.key == .space {
                     onToggle()
+                } else {
+                    onToggleAndAdvance()
                 }
                 return .handled
             }
-            .onKeyPress("*") {
-                onInvertAll()
+            .onKeyPress(keys: ["*", "-"]) { press in
+                if press.key == "*" {
+                    onSelectAll()
+                } else {
+                    onDeselectAll()
+                }
                 return .handled
             }
             .onKeyPress(.escape) {

@@ -123,40 +123,28 @@ struct PanelCommandsTests {
         #expect(result.nextCursor == entries[2].id)
     }
 
-    // MARK: - invertSelection ("*"), via SelectionService.invert
+    // MARK: - selectAll ("*") / deselectAll ("-")
 
-    @Test("invertSelection from an empty selection selects everything")
-    func invertSelectionFromEmptySelectsAll() {
-        let result = PanelCommands.invertSelection([], entries: entries)
+    @Test("selectAll from an empty selection selects everything")
+    func selectAllFromEmptySelectsAll() {
+        let result = PanelCommands.selectAll(entries: entries)
 
         #expect(result == Set(entries.map(\.id)))
     }
 
-    @Test("invertSelection from everything selected deselects everything")
-    func invertSelectionFromAllDeselectsAll() {
-        let all = Set(entries.map(\.id))
+    @Test("selectAll from a partial selection still selects everything, not just the unselected ones")
+    func selectAllFromPartialSelectsAll() {
+        // bugfix: "*" used to invert (deselecting whatever was already marked) - it must
+        // always select everything, regardless of what was already selected.
+        let result = PanelCommands.selectAll(entries: entries)
 
-        let result = PanelCommands.invertSelection(all, entries: entries)
+        #expect(result == Set(entries.map(\.id)))
+    }
+
+    @Test("deselectAll clears the selection")
+    func deselectAllClearsSelection() {
+        let result = PanelCommands.deselectAll()
 
         #expect(result.isEmpty)
-    }
-
-    @Test("invertSelection flips a partial selection entry by entry")
-    func invertSelectionFlipsPartialSelection() {
-        let partial = Set([entries[0].id])
-
-        let result = PanelCommands.invertSelection(partial, entries: entries)
-
-        #expect(result == Set([entries[1].id, entries[2].id]))
-    }
-
-    @Test("invertSelection twice in a row returns to the original selection")
-    func invertSelectionTwiceReturnsToOriginal() {
-        let original = Set([entries[1].id])
-
-        let onceInverted = PanelCommands.invertSelection(original, entries: entries)
-        let twiceInverted = PanelCommands.invertSelection(onceInverted, entries: entries)
-
-        #expect(twiceInverted == original)
     }
 }
