@@ -1066,9 +1066,9 @@ T42 → T43
 - Skill: NONE
 
 **Done when**:
-- [ ] `open(_:)` loads content into `EditorDocumentState` with detected encoding
-- [ ] `save(_:)` writes content back to disk
-- [ ] Integration tests cover: load+save round-trip, non-UTF8 encoding detection, save-to-read-only-path error
+- [x] `open(_:)` loads content into `EditorDocumentState` with detected encoding
+- [x] `save(_:)` writes content back to disk
+- [x] Integration tests cover: load+save round-trip, non-UTF8 encoding detection, save-to-read-only-path error
 
 **Tests**: integration
 **Gate**: full
