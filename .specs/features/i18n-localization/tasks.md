@@ -669,6 +669,20 @@ parity, confirming every key added across T13-T19 is present and translated in a
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 37 keys extracted (8 menu/submenu titles: File/Edit/View/Go/Window/Help/
+Sort/Theme, plus 29 item labels across File(7)/Edit(6)/View(6)/Go(5)/Window(4)/Help(1)).
+Keyboard shortcuts (`.keyboardShortcut(...)`) left untouched - only label text extracted.
+Native View menu title uses the glossary's distinct "View (native menu)" row
+(Visualizar/Ver/Ver); the File menu's "View" verb button (open in viewer) reuses
+TopBar's Ver/Ver/Ver (no divergence), per T13's note distinguishing the two. Volume
+names in the Go menu (`volume.name`) stay untranslated - user/OS data, same precedent
+as TopBar/T13. "Midnight Commander" product name preserved literally in the Help item
+per spec.md's assumption; only the surrounding "Help" word translated. No existing test
+referenced `AppCommands.swift`'s view text - none needed updating. `swift test`: 318
+passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T21: Extract `WindowManager.swift` (MCGuiApp)
