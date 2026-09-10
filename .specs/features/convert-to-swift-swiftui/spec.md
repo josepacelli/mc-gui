@@ -380,10 +380,10 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | KN-11 | P1: Keyboard Navigation | Execute | Implementing |
 | KN-12 | P1: Keyboard Navigation | Execute | Implementing |
 | TH-01 | P1: Theme Support | Execute | Verified |
-| TH-02 | P1: Theme Support | Design | Pending |
-| TH-03 | P1: Theme Support | Design | Pending |
-| TH-04 | P1: Theme Support | Design | Pending |
-| TH-05 | P1: Theme Support | Design | Pending |
+| TH-02 | P1: Theme Support | Execute | Verified |
+| TH-03 | P1: Theme Support | Execute | Verified |
+| TH-04 | P1: Theme Support | Execute | Verified |
+| TH-05 | P1: Theme Support | Execute | Verified |
 | TH-06 | P1: Theme Support | Execute | Verified |
 | MB-01 | P1: Menu Bar | Design | Pending |
 | MB-02 | P1: Menu Bar | Design | Pending |

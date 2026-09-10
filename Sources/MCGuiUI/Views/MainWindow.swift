@@ -6,6 +6,11 @@ import MCGuiCore
 public struct MainWindow: View {
     public let viewModel: MainWindowViewModel
 
+    // TH-05: reading the same `@AppStorage` key `ThemeMenu` (T47) writes to means this
+    // view re-renders immediately whenever the user picks a different theme option, with
+    // no direct reference between the two views needed.
+    @AppStorage(ThemePreference.storageKey) private var themePreference: ThemePreference = .system
+
     public init(viewModel: MainWindowViewModel) {
         self.viewModel = viewModel
     }
@@ -23,5 +28,6 @@ public struct MainWindow: View {
                 onActivate: { viewModel.activate(.right) }
             )
         }
+        .preferredColorScheme(themePreference.colorScheme)
     }
 }

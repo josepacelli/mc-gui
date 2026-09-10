@@ -1265,8 +1265,8 @@ T46 → T47
 - Skill: NONE
 
 **Done when**:
-- [ ] Selecting each theme option updates the UI immediately without restart
-- [ ] XCUITest covers: switch to Light, switch to Dark, switch to Follow System, verify visual state changes
+- [x] Selecting each theme option updates the UI immediately without restart
+- [ ] XCUITest covers: switch to Light, switch to Dark, switch to Follow System, verify visual state changes - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. `ThemeMenu` and `MainWindow`'s theme application both declare `@AppStorage(ThemePreference.storageKey)` directly (the standard, SwiftUI-native way multiple views stay in sync on the same persisted value) with no additional branching/dispatch logic beyond `ThemePreference.colorScheme` (unit-tested in `ThemePreferenceTests`, T46) - there is no extractable ViewModel-level logic in `ThemeMenu`/`MainWindow` itself to unit test, mirroring T38/T42's precedent for thin declarative views.
 
 **Tests**: e2e
 **Gate**: build
