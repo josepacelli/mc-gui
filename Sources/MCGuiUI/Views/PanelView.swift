@@ -37,6 +37,11 @@ public struct PanelView: View {
     @State private var selection: Set<UUID> = []
     // KN-05/KN-06: the row Space/Insert last acted on - see `currentRowID`.
     @State private var cursorID: FileEntry.ID?
+    // Double-click detection (mouse): the last single-selected row and when it was
+    // selected, so a second click on the same row within `NSEvent.doubleClickInterval`
+    // is recognized as a double-click purely from `selection` changes - see the
+    // `.onChange(of: selection)` in `entryList`.
+    @State private var lastRowClick: (id: FileEntry.ID, time: Date)?
 
     @State private var copyMoveViewModel: CopyMoveDialogViewModel?
     // FO-05..FO-09: the conflict dialog shown for each destination-name collision found
@@ -189,19 +194,36 @@ public struct PanelView: View {
                 .contextMenu {
                     Text(entry.name)
                 }
-                // `.simultaneousGesture` (not `.onTapGesture`/`.gesture`, which claim
-                // exclusive priority) so this double-click recognizer runs *alongside*
-                // the List's own native single-click-to-select handling instead of
-                // racing/blocking it - user-reported: single click sometimes failed to
-                // select a row once a competing `.onTapGesture(count: 2)` was attached.
-                .simultaneousGesture(TapGesture(count: 2).onEnded { activate(entry) })
         }
         .focusable()
         .focused($isFocused)
         .onChange(of: isFocused) { _, focused in
             if focused { onActivate() }
         }
-        .onTapGesture { onActivate() }
+        // Double-click detection previously used a `.onTapGesture`/`.simultaneousGesture`
+        // TapGesture(count: 2) attached to each row, but *any* extra gesture recognizer
+        // on a List row - simultaneous or not - still makes AppKit hold every click to
+        // see whether a second one follows before it commits the native single-click
+        // selection, which is exactly why single-click selection stayed unreliable even
+        // after switching to `.simultaneousGesture` (user-reported). Detecting the
+        // double-click from `selection` itself - two single clicks on the same row within
+        // the system's own double-click interval - uses nothing but the List's already-
+        // reliable native selection, so it can't compete with it.
+        .onChange(of: selection) { _, newSelection in
+            guard newSelection.count == 1, let id = newSelection.first else {
+                lastRowClick = nil
+                return
+            }
+            let now = Date()
+            if let lastRowClick, lastRowClick.id == id,
+               now.timeIntervalSince(lastRowClick.time) <= NSEvent.doubleClickInterval,
+               let entry = displayEntries.first(where: { $0.id == id }) {
+                self.lastRowClick = nil
+                activate(entry)
+            } else {
+                lastRowClick = (id, now)
+            }
+        }
         .modifier(PanelPrimaryKeys(
             functionKeys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key],
             onFunctionKey: handleFunctionKey,
