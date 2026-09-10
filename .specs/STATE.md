@@ -34,6 +34,14 @@
 - **Date**: 2026-09-10
 - **Status**: active
 
+### AD-005
+- **Decision**: Localização usa `.strings` clássicos (não `.xcstrings`/String Catalog) por target (`MCGuiUI`, `MCGuiApp`, `MCGuiMacOS`), um `Resources/<lang>.lproj/Localizable.strings` por idioma, resolvidos via `Bundle.module` de cada target. Chaves namespaced (`tela.elemento.nome`), nunca o texto em inglês literal como chave. Strings com parâmetro usam `NSLocalizedString` + `String(format:)` com `%1$d`/`%2$@` (não a forma `String(localized: "texto \(x)")`, que usa o texto interpolado como chave). Erros tipados ganham `LocalizedError` no próprio target onde são definidos (`FileSystemServiceError` em `MCGuiMacOS`), preservando a fronteira do AD-002 (MCGuiUI nunca importa MCGuiMacOS). Detecção de tradução faltando é um teste `swift test` (diff de chaves entre os 4 `.lproj` de cada target), não ferramenta do Xcode.
+- **Reason**: `.strings` é editável à mão sem risco de JSON malformado do String Catalog (não há Xcode interativo nesta sessão); mecanismo nativo da Apple pra negociação de idioma e fallback pro inglês evita reinventar essa lógica; teste de cobertura de chaves se encaixa no padrão já existente do projeto de gates via `swift test`/scripts.
+- **Trade-off**: Sem a UI de estado de tradução do Xcode (pending/translated/stale) — compensado pelo teste de diff de chaves.
+- **Scope**: Toda feature futura que adicionar string visível ao usuário.
+- **Date**: 2026-09-10
+- **Status**: active
+
 ## Handoff
 
 - **Feature `convert-to-swift-swiftui`**: **DONE — Verifier PASS ✅ (iteração 2/3 do fix→reverify).** Histórico: Execute completou as 54 tasks originais; 1º Verifier retornou FAIL (14 requirement IDs eram código morto nunca plugado no app real — conflict dialog, Enter/Backspace/".." navigation, progress dialog, KN-04/05/06/12, FV-02/03, 3 Edge Cases). Fix cycle iteração 1 (6 commits: `9657e1e` `1ea38fd` `0232d46` `60cd903` `b20eff4` `46ce1a6`) resolveu os 6 Fix Plans; 2º Verifier achou só 1 gap residual (KN-06/Insert usava o mesmo handler do Space, nunca chamava `PanelCommands.toggleAndAdvance`). Fix iteração 2 (`2223763`) resolveu isso com `cursorID` state separado de `selection`. 3º Verifier (mesma sessão, iteração 2 do loop): **PASS**, 22/22 ACs re-derivados batem, 254/254 testes, sem gaps. `validate_state.py`: 0 erros. Relatório final: `.specs/features/convert-to-swift-swiftui/validation.md`.
