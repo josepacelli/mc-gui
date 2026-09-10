@@ -3,3 +3,15 @@
 "panel.footer.selectionCount" = "%1$d of %2$d selected";
 "panel.operationFailure.single" = "%1$@: %2$@";
 "panel.operationFailure.multiple" = "%1$@: %2$@ (+%3$d more)";
+
+/* CopyMoveDialog.swift (T7) */
+"copyMove.title.copy" = "Copy";
+"copyMove.title.move" = "Move";
+"copyMove.header.singular" = "%1$@ %2$d item";
+"copyMove.header.plural" = "%1$@ %2$d items";
+"copyMove.field.destination" = "Destination";
+"copyMove.toggle.preserveAttributes" = "Preserve attributes";
+"copyMove.toggle.followSymlinks" = "Follow symlinks";
+"copyMove.toggle.updateOnly" = "Update only (skip up-to-date files)";
+"copyMove.button.cancel" = "Cancel";
+"copyMove.button.background" = "Background";

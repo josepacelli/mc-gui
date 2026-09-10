@@ -305,12 +305,20 @@ passed, 0 failed (was 311).
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] Every UI string extracted to all 4 languages
-- [ ] Any broken existing test updated in this task
-- [ ] `swift test` passes
+- [x] Every UI string extracted to all 4 languages
+- [x] Any broken existing test updated in this task
+- [x] `swift test` passes
 
 **Tests**: none / update existing
 **Gate**: full
+
+**Confirmed**: 10 keys extracted (title/header/destination/3 toggles/3 buttons). Header
+combines the localized mode word with a singular/plural item-count template (no
+`.stringsdict` per AD-005, so singular/plural are two full `.strings` templates, matching
+the fo15Message pattern from T6). No existing test asserted view text (`CopyMoveDialogViewModelTests`
+covers ViewModel logic only) - none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
 
 ---
 

@@ -25,29 +25,52 @@ public struct CopyMoveDialog: View {
     }
 
     private var title: String {
-        viewModel.mode == .copy ? "Copy" : "Move"
+        viewModel.mode == .copy
+            ? String(localized: "copyMove.title.copy", bundle: .module, comment: "F5 dialog title/button: Copy")
+            : String(localized: "copyMove.title.move", bundle: .module, comment: "F6 dialog title/button: Move")
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("\(title) \(viewModel.sources.count) item\(viewModel.sources.count == 1 ? "" : "s")")
-                .font(.headline)
+            Text(
+                String(
+                    format: NSLocalizedString(
+                        viewModel.sources.count == 1 ? "copyMove.header.singular" : "copyMove.header.plural",
+                        bundle: .module,
+                        comment: "Copy/Move dialog header. %1$@ is the localized mode word (Copy/Move), %2$d is the item count."
+                    ),
+                    title, viewModel.sources.count
+                )
+            )
+            .font(.headline)
 
-            TextField("Destination", text: Binding(
-                get: { viewModel.destinationDirectory.path },
-                set: { viewModel.destinationDirectory = URL(fileURLWithPath: $0) }
-            ))
+            TextField(
+                String(localized: "copyMove.field.destination", bundle: .module, comment: "Destination path text field label"),
+                text: Binding(
+                    get: { viewModel.destinationDirectory.path },
+                    set: { viewModel.destinationDirectory = URL(fileURLWithPath: $0) }
+                )
+            )
             .textFieldStyle(.roundedBorder)
 
-            Toggle("Preserve attributes", isOn: $viewModel.options.preserveAttributes)
-            Toggle("Follow symlinks", isOn: $viewModel.options.followSymlinks)
-            Toggle("Update only (skip up-to-date files)", isOn: $viewModel.options.updateOnly)
+            Toggle(
+                String(localized: "copyMove.toggle.preserveAttributes", bundle: .module, comment: "Preserve file attributes checkbox"),
+                isOn: $viewModel.options.preserveAttributes
+            )
+            Toggle(
+                String(localized: "copyMove.toggle.followSymlinks", bundle: .module, comment: "Follow symlinks checkbox"),
+                isOn: $viewModel.options.followSymlinks
+            )
+            Toggle(
+                String(localized: "copyMove.toggle.updateOnly", bundle: .module, comment: "Update-only (skip up-to-date files) checkbox"),
+                isOn: $viewModel.options.updateOnly
+            )
 
             HStack {
                 Spacer()
-                Button("Cancel", role: .cancel, action: onCancel)
+                Button(String(localized: "copyMove.button.cancel", bundle: .module, comment: "Cancel button"), role: .cancel, action: onCancel)
                     .keyboardShortcut(.cancelAction)
-                Button("Background", action: onConfirmBackground)
+                Button(String(localized: "copyMove.button.background", bundle: .module, comment: "Run in background button"), action: onConfirmBackground)
                 Button(title, action: onConfirm)
                     .keyboardShortcut(.defaultAction)
             }
