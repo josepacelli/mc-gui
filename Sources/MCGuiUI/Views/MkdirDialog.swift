@@ -18,11 +18,14 @@ public struct MkdirDialog: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("New Folder")
+            Text(String(localized: "mkdir.title", bundle: .module, comment: "F7 dialog title: New Folder"))
                 .font(.headline)
 
-            TextField("Folder name", text: $viewModel.name)
-                .textFieldStyle(.roundedBorder)
+            TextField(
+                String(localized: "mkdir.field.name", bundle: .module, comment: "Folder name text field label"),
+                text: $viewModel.name
+            )
+            .textFieldStyle(.roundedBorder)
 
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
@@ -32,9 +35,9 @@ public struct MkdirDialog: View {
 
             HStack {
                 Spacer()
-                Button("Cancel", role: .cancel, action: onCancel)
+                Button(String(localized: "mkdir.button.cancel", bundle: .module, comment: "Cancel button"), role: .cancel, action: onCancel)
                     .keyboardShortcut(.cancelAction)
-                Button("Create") {
+                Button(String(localized: "mkdir.button.create", bundle: .module, comment: "Create folder button")) {
                     Task { await viewModel.confirm() }
                 }
                 .keyboardShortcut(.defaultAction)

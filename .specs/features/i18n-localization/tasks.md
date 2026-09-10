@@ -363,6 +363,15 @@ text assertions - none needed updating. `swift test`: 318 passed, 0 failed.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 4 keys extracted (title, folder-name field, Cancel/Create buttons). Left
+`MkdirDialogViewModel.swift`'s 2 own validation-error literals ("Folder name cannot be
+empty.", "Folder name cannot contain \"/\".") untouched - that file is not in this task's
+`Where:` scope (`MkdirDialog.swift` only) or this batch's file list; flagged for a future
+task/sweep (likely T24) rather than fixed here. No existing test asserted this file's view
+text - none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T10: Extract `DeleteConfirmDialog.swift`

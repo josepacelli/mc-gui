@@ -22,3 +22,9 @@
 "conflictDialog.button.skip" = "Omitir";
 "conflictDialog.button.rename" = "Renombrar";
 "conflictDialog.button.overwrite" = "Sobrescribir";
+
+/* MkdirDialog.swift (T9) */
+"mkdir.title" = "Nueva Carpeta";
+"mkdir.field.name" = "Nombre de la Carpeta";
+"mkdir.button.cancel" = "Cancelar";
+"mkdir.button.create" = "Crear";

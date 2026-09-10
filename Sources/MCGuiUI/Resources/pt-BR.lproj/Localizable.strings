@@ -22,3 +22,9 @@
 "conflictDialog.button.skip" = "Ignorar";
 "conflictDialog.button.rename" = "Renomear";
 "conflictDialog.button.overwrite" = "Substituir";
+
+/* MkdirDialog.swift (T9) */
+"mkdir.title" = "Nova Pasta";
+"mkdir.field.name" = "Nome da Pasta";
+"mkdir.button.cancel" = "Cancelar";
+"mkdir.button.create" = "Criar";

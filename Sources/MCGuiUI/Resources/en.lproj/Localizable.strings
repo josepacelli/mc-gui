@@ -22,3 +22,9 @@
 "conflictDialog.button.skip" = "Skip";
 "conflictDialog.button.rename" = "Rename";
 "conflictDialog.button.overwrite" = "Overwrite";
+
+/* MkdirDialog.swift (T9) */
+"mkdir.title" = "New Folder";
+"mkdir.field.name" = "Folder name";
+"mkdir.button.cancel" = "Cancel";
+"mkdir.button.create" = "Create";
