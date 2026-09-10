@@ -1137,8 +1137,8 @@ T42 → T43
 - Skill: NONE
 
 **Done when**:
-- [ ] All 3 buttons present and wired to the ViewModel action
-- [ ] XCUITest covers: closing a dirty editor triggers the prompt, each of the 3 buttons produces the correct outcome (saved/discarded/still-open)
+- [x] All 3 buttons present and wired to the ViewModel action
+- [ ] XCUITest covers: closing a dirty editor triggers the prompt, each of the 3 buttons produces the correct outcome (saved/discarded/still-open) - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. The 3 outcomes this view's buttons invoke are unit-tested in `SaveChangesDialogViewModelTests` (T41); `SaveChangesDialog` itself is a thin declarative binding with no additional testable logic (mirrors T28's `ConflictDialog` precedent).
 
 **Tests**: e2e
 **Gate**: build
