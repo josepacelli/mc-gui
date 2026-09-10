@@ -29,6 +29,9 @@ public struct PanelView: View {
     @State private var selection: Set<UUID> = []
 
     @State private var copyMoveViewModel: CopyMoveDialogViewModel?
+    // FO-05..FO-09: the conflict dialog shown for each destination-name collision found
+    // while resolving a copy/move, one at a time, before the operation actually runs.
+    @State private var conflictDialogViewModel: ConflictDialogViewModel?
     @State private var mkdirViewModel: MkdirDialogViewModel?
     @State private var deleteViewModel: DeleteConfirmDialogViewModel?
     @State private var operationErrorMessage: String?
@@ -152,6 +155,11 @@ public struct PanelView: View {
                     onConfirm: { Task { await performCopyMove(copyMoveViewModel) } },
                     onCancel: { self.copyMoveViewModel = nil }
                 )
+            }
+        }
+        .sheet(isPresented: presented($conflictDialogViewModel)) {
+            if let conflictDialogViewModel {
+                ConflictDialog(viewModel: conflictDialogViewModel)
             }
         }
         .sheet(isPresented: presented($mkdirViewModel)) {
@@ -302,23 +310,65 @@ public struct PanelView: View {
         Task { await viewModel.load(viewModel.currentPath.deletingLastPathComponent()) }
     }
 
+    /// FO-05..FO-09: resolves every destination-name conflict (one dialog at a time) before
+    /// running the copy/move, then applies the batch with whatever the user chose per file.
     private func performCopyMove(_ dialogViewModel: CopyMoveDialogViewModel) async {
         copyMoveViewModel = nil
-        let plan = CopyMovePlan(
-            sources: dialogViewModel.sources,
-            destinationDirectory: dialogViewModel.destinationDirectory,
-            mode: dialogViewModel.mode,
-            options: dialogViewModel.options
-        )
-        do {
-            let result = dialogViewModel.mode == .copy
-                ? try await fileSystemService.copy(plan)
-                : try await fileSystemService.move(plan)
-            operationErrorMessage = Self.fo15Message(from: result)
-        } catch {
-            operationErrorMessage = error.localizedDescription
+        operationErrorMessage = nil
+
+        let destinationEntries = (try? await fileSystemService.listDirectory(dialogViewModel.destinationDirectory)) ?? []
+        let conflicts = CopyMovePlanner.conflicts(for: dialogViewModel.sources, in: destinationEntries)
+
+        var resolutions: [(FileEntry, FileConflictResolution)] = []
+        for conflict in conflicts {
+            let destinationPath = dialogViewModel.destinationDirectory.appendingPathComponent(conflict.name)
+            let resolution = await resolveConflict(destinationPath: destinationPath)
+            resolutions.append((conflict, resolution))
+            if resolution == .cancel { break }
         }
-        await viewModel.load()
+
+        switch Self.applyResolutions(
+            sources: dialogViewModel.sources,
+            resolutions: resolutions,
+            existingNames: Set(destinationEntries.map(\.name))
+        ) {
+        case .cancelled:
+            return
+
+        case .proceed(let sources, let renames):
+            guard !sources.isEmpty else {
+                await viewModel.load()
+                return
+            }
+
+            let plan = CopyMovePlan(
+                sources: sources,
+                destinationDirectory: dialogViewModel.destinationDirectory,
+                mode: dialogViewModel.mode,
+                options: dialogViewModel.options,
+                renames: renames
+            )
+            do {
+                let result = dialogViewModel.mode == .copy
+                    ? try await fileSystemService.copy(plan)
+                    : try await fileSystemService.move(plan)
+                operationErrorMessage = Self.fo15Message(from: result)
+            } catch {
+                operationErrorMessage = error.localizedDescription
+            }
+            await viewModel.load()
+        }
+    }
+
+    /// Presents `ConflictDialog` for `destinationPath` and suspends until the user picks
+    /// Overwrite/Skip/Rename/Cancel.
+    private func resolveConflict(destinationPath: URL) async -> FileConflictResolution {
+        await withCheckedContinuation { continuation in
+            conflictDialogViewModel = ConflictDialogViewModel(destinationPath: destinationPath) { resolution in
+                conflictDialogViewModel = nil
+                continuation.resume(returning: resolution)
+            }
+        }
     }
 
     // MARK: - Pure helpers (unit-tested; the body above is thin declarative glue)
@@ -359,6 +409,51 @@ public struct PanelView: View {
             isSymlink: false,
             symlinkTarget: nil
         )
+    }
+
+    /// The result of resolving every destination-name conflict for a copy/move batch
+    /// (FO-05..FO-09): either the (possibly narrowed/renamed) sources to actually run, or
+    /// `cancelled` when the user chose Cancel on any one of them - which aborts the whole
+    /// batch, not just that file.
+    enum ConflictResolutionOutcome: Equatable {
+        case proceed(sources: [FileEntry], renames: [UUID: String])
+        case cancelled
+    }
+
+    /// Applies `resolutions` (one per conflicting source, in the order they were resolved)
+    /// to `sources`: Overwrite leaves the source untouched (destination already gets
+    /// overwritten unconditionally downstream, FO-06); Skip removes it (FO-07); Rename
+    /// claims the next available `CopyMovePlanner.resolvedName` against `existingNames`
+    /// plus every name already claimed earlier in this same batch, so two renamed
+    /// conflicts in one operation can't collide with each other (FO-08); Cancel stops
+    /// processing further resolutions and aborts the entire batch (FO-09), matching the
+    /// spec's "Cancel aborts entire operation" - not just the one file being resolved.
+    static func applyResolutions(
+        sources: [FileEntry],
+        resolutions: [(FileEntry, FileConflictResolution)],
+        existingNames: Set<String>
+    ) -> ConflictResolutionOutcome {
+        var remainingSources = sources
+        var renames: [UUID: String] = [:]
+        var claimedNames = existingNames
+
+        for (entry, resolution) in resolutions {
+            switch resolution {
+            case .overwrite:
+                continue
+            case .skip:
+                remainingSources.removeAll { $0.id == entry.id }
+            case .rename:
+                if let newName = CopyMovePlanner.resolvedName(for: entry.name, existingNames: claimedNames) {
+                    renames[entry.id] = newName
+                    claimedNames.insert(newName)
+                }
+            case .cancel:
+                return .cancelled
+            }
+        }
+
+        return .proceed(sources: remainingSources, renames: renames)
     }
 
     /// The entry F3/F4 should act on (FV-01, ED-01): the first selected entry, or `nil`

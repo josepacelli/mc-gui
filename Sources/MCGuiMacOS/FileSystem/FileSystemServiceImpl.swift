@@ -144,7 +144,7 @@ public final class FileSystemServiceImpl {
         var processedCount = 0
 
         for source in plan.sources {
-            let destination = plan.destinationDirectory.appendingPathComponent(source.name)
+            let destination = plan.destinationDirectory.appendingPathComponent(plan.renames[source.id] ?? source.name)
             do {
                 if try resolveExistingDestination(source: source, destination: destination, options: plan.options) == .skip {
                     processedCount += 1
@@ -177,7 +177,7 @@ public final class FileSystemServiceImpl {
         var processedCount = 0
 
         for source in plan.sources {
-            let destination = plan.destinationDirectory.appendingPathComponent(source.name)
+            let destination = plan.destinationDirectory.appendingPathComponent(plan.renames[source.id] ?? source.name)
             do {
                 if try resolveExistingDestination(source: source, destination: destination, options: plan.options) == .skip {
                     processedCount += 1

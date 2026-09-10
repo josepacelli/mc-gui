@@ -210,4 +210,79 @@ struct PanelViewFileOperationsTests {
 
         #expect(PanelView.activationResult(for: file) == .view(file))
     }
+
+    // MARK: - applyResolutions(sources:resolutions:existingNames:) (FO-05..FO-09 - the
+    // conflict dialog's Overwrite/Skip/Rename/Cancel choices)
+
+    @Test("overwrite leaves the source untouched (downstream copy/move overwrites unconditionally)")
+    func applyResolutionsOverwriteLeavesSourceUnchanged() {
+        let a = makeTestEntry(name: "a.txt")
+        let b = makeTestEntry(name: "b.txt")
+
+        let outcome = PanelView.applyResolutions(
+            sources: [a, b],
+            resolutions: [(a, .overwrite)],
+            existingNames: ["a.txt"]
+        )
+
+        #expect(outcome == .proceed(sources: [a, b], renames: [:]))
+    }
+
+    @Test("skip removes the conflicting source from the batch")
+    func applyResolutionsSkipRemovesSource() {
+        let a = makeTestEntry(name: "a.txt")
+        let b = makeTestEntry(name: "b.txt")
+
+        let outcome = PanelView.applyResolutions(
+            sources: [a, b],
+            resolutions: [(a, .skip)],
+            existingNames: ["a.txt"]
+        )
+
+        #expect(outcome == .proceed(sources: [b], renames: [:]))
+    }
+
+    @Test("rename claims the next available numeric suffix against existingNames")
+    func applyResolutionsRenameClaimsSuffix() {
+        let a = makeTestEntry(name: "a.txt")
+
+        let outcome = PanelView.applyResolutions(
+            sources: [a],
+            resolutions: [(a, .rename)],
+            existingNames: ["a.txt"]
+        )
+
+        #expect(outcome == .proceed(sources: [a], renames: [a.id: "a (1).txt"]))
+    }
+
+    @Test("two renamed conflicts in the same batch don't collide with each other")
+    func applyResolutionsTwoRenamesDontCollide() {
+        let a = makeTestEntry(name: "a.txt")
+        let aDuplicateSelection = makeTestEntry(name: "a.txt")
+
+        let outcome = PanelView.applyResolutions(
+            sources: [a, aDuplicateSelection],
+            resolutions: [(a, .rename), (aDuplicateSelection, .rename)],
+            existingNames: ["a.txt"]
+        )
+
+        #expect(outcome == .proceed(
+            sources: [a, aDuplicateSelection],
+            renames: [a.id: "a (1).txt", aDuplicateSelection.id: "a (2).txt"]
+        ))
+    }
+
+    @Test("cancel aborts the entire batch, not just the file being resolved")
+    func applyResolutionsCancelAbortsWholeBatch() {
+        let a = makeTestEntry(name: "a.txt")
+        let b = makeTestEntry(name: "b.txt")
+
+        let outcome = PanelView.applyResolutions(
+            sources: [a, b],
+            resolutions: [(a, .skip), (b, .cancel)],
+            existingNames: ["a.txt", "b.txt"]
+        )
+
+        #expect(outcome == .cancelled)
+    }
 }

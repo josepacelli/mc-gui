@@ -30,12 +30,25 @@ public struct CopyMovePlan: Codable {
     public var destinationDirectory: URL
     public var mode: OperationMode
     public var options: CopyMoveOptions
+    // FO-08: per-source destination filename override (keyed by `FileEntry.id`), set by
+    // the caller when the user picked "Rename" for a conflicting file
+    // (`CopyMovePlanner.resolvedName`). Sources absent here use their own `name`
+    // unchanged - the common case, so existing callers building a plan without conflicts
+    // don't need to know this field exists.
+    public var renames: [UUID: String]
 
-    public init(sources: [FileEntry], destinationDirectory: URL, mode: OperationMode, options: CopyMoveOptions) {
+    public init(
+        sources: [FileEntry],
+        destinationDirectory: URL,
+        mode: OperationMode,
+        options: CopyMoveOptions,
+        renames: [UUID: String] = [:]
+    ) {
         self.sources = sources
         self.destinationDirectory = destinationDirectory
         self.mode = mode
         self.options = options
+        self.renames = renames
     }
 }
 

@@ -24,9 +24,10 @@ struct FileSystemServiceImplCopyMoveTests {
         sources: [FileEntry],
         destination: URL,
         mode: OperationMode,
-        options: CopyMoveOptions = CopyMoveOptions(preserveAttributes: false, followSymlinks: false, updateOnly: false)
+        options: CopyMoveOptions = CopyMoveOptions(preserveAttributes: false, followSymlinks: false, updateOnly: false),
+        renames: [UUID: String] = [:]
     ) -> CopyMovePlan {
-        CopyMovePlan(sources: sources, destinationDirectory: destination, mode: mode, options: options)
+        CopyMovePlan(sources: sources, destinationDirectory: destination, mode: mode, options: options, renames: renames)
     }
 
     // MARK: - preserveAttributes (FO-03)
@@ -179,6 +180,35 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(result.processedCount == 1)
         #expect(result.failedItems == [])
         #expect(try String(contentsOf: destURL, encoding: .utf8) == "old-content")
+    }
+
+    // MARK: - rename conflict resolution (FO-08)
+
+    @Test("copy writes to the renamed destination name when plan.renames has an entry for the source")
+    func copyUsesRenameWhenPresent() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        try writeFile(named: "a.txt", content: "new-content", in: srcDir)
+        let existingDestURL = try writeFile(named: "a.txt", content: "old-content", in: dstDir)
+
+        let service = FileSystemServiceImpl()
+        let sourceEntry = try #require(try await service.listDirectory(srcDir).first)
+        let result = try await service.copy(
+            plan(sources: [sourceEntry], destination: dstDir, mode: .copy, renames: [sourceEntry.id: "a (1).txt"])
+        )
+
+        #expect(result.success)
+        #expect(result.processedCount == 1)
+        // the original destination file is untouched - the rename avoided the conflict
+        // entirely rather than overwriting it
+        #expect(try String(contentsOf: existingDestURL, encoding: .utf8) == "old-content")
+        let renamedDestURL = dstDir.appendingPathComponent("a (1).txt")
+        #expect(try String(contentsOf: renamedDestURL, encoding: .utf8) == "new-content")
     }
 
     // MARK: - EBUSY-simulated retry
