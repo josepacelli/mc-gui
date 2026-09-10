@@ -127,14 +127,12 @@ public struct ViewerWindow: View {
         }
     }
 
-    // SPEC_DEVIATION (Fix 5, validation.md): FV-02 asks for syntax highlighting *and*
-    // line numbers. Line numbers are implemented below (a `LazyVStack` gutter, lazy so
-    // FV-07's 100MB-file requirement still holds - only visible rows are built). Full
-    // tokenized syntax highlighting is not: mirrors `EditorWindow`'s ED-02 precedent
-    // (monospaced text without per-token coloring, design.md's own documented risk
-    // fallback) - this file previously claimed "Verified" for FV-02 without either half
-    // implemented, which validation.md flagged as an over-claim; spec.md now matches
-    // `EditorWindow`'s honest `Implementing` status for the same category of gap.
+    // FV-02: line numbers (a `LazyVStack` gutter, lazy so FV-07's 100MB-file requirement
+    // still holds - only visible rows are built) plus heuristic syntax highlighting via
+    // `SyntaxHighlighter` (comments/strings/keywords/numbers, single-line-scoped, one
+    // shared keyword set across languages rather than a real per-language grammar - see
+    // that type's doc comment). Not a real tokenizer/parser, but real per-token coloring,
+    // unlike the earlier line-numbers-only version this replaces.
     private var textContent: some View {
         ScrollView([.vertical, .horizontal]) {
             if case .text(let text) = viewModel.content {
@@ -145,7 +143,7 @@ public struct ViewerWindow: View {
                             Text("\(index + 1)")
                                 .frame(minWidth: 40, alignment: .trailing)
                                 .foregroundStyle(.secondary)
-                            Text(String(line))
+                            Text(SyntaxHighlighter.highlight(line))
                         }
                         .font(.system(.body, design: .monospaced))
                     }

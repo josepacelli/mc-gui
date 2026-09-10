@@ -351,7 +351,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FO-15 | P1: File Operations | Execute | Implementing |
 | FO-16 | P1: File Operations | Execute | Implementing |
 | FV-01 | P1: File Viewer | Execute | Verified |
-| FV-02 | P1: File Viewer | Execute | Implementing |
+| FV-02 | P1: File Viewer | Execute | Verified |
 | FV-03 | P1: File Viewer | Execute | Implementing |
 | FV-04 | P1: File Viewer | Execute | Implementing |
 | FV-05 | P1: File Viewer | Execute | Implementing |
