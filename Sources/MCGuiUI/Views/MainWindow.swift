@@ -50,12 +50,6 @@ public struct MainWindow: View {
     // in-window `TopBar`'s Left/Right menus (CL-02).
     @State private var volumesListViewModel: VolumesListViewModel
 
-    // classic-layout-parity CL-05: which pending action (if any) each panel should run
-    // next, set by `ButtonBar`/`TopBar`'s File menu for whichever panel is active and
-    // consumed by that `PanelView` via its `pendingAction` binding.
-    @State private var leftPendingAction: PanelAction?
-    @State private var rightPendingAction: PanelAction?
-
     public init(
         viewModel: MainWindowViewModel,
         onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
@@ -80,7 +74,7 @@ public struct MainWindow: View {
                 onSelectRightVolume: { volume in Task { await viewModel.rightPanel.load(volume.mountPoint) } },
                 onRescanLeft: { Task { await viewModel.leftPanel.load() } },
                 onRescanRight: { Task { await viewModel.rightPanel.load() } },
-                onFileAction: triggerActivePanel,
+                onFileAction: viewModel.triggerActivePanel,
                 onRefreshActive: { Task { await viewModel.activePanelViewModel.load() } },
                 onGoBackActive: { Task { await viewModel.activePanelViewModel.goBack() } },
                 onGoForwardActive: { Task { await viewModel.activePanelViewModel.goForward() } },
@@ -107,7 +101,10 @@ public struct MainWindow: View {
                     onActivate: { viewModel.activate(.left) },
                     onViewFile: { entry in onViewFile(entry, .left) },
                     onEditFile: { entry in onEditFile(entry, .left) },
-                    pendingAction: $leftPendingAction,
+                    pendingAction: Binding(
+                        get: { viewModel.leftPendingAction },
+                        set: { viewModel.leftPendingAction = $0 }
+                    ),
                     otherPanelPath: viewModel.rightPanel.currentPath
                 )
                 PanelView(
@@ -116,14 +113,17 @@ public struct MainWindow: View {
                     onActivate: { viewModel.activate(.right) },
                     onViewFile: { entry in onViewFile(entry, .right) },
                     onEditFile: { entry in onEditFile(entry, .right) },
-                    pendingAction: $rightPendingAction,
+                    pendingAction: Binding(
+                        get: { viewModel.rightPendingAction },
+                        set: { viewModel.rightPendingAction = $0 }
+                    ),
                     otherPanelPath: viewModel.leftPanel.currentPath
                 )
             }
 
             Divider()
             // classic-layout-parity CL-03..CL-07: bottom F1-F10 button row.
-            ButtonBar(onAction: triggerActivePanel, onQuit: { NSApp.terminate(nil) })
+            ButtonBar(onAction: viewModel.triggerActivePanel, onQuit: { NSApp.terminate(nil) })
         }
         .onAppear { volumesListViewModel.refresh() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in
@@ -133,14 +133,5 @@ public struct MainWindow: View {
             volumesListViewModel.refresh()
         }
         .preferredColorScheme(themePreference.colorScheme)
-    }
-
-    /// Routes a `ButtonBar`/`TopBar` File-menu action (CL-05) to whichever panel is
-    /// currently active, via that panel's `pendingAction` binding.
-    private func triggerActivePanel(_ action: PanelAction) {
-        switch viewModel.activePanel {
-        case .left: leftPendingAction = action
-        case .right: rightPendingAction = action
-        }
     }
 }

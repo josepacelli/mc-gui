@@ -24,7 +24,12 @@ struct AppEntry: App {
         }
         .commandsRemoved()
         .commands {
-            AppCommands(actions: appDelegate.commandActions)
+            // VL-01: reading `appDelegate.volumes` here (not just inside
+            // `commandActions`/a nested closure) is what makes this `Scene` rebuild the
+            // Go menu when `AppDelegate` (an `@Observable` class) posts a change -
+            // SwiftUI's Observation tracking only sees property reads that happen
+            // directly inside a tracked `body`.
+            AppCommands(actions: appDelegate.commandActions, volumes: appDelegate.volumes)
         }
     }
 }
@@ -33,10 +38,15 @@ struct AppEntry: App {
 /// main window on launch, and builds the `AppCommandActions` closures `AppCommands`
 /// routes menu selections through.
 @MainActor
+@Observable
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let windowManager = WindowManager()
     private let mainViewModel: MainWindowViewModel
     private let bookmarksViewModel: BookmarksViewModel
+    // VL-01, VL-04: the native Go menu's volume list, refreshed on mount/unmount -
+    // mirrors `MainWindow`'s own `VolumesListViewModel`, duplicated here because this
+    // class (not a View) has no access to that one's `@State` instance.
+    private(set) var volumes: [VolumeInfo] = []
 
     override init() {
         let fileSystemService = FileSystemServiceImpl()
@@ -56,22 +66,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             remove: { id in try await bookmarkStore.remove(id: id) }
         ))
         super.init()
+        volumes = fileSystemService.getVolumes()
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(refreshVolumes),
+            name: NSWorkspace.didMountNotification, object: NSWorkspace.shared
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(refreshVolumes),
+            name: NSWorkspace.didUnmountNotification, object: NSWorkspace.shared
+        )
     }
 
-    /// Menu actions that meaningfully operate on the active panel today (sort, hidden
-    /// toggle, refresh, parent/home/computer/back/forward navigation) are wired for real.
-    /// `view`/`edit`/`copy`/`move`/`mkdir`/`delete` stay no-op here: triggering them from
-    /// the native menu bar would need the active panel's current selection, which lives in
-    /// `PanelView`'s private `@State` (T21/T33) with no accessor exposed upward - lifting
-    /// that state is a larger change out of scope. The physical F3-F8 keys already work
-    /// correctly via `PanelView`'s own `.onKeyPress` handling (T33 for F5-F8, T50 for
-    /// F3/F4), and classic-layout-parity's `TopBar`/`ButtonBar` also reach them via
-    /// `PanelAction`/`pendingAction` (state that lives on `MainWindow`, not reachable from
-    /// here either); these native menu items are secondary/redundant triggers for the same
-    /// shortcuts and inherit this limitation until selection state is lifted to
-    /// `MainWindowViewModel`.
+    @objc private func refreshVolumes() {
+        volumes = mainViewModel.leftPanel.fileSystemService.getVolumes()
+    }
+
+    /// Every action here operates on whichever panel is active. Sort/hidden-toggle/
+    /// refresh/navigation act directly on `MainWindowViewModel.activePanelViewModel`;
+    /// `view`/`edit`/`copy`/`move`/`mkdir`/`delete` route through
+    /// `MainWindowViewModel.triggerActivePanel` (`PanelAction`/`pendingAction`, the same
+    /// mechanism classic-layout-parity's `TopBar`/`ButtonBar` already use) since those
+    /// need the active panel's current selection, which lives in `PanelView`'s private
+    /// `@State` - `triggerActivePanel` is the one path that reaches it from outside.
     var commandActions: AppCommandActions {
         AppCommandActions(
+            view: { [mainViewModel] in mainViewModel.triggerActivePanel(.view) },
+            edit: { [mainViewModel] in mainViewModel.triggerActivePanel(.edit) },
+            copy: { [mainViewModel] in mainViewModel.triggerActivePanel(.copy) },
+            move: { [mainViewModel] in mainViewModel.triggerActivePanel(.move) },
+            mkdir: { [mainViewModel] in mainViewModel.triggerActivePanel(.mkdir) },
+            delete: { [mainViewModel] in mainViewModel.triggerActivePanel(.delete) },
             sortByName: { [mainViewModel] in mainViewModel.activePanelViewModel.sortColumn = .name },
             sortBySize: { [mainViewModel] in mainViewModel.activePanelViewModel.sortColumn = .size },
             sortByDate: { [mainViewModel] in mainViewModel.activePanelViewModel.sortColumn = .date },
@@ -95,6 +119,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             },
             goComputer: { [mainViewModel] in
                 Task { await mainViewModel.activePanelViewModel.load(URL(fileURLWithPath: "/")) }
+            },
+            goToVolume: { [mainViewModel] volume in
+                Task { await mainViewModel.activePanelViewModel.load(volume.mountPoint) }
             },
             showViewerWindow: { [windowManager] in windowManager.bringViewerToFront() },
             showEditorWindow: { [windowManager] in windowManager.bringEditorToFront() }

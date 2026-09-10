@@ -398,7 +398,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | PH-02 | P2: Path History Persistence | Execute | Implementing |
 | PH-03 | P2: Path History Persistence | Execute | Implementing |
 | PH-04 | P2: Path History Persistence | Execute | Implementing |
-| VL-01 | P2: Volume Listing | Execute | Implementing |
+| VL-01 | P2: Volume Listing | Execute | Verified |
 | VL-02 | P2: Volume Listing | Execute | Verified |
 | VL-03 | P2: Volume Listing | Execute | Verified |
 | VL-04 | P2: Volume Listing | Execute | Verified |

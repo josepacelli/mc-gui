@@ -44,4 +44,27 @@ struct MainWindowViewModelTests {
         viewModel.switchActivePanel()
         #expect(viewModel.activePanel == .left)
     }
+
+    // MARK: - triggerActivePanel (native menu bar wiring, classic-layout-parity CL-05)
+
+    @Test("triggerActivePanel sets leftPendingAction when the left panel is active")
+    func triggerActivePanelSetsLeftPendingAction() {
+        let viewModel = makeViewModel()
+
+        viewModel.triggerActivePanel(.copy)
+
+        #expect(viewModel.leftPendingAction == .copy)
+        #expect(viewModel.rightPendingAction == nil)
+    }
+
+    @Test("triggerActivePanel sets rightPendingAction when the right panel is active")
+    func triggerActivePanelSetsRightPendingAction() {
+        let viewModel = makeViewModel()
+        viewModel.activate(.right)
+
+        viewModel.triggerActivePanel(.delete)
+
+        #expect(viewModel.rightPendingAction == .delete)
+        #expect(viewModel.leftPendingAction == nil)
+    }
 }

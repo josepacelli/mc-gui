@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import MCGuiCore
 
 /// Actions the File/View/Go/Window menu items route to (MB-02, MB-04, MB-05, MB-06).
 /// Injected by the caller (`MCGuiApp`, Phase 11) - `MCGuiUI` has no dependency on
@@ -27,6 +28,9 @@ public struct AppCommandActions {
     public var goForward: () -> Void
     public var goHome: () -> Void
     public var goComputer: () -> Void
+    // VL-01: navigates the active panel to a mounted volume's root, selected from the
+    // Go menu's dynamic volume list (see `AppCommands.volumes`).
+    public var goToVolume: (VolumeInfo) -> Void
     public var showViewerWindow: () -> Void
     public var showEditorWindow: () -> Void
 
@@ -48,6 +52,7 @@ public struct AppCommandActions {
         goForward: @escaping () -> Void = {},
         goHome: @escaping () -> Void = {},
         goComputer: @escaping () -> Void = {},
+        goToVolume: @escaping (VolumeInfo) -> Void = { _ in },
         showViewerWindow: @escaping () -> Void = {},
         showEditorWindow: @escaping () -> Void = {}
     ) {
@@ -68,6 +73,7 @@ public struct AppCommandActions {
         self.goForward = goForward
         self.goHome = goHome
         self.goComputer = goComputer
+        self.goToVolume = goToVolume
         self.showViewerWindow = showViewerWindow
         self.showEditorWindow = showEditorWindow
     }
@@ -83,6 +89,10 @@ public struct AppCommandActions {
 /// this type's identically-named menus would appear side by side as duplicates.
 public struct AppCommands: Commands {
     private let actions: AppCommandActions
+    // VL-01: the Go menu's dynamic volume list - a plain array (not itself observed
+    // here), so the caller (`MCGuiApp`) must re-supply `AppCommands` when it changes for
+    // the menu to reflect a mount/unmount.
+    private let volumes: [VolumeInfo]
 
     // NSF3FunctionKey..NSF8FunctionKey mirror PanelView/ViewerWindow/EditorWindow/
     // KeyboardShortcuts' technique for binding physical F-keys via SwiftUI's `KeyEquivalent`.
@@ -93,8 +103,9 @@ public struct AppCommands: Commands {
     private static let f7Key = KeyEquivalent(Character(UnicodeScalar(NSF7FunctionKey)!))
     private static let f8Key = KeyEquivalent(Character(UnicodeScalar(NSF8FunctionKey)!))
 
-    public init(actions: AppCommandActions) {
+    public init(actions: AppCommandActions, volumes: [VolumeInfo] = []) {
         self.actions = actions
+        self.volumes = volumes
     }
 
     public var body: some Commands {
@@ -150,6 +161,12 @@ public struct AppCommands: Commands {
             Divider()
             Button("Home") { actions.goHome() }
             Button("Computer") { actions.goComputer() }
+            if !volumes.isEmpty {
+                Divider()
+                ForEach(volumes) { volume in
+                    Button(volume.name) { actions.goToVolume(volume) }
+                }
+            }
         }
 
         // MB-06: Window menu - Minimize (Cmd+M), Zoom, Viewer, Editor.
