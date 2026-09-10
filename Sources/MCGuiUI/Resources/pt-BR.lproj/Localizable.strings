@@ -39,3 +39,11 @@
 "saveChanges.button.cancel" = "Cancelar";
 "saveChanges.button.dontSave" = "Não Salvar";
 "saveChanges.button.save" = "Salvar";
+
+/* ProgressDialog.swift (T12) */
+"progress.title.copying" = "Copiando…";
+"progress.status.scanning" = "Analisando…";
+"progress.status.fileCount" = "Arquivo %1$d de %2$d";
+"progress.label.of" = "de";
+"progress.label.etaRemaining" = "%1$ds restantes";
+"progress.button.cancel" = "Cancelar";

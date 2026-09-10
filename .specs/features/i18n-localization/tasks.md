@@ -439,6 +439,26 @@ doesn't currently show up as a test failure either. `swift test`: 318 passed, 0 
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 6 keys extracted (title, scanning status, "File N of M" - matching the
+glossary's exact `%1$d`/`%2$@`-style template, the "of" separator between byte counts,
+"%1$ds remaining" ETA, Cancel button). `ByteCountFormatter.string(fromByteCount:countStyle:)`
+takes no explicit `Locale` parameter - confirmed by inspection it resolves formatting
+(decimal separators, unit words) from `Locale.current` internally, which is exactly the
+resolved system locale per design.md's I18N-07 decision; no code change needed beyond the
+surrounding labels already done here.
+
+SPEC_DEVIATION: `ProgressDialogViewModel` carries no copy-vs-move mode - the title always
+reads "Copying…"/"Copiando…"/"A copiar…" even during an F6 move. Pre-existing (not
+introduced by this task); localized the literal text as-is rather than adding a mode flag,
+which would be a behavior change outside T12's string-extraction scope - flagged for a
+future task, not fixed here.
+
+No existing test asserted this file's view text - none needed updating. `swift test`: 318
+passed, 0 failed. `swift test --filter LocalizationCoverageTests`: all 9
+target×language pairs pass key-set parity.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T13: Extract `TopBar.swift`

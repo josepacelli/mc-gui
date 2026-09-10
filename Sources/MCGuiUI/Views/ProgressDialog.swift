@@ -25,13 +25,17 @@ public struct ProgressDialog: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Copying…")
+            // SPEC_DEVIATION: ProgressDialogViewModel has no copy-vs-move mode of its own
+            // (pre-existing, not part of this localization task) - the header always reads
+            // "Copying…" even during a move. Localizing the literal as-is; adding a mode
+            // flag would be a behavior change outside T12's string-extraction scope.
+            Text(String(localized: "progress.title.copying", bundle: .module, comment: "Progress dialog title (always shown, even for move - pre-existing limitation)"))
                 .font(.headline)
 
             ProgressView(value: fraction)
 
             if isScanning {
-                Text("Scanning…")
+                Text(String(localized: "progress.status.scanning", bundle: .module, comment: "Shown while pre-scanning the source tree, before totals are known"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
@@ -40,16 +44,34 @@ public struct ProgressDialog: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
 
-                Text("File \(viewModel.filesProcessed) of \(viewModel.totalFiles)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Text(
+                    String(
+                        format: NSLocalizedString(
+                            "progress.status.fileCount",
+                            bundle: .module,
+                            comment: "Progress dialog: current file index of total. %1$d is the files processed so far, %2$d is the total file count."
+                        ),
+                        viewModel.filesProcessed, viewModel.totalFiles
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
                 HStack {
                     Text(ByteCountFormatter.string(fromByteCount: viewModel.bytesTransferred, countStyle: .file))
-                    Text("of")
+                    Text(String(localized: "progress.label.of", bundle: .module, comment: "Separator between transferred and total byte counts, e.g. '10 MB of 100 MB'"))
                     Text(ByteCountFormatter.string(fromByteCount: viewModel.totalBytes, countStyle: .file))
                     Spacer()
-                    Text("\(Int(viewModel.eta))s remaining")
+                    Text(
+                        String(
+                            format: NSLocalizedString(
+                                "progress.label.etaRemaining",
+                                bundle: .module,
+                                comment: "Estimated time remaining. %1$d is the number of seconds."
+                            ),
+                            Int(viewModel.eta)
+                        )
+                    )
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -57,7 +79,7 @@ public struct ProgressDialog: View {
 
             HStack {
                 Spacer()
-                Button("Cancel") { viewModel.cancel() }
+                Button(String(localized: "progress.button.cancel", bundle: .module, comment: "Cancel button")) { viewModel.cancel() }
                     .keyboardShortcut(.cancelAction)
             }
         }
