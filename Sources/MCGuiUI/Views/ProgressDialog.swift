@@ -15,6 +15,14 @@ public struct ProgressDialog: View {
         return Double(viewModel.bytesTransferred) / Double(viewModel.totalBytes)
     }
 
+    // Before the first source file/byte lands, `totalFiles == 0` means the operation is
+    // still walking the source tree to compute real totals (`FileSystemServiceImpl.
+    // expandedFiles`) - for a large folder that scan itself can take a few seconds, and
+    // with nothing else on screen changing yet it looked like the dialog had frozen.
+    private var isScanning: Bool {
+        !viewModel.isCompleted && viewModel.totalFiles == 0
+    }
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Copying…")
@@ -22,24 +30,30 @@ public struct ProgressDialog: View {
 
             ProgressView(value: fraction)
 
-            Text(viewModel.currentFile)
+            if isScanning {
+                Text("Scanning…")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(viewModel.currentFile)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
+                Text("File \(viewModel.filesProcessed) of \(viewModel.totalFiles)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                HStack {
+                    Text(ByteCountFormatter.string(fromByteCount: viewModel.bytesTransferred, countStyle: .file))
+                    Text("of")
+                    Text(ByteCountFormatter.string(fromByteCount: viewModel.totalBytes, countStyle: .file))
+                    Spacer()
+                    Text("\(Int(viewModel.eta))s remaining")
+                }
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
-
-            Text("File \(viewModel.filesProcessed) of \(viewModel.totalFiles)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            HStack {
-                Text(ByteCountFormatter.string(fromByteCount: viewModel.bytesTransferred, countStyle: .file))
-                Text("of")
-                Text(ByteCountFormatter.string(fromByteCount: viewModel.totalBytes, countStyle: .file))
-                Spacer()
-                Text("\(Int(viewModel.eta))s remaining")
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
 
             HStack {
                 Spacer()

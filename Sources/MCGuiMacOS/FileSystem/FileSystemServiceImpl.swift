@@ -324,25 +324,54 @@ public final class FileSystemServiceImpl {
         }
     }
 
+    /// Directory-walk resource keys: just enough to tell files from directories and get
+    /// their size - `buildEntry`'s full listing entry additionally does a separate
+    /// `attributesOfItem` stat (for `permissions`) and, for symlinks, a
+    /// `destinationOfSymbolicLink` call, neither of which `copySingleFile`/
+    /// `OperationProgressTracker` ever actually reads (`copySingleFile` re-stats itself
+    /// when it needs attributes). Skipping them here roughly halves the syscalls per file
+    /// during a directory walk - the difference between a barely-noticeable pre-scan and
+    /// one that visibly stalls the dialog on an 11GB source tree.
+    private static let directoryWalkKeys: [URLResourceKey] = [.isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey]
+
+    /// A minimal `FileEntry` for internal directory-walk bookkeeping only (progress
+    /// totals, per-file copy dispatch) - never returned to callers of `listDirectory`,
+    /// so the unused fields (dates/permissions/hidden/symlinkTarget) are safe filler.
+    private func lightEntry(for url: URL, keys: Set<URLResourceKey> = Set(directoryWalkKeys)) -> FileEntry {
+        let values = try? url.resourceValues(forKeys: keys)
+        let isDirectory = values?.isDirectory ?? false
+        let isSymlink = values?.isSymbolicLink ?? false
+        let size = Int64(values?.fileSize ?? 0)
+        let type: FileType = isSymlink ? .symlink : (isDirectory ? .directory : .file)
+        return FileEntry(
+            name: url.lastPathComponent,
+            path: url,
+            size: size,
+            creationDate: .distantPast,
+            modificationDate: .distantPast,
+            permissions: [],
+            type: type,
+            isHidden: false,
+            isSymlink: isSymlink,
+            symlinkTarget: nil
+        )
+    }
+
     /// Recursively lists the real leaf files under `sources`' directories (files and
     /// symlinks only, never the directory entries themselves) so `OperationProgressTracker`
     /// can be built from the actual total file count/bytes instead of "1 unit per
     /// top-level source" - which made copying a single folder report "File 1 of 1" with
     /// no visible progress until the whole thing finished.
     private func expandedFiles(for sources: [FileEntry]) -> [FileEntry] {
-        let keys: [URLResourceKey] = [
-            .isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey,
-            .creationDateKey, .contentModificationDateKey, .isHiddenKey
-        ]
         var result: [FileEntry] = []
         for source in sources {
             guard source.type == .directory else {
                 result.append(source)
                 continue
             }
-            let enumerator = fileManager.enumerator(at: source.path, includingPropertiesForKeys: keys, options: [])
+            let enumerator = fileManager.enumerator(at: source.path, includingPropertiesForKeys: Self.directoryWalkKeys, options: [])
             while let url = enumerator?.nextObject() as? URL {
-                let entry = buildEntry(for: url, keys: Set(keys))
+                let entry = lightEntry(for: url)
                 guard entry.type != .directory else { continue }
                 result.append(entry)
             }
@@ -364,18 +393,14 @@ public final class FileSystemServiceImpl {
     ) async throws {
         try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
 
-        let keys: [URLResourceKey] = [
-            .isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey,
-            .creationDateKey, .contentModificationDateKey, .isHiddenKey
-        ]
         let sourceDepth = source.path.pathComponents.count
-        let enumerator = fileManager.enumerator(at: source.path, includingPropertiesForKeys: keys, options: [])
+        let enumerator = fileManager.enumerator(at: source.path, includingPropertiesForKeys: Self.directoryWalkKeys, options: [])
 
         while let url = enumerator?.nextObject() as? URL {
             try Task.checkCancellation()
             let relativeComponents = url.pathComponents.dropFirst(sourceDepth)
             let itemDestination = relativeComponents.reduce(destination) { $0.appendingPathComponent($1) }
-            let entry = buildEntry(for: url, keys: Set(keys))
+            let entry = lightEntry(for: url)
 
             if entry.type == .directory {
                 try fileManager.createDirectory(at: itemDestination, withIntermediateDirectories: true)
@@ -396,13 +421,9 @@ public final class FileSystemServiceImpl {
         progress: OperationProgressTracker,
         onProgress: (OperationProgress) -> Void
     ) {
-        let keys: [URLResourceKey] = [
-            .isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey,
-            .creationDateKey, .contentModificationDateKey, .isHiddenKey
-        ]
-        let enumerator = fileManager.enumerator(at: destination, includingPropertiesForKeys: keys, options: [])
+        let enumerator = fileManager.enumerator(at: destination, includingPropertiesForKeys: Self.directoryWalkKeys, options: [])
         while let url = enumerator?.nextObject() as? URL {
-            let entry = buildEntry(for: url, keys: Set(keys))
+            let entry = lightEntry(for: url)
             guard entry.type != .directory else { continue }
             onProgress(progress.recordProcessed(entry))
         }

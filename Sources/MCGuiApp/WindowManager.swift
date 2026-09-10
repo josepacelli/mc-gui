@@ -82,6 +82,7 @@ public final class WindowManager {
         window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.title = entry.name
         window.setContentSize(NSSize(width: 800, height: 600))
+        centerOverMainWindow(window)
         window.makeKeyAndOrderFront(nil)
         viewerWindows.append(window)
     }
@@ -105,6 +106,7 @@ public final class WindowManager {
                 window = NSWindow(contentViewController: NSHostingController(rootView: content))
                 window.title = entry.name
                 window.setContentSize(NSSize(width: 800, height: 600))
+                centerOverMainWindow(window)
                 window.makeKeyAndOrderFront(nil)
                 editorWindows.append(window)
             } catch {
@@ -133,6 +135,7 @@ public final class WindowManager {
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.title = "Copying…"
         window.styleMask = [.titled, .closable]
+        centerOverMainWindow(window)
         window.makeKeyAndOrderFront(nil)
         progressWindows.append(window)
 
@@ -178,6 +181,7 @@ public final class WindowManager {
         let observer = WindowCloseObserver { [weak self] in self?.helpWindow = nil }
         window.delegate = observer
         helpWindowCloseObserver = observer
+        centerOverMainWindow(window)
         window.makeKeyAndOrderFront(nil)
         helpWindow = window
     }
@@ -193,6 +197,7 @@ public final class WindowManager {
         window.title = "User Menu"
         window.styleMask = [.titled, .closable, .resizable, .miniaturizable]
         window.setContentSize(NSSize(width: 460, height: 360))
+        centerOverMainWindow(window)
         window.makeKeyAndOrderFront(nil)
         userMenuWindows.append(window)
     }
@@ -212,6 +217,23 @@ public final class WindowManager {
     private func closeWindow(_ window: NSWindow, from keyPath: ReferenceWritableKeyPath<WindowManager, [NSWindow]>) {
         self[keyPath: keyPath].removeAll { $0 === window }
         window.close()
+    }
+
+    /// Positions `window` centered over the main window instead of AppKit's default
+    /// cascading placement, per user request - call after the window's final content
+    /// size is set (`setContentSize`) and before `makeKeyAndOrderFront`. Falls back to
+    /// centering on screen when there's no main window yet.
+    private func centerOverMainWindow(_ window: NSWindow) {
+        guard let mainWindow else {
+            window.center()
+            return
+        }
+        let mainFrame = mainWindow.frame
+        let size = window.frame.size
+        window.setFrameOrigin(NSPoint(
+            x: mainFrame.midX - size.width / 2,
+            y: mainFrame.midY - size.height / 2
+        ))
     }
 }
 
