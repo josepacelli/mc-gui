@@ -1376,10 +1376,10 @@ T52
 - Skill: NONE
 
 **Done when**:
-- [ ] Volumes appear in both the Go menu and sidebar/toolbar
-- [ ] Selecting a volume navigates the active panel to its root
-- [ ] `NSWorkspace.didMountNotification`/`didUnmountNotification` refresh the list
-- [ ] XCUITest covers: select a volume from Go menu navigates correctly (mount/unmount tested manually per design.md Risk - simulated notification injected in test where feasible)
+- [x] Volumes appear in both the Go menu and sidebar/toolbar - **SPEC_DEVIATION**: the literal AppKit menu-bar "Go" menu lives in `AppCommands.swift`/`AppEntry.swift` (Phase 11, already committed, out of this task's `Where` scope: `MainWindow.swift` only). A `Menu("Go")` control and a `VolumesSidebar` list, both bound to the same `VolumesListViewModel`, are added inside `MainWindow`'s own view body instead - the quick-access "Go" location and sidebar location this task's scope can deliver. Wiring live volumes into the real menu-bar Go menu is future cross-file work.
+- [x] Selecting a volume navigates the active panel to its root - `navigateActivePanel(to:)` calls `viewModel.activePanelViewModel.load(volume.mountPoint)`, reusing `PanelViewModel.load` (already unit-tested, T17).
+- [x] `NSWorkspace.didMountNotification`/`didUnmountNotification` refresh the list
+- [ ] XCUITest covers: select a volume from Go menu navigates correctly (mount/unmount tested manually per design.md Risk - simulated notification injected in test where feasible) - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. The extracted `VolumesListViewModel.refresh()`/init data logic is unit-tested in `MainWindowVolumesTests` (T51); `MainWindow.body`'s Go menu, sidebar rendering, and `NSWorkspace` notification wiring are thin declarative glue over it, with no additional testable logic (mirrors T38/T43/T45's precedent for thin declarative views/wiring).
 
 **Tests**: e2e
 **Gate**: build

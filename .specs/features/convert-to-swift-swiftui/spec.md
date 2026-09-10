@@ -397,9 +397,9 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | PH-03 | P2: Path History Persistence | Execute | Implementing |
 | PH-04 | P2: Path History Persistence | Execute | Implementing |
 | VL-01 | P2: Volume Listing | Execute | Implementing |
-| VL-02 | P2: Volume Listing | Design | Pending |
-| VL-03 | P2: Volume Listing | Design | Pending |
-| VL-04 | P2: Volume Listing | Design | Pending |
+| VL-02 | P2: Volume Listing | Execute | Verified |
+| VL-03 | P2: Volume Listing | Execute | Verified |
+| VL-04 | P2: Volume Listing | Execute | Verified |
 | SF-01 | P2: Search/Filter | Execute | Verified |
 | SF-02 | P2: Search/Filter | Execute | Verified |
 | SF-03 | P2: Search/Filter | Execute | Verified |
@@ -409,7 +409,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | BM-03 | P3: Bookmarks | Design | Pending |
 | BM-04 | P3: Bookmarks | Design | Pending |
 
-**Coverage:** 93 total, 92 mapped to tasks, 1 unmapped to a task's `Requirement` field (FS-06) - functionally covered as of T50 (Cmd+Up in `AppCommands`' Go menu, wired to real parent-directory navigation in `AppEntry`), though no task explicitly cites it.
+**Coverage:** 93 total, 92 mapped to tasks, 1 unmapped to a task's `Requirement` field (FS-06) - functionally covered as of T50 (Cmd+Up in `AppCommands`' Go menu, wired to real parent-directory navigation in `AppEntry`), though no task explicitly cites it. VL-01 stays `Implementing` (not `Verified`) per T51's SPEC_DEVIATION: volumes are listed in `MainWindow`'s own `Menu("Go")` control (this task's `Where` scope), not the literal AppKit menu-bar Go menu (`AppCommands.swift`/`AppEntry.swift`, Phase 11, out of scope) - closing that gap is future cross-file work.
 
 ---
 

@@ -7,15 +7,18 @@ import MCGuiCore
 struct MockFileSystemService: FileSystemService {
     var listDirectoryImpl: @Sendable (URL) async throws -> [FileEntry]
     var createDirectoryImpl: @Sendable (URL) async throws -> Void
+    var getVolumesImpl: @Sendable () -> [VolumeInfo]
 
-    // `createDirectoryImpl` is declared before `listDirectoryImpl` so existing unlabeled
-    // trailing-closure call sites (`MockFileSystemService { ... }`) keep binding to
-    // `listDirectoryImpl`, the last parameter.
+    // `createDirectoryImpl` and `getVolumesImpl` are declared before `listDirectoryImpl` so
+    // existing unlabeled trailing-closure call sites (`MockFileSystemService { ... }`) keep
+    // binding to `listDirectoryImpl`, the last parameter.
     init(
         createDirectoryImpl: @escaping @Sendable (URL) async throws -> Void = { _ in },
+        getVolumesImpl: @escaping @Sendable () -> [VolumeInfo] = { [] },
         listDirectoryImpl: @escaping @Sendable (URL) async throws -> [FileEntry] = { _ in [] }
     ) {
         self.createDirectoryImpl = createDirectoryImpl
+        self.getVolumesImpl = getVolumesImpl
         self.listDirectoryImpl = listDirectoryImpl
     }
 
@@ -39,7 +42,7 @@ struct MockFileSystemService: FileSystemService {
         OperationResult(success: true, errorMessage: nil, processedCount: 0, failedItems: [])
     }
 
-    func getVolumes() -> [VolumeInfo] { [] }
+    func getVolumes() -> [VolumeInfo] { getVolumesImpl() }
 }
 
 struct MockError: LocalizedError {
