@@ -1031,10 +1031,10 @@ T37 → T38
 - Skill: NONE
 
 **Done when**:
-- [ ] F3 on a selected file opens the viewer in the correct mode
-- [ ] Tab/Shift+Tab move to next/previous file in the panel
-- [ ] Cmd+F focuses the search bar
-- [ ] XCUITest covers: F3 opens viewer, mode tab switch, Tab navigation, search finds and highlights a match
+- [ ] F3 on a selected file opens the viewer in the correct mode - **PARTIAL**: `ViewerWindow.load(initialURL)` (via its injected `ViewerViewModel`) always displays the correct mode for whatever file it's given, and F3 is bound within the window itself (to close, see the file's SPEC_DEVIATION - spec.md/design.md don't define an in-viewer F3 action). Constructing and presenting `ViewerWindow` when F3 is pressed on a panel selection, and supplying the panel's file list to the underlying `ViewerServiceImpl.setFileList(_:)` (concrete-type-only, unreachable from `MCGuiUI`), is wiring that belongs to a future task - out of scope here (`Where` is `ViewerWindow.swift` only).
+- [x] Tab/Shift+Tab move to next/previous file in the panel (calls `ViewerViewModel.next()`/`.previous()`, tested at the ViewModel layer in T37)
+- [x] Cmd+F focuses the search bar
+- [ ] XCUITest covers: F3 opens viewer, mode tab switch, Tab navigation, search finds and highlights a match - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. Mode switching, navigation, and search logic are unit-tested in `ViewerViewModelTests` (T37); `ViewerWindow.body`'s toolbar/search bar/key bindings are thin declarative glue over `ViewerViewModel`, with no additional testable logic (mirrors T33's `PanelView` precedent).
 
 **Tests**: e2e
 **Gate**: build
