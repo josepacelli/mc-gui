@@ -63,6 +63,10 @@ public struct PanelView: View {
     private static let f6Key = KeyEquivalent(Character(UnicodeScalar(NSF6FunctionKey)!))
     private static let f7Key = KeyEquivalent(Character(UnicodeScalar(NSF7FunctionKey)!))
     private static let f8Key = KeyEquivalent(Character(UnicodeScalar(NSF8FunctionKey)!))
+    // KN-06: NSInsertFunctionKey is the same kind of AppKit private-use-area scalar as the
+    // F-keys above - most Mac keyboards have no physical Insert key, but external/Windows
+    // keyboards that do send this.
+    private static let insertKey = KeyEquivalent(Character(UnicodeScalar(NSInsertFunctionKey)!))
 
     private var fileSystemService: FileSystemService { viewModel.fileSystemService }
 
@@ -95,38 +99,7 @@ public struct PanelView: View {
             header
 
             ZStack {
-                List(displayEntries, selection: $selection) { entry in
-                    FileRow(entry: entry)
-                        .contextMenu {
-                            Text(entry.name)
-                        }
-                        .onTapGesture(count: 2) { activate(entry) }
-                }
-                .focusable()
-                .focused($isFocused)
-                .onChange(of: isFocused) { _, focused in
-                    if focused { onActivate() }
-                }
-                .onTapGesture { onActivate() }
-                .onKeyPress(keys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key]) { press in
-                    handleFunctionKey(press.key)
-                    return .handled
-                }
-                // FS-04, KN-11: Enter navigates into the selected directory (or the ".."
-                // entry) / opens the selected file. Mirrors F3/F4's existing "first
-                // selected entry, no-op when empty" precedent.
-                .onKeyPress(.return) {
-                    guard let entry = Self.targetEntry(selection: selectedDisplayEntries) else { return .ignored }
-                    activate(entry)
-                    return .handled
-                }
-                // FS-05: Backspace always navigates to the parent directory, independent
-                // of selection - mirrors Cmd+Up's existing `navigateToParent` behavior
-                // (AppCommandActions).
-                .onKeyPress(.delete) {
-                    navigateToParent()
-                    return .handled
-                }
+                entryList
 
                 if viewModel.isLoading {
                     LoadingOverlay()
@@ -185,6 +158,38 @@ public struct PanelView: View {
         }
     }
 
+    // Split out of `body` (and its keyboard handling split across two `ViewModifier`s
+    // below) because chaining every `.onKeyPress` directly in one expression made the
+    // compiler give up with "unable to type-check this expression in reasonable time".
+    private var entryList: some View {
+        List(displayEntries, selection: $selection) { entry in
+            FileRow(entry: entry)
+                .contextMenu {
+                    Text(entry.name)
+                }
+                .onTapGesture(count: 2) { activate(entry) }
+        }
+        .focusable()
+        .focused($isFocused)
+        .onChange(of: isFocused) { _, focused in
+            if focused { onActivate() }
+        }
+        .onTapGesture { onActivate() }
+        .modifier(PanelPrimaryKeys(
+            functionKeys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key],
+            onFunctionKey: handleFunctionKey,
+            onReturn: activateSelected,
+            onBackspace: navigateToParent
+        ))
+        .modifier(PanelSelectionKeys(
+            insertKey: Self.insertKey,
+            onJumpFirst: { jumpToEdge(first: true) },
+            onJumpLast: { jumpToEdge(first: false) },
+            onToggle: toggleCurrentSelection,
+            onEscape: handleEscape
+        ))
+    }
+
     // MARK: - Classic chrome (classic-layout-parity CL-09..CL-12): header shows the
     // current path, footer shows the entry count or, once something is selected, the
     // selected count - mirrors the original terminal panel's title/status-line border.
@@ -222,6 +227,16 @@ public struct PanelView: View {
     private func handleFunctionKey(_ key: KeyEquivalent) {
         guard let action = Self.action(forKey: key) else { return }
         perform(action)
+    }
+
+    /// FS-04, KN-11: Enter navigates into the selected directory (or the ".." entry) /
+    /// opens the selected file. Mirrors F3/F4's existing "first selected entry, no-op
+    /// when empty" precedent. Returns whether there was a target to act on, so the caller
+    /// can report the key press as `.ignored` rather than `.handled` when there wasn't.
+    private func activateSelected() -> Bool {
+        guard let entry = Self.targetEntry(selection: selectedDisplayEntries) else { return false }
+        activate(entry)
+        return true
     }
 
     /// Maps a physical F3-F8 key press to the `PanelAction` it triggers.
@@ -308,6 +323,42 @@ public struct PanelView: View {
     /// precondition), mirroring `AppCommandActions.navigateToParent`.
     private func navigateToParent() {
         Task { await viewModel.load(viewModel.currentPath.deletingLastPathComponent()) }
+    }
+
+    /// KN-04: jumps the selection to the first/last row via `PanelCommands.jump`. A no-op
+    /// on an empty panel.
+    private func jumpToEdge(first: Bool) {
+        guard let target = PanelCommands.jump(toFirst: first, entries: displayEntries) else { return }
+        selection = [target]
+    }
+
+    /// KN-05/KN-06: toggles the current row (the sole member of `selection` when there is
+    /// one, otherwise the first row) via `PanelCommands.toggleSelection`. A no-op on an
+    /// empty panel.
+    private func toggleCurrentSelection() {
+        guard let currentID = selection.first ?? displayEntries.first?.id else { return }
+        selection = PanelCommands.toggleSelection(selection, id: currentID, entries: displayEntries)
+    }
+
+    /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state.
+    private func handleEscape() {
+        switch Self.escapeAction(hasOpenSheet: hasOpenSheet, filterText: viewModel.filterText, hasSelection: !selection.isEmpty) {
+        case .dismissSheet:
+            conflictDialogViewModel = nil
+            copyMoveViewModel = nil
+            mkdirViewModel = nil
+            deleteViewModel = nil
+        case .clearFilter:
+            viewModel.clearFilter()
+        case .clearSelection:
+            selection = []
+        case .none:
+            break
+        }
+    }
+
+    private var hasOpenSheet: Bool {
+        conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil || deleteViewModel != nil
     }
 
     /// FO-05..FO-09: resolves every destination-name conflict (one dialog at a time) before
@@ -456,6 +507,22 @@ public struct PanelView: View {
         return .proceed(sources: remainingSources, renames: renames)
     }
 
+    /// What Escape does (KN-12, SF-04), in priority order: dismiss an open dialog, else
+    /// clear an active filename filter, else clear the selection, else nothing.
+    enum EscapeAction: Equatable {
+        case dismissSheet
+        case clearFilter
+        case clearSelection
+        case none
+    }
+
+    static func escapeAction(hasOpenSheet: Bool, filterText: String, hasSelection: Bool) -> EscapeAction {
+        if hasOpenSheet { return .dismissSheet }
+        if !filterText.isEmpty { return .clearFilter }
+        if hasSelection { return .clearSelection }
+        return .none
+    }
+
     /// The entry F3/F4 should act on (FV-01, ED-01): the first selected entry, or `nil`
     /// when nothing is selected - F3/F4 with an empty selection is a no-op, mirroring
     /// F5/F6/F8's existing empty-selection precedent above.
@@ -511,5 +578,62 @@ private struct FileSystemTrashAdapter: TrashService {
 
     func trash(_ urls: [URL]) async throws -> OperationResult {
         try await fileSystemService.trash(urls)
+    }
+}
+
+/// F3-F8 (function keys), FS-04/KN-11 (Enter), FS-05 (Backspace) - split out of
+/// `PanelView.entryList` (alongside `PanelSelectionKeys` below) so the compiler doesn't
+/// have to type-check every `.onKeyPress` in one giant chained expression.
+private struct PanelPrimaryKeys: ViewModifier {
+    let functionKeys: Set<KeyEquivalent>
+    let onFunctionKey: (KeyEquivalent) -> Void
+    let onReturn: () -> Bool
+    let onBackspace: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onKeyPress(keys: functionKeys) { press in
+                onFunctionKey(press.key)
+                return .handled
+            }
+            .onKeyPress(.return) {
+                onReturn() ? .handled : .ignored
+            }
+            .onKeyPress(.delete) {
+                onBackspace()
+                return .handled
+            }
+    }
+}
+
+/// KN-04 (Cmd+Left/Right jump), KN-05/KN-06 (Space/Insert toggle), KN-12/SF-04 (Escape) -
+/// the other half of `PanelView.entryList`'s keyboard handling, split for the same reason
+/// as `PanelPrimaryKeys` above.
+private struct PanelSelectionKeys: ViewModifier {
+    let insertKey: KeyEquivalent
+    let onJumpFirst: () -> Void
+    let onJumpLast: () -> Void
+    let onToggle: () -> Void
+    let onEscape: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onKeyPress(keys: [.leftArrow, .rightArrow]) { press in
+                guard press.modifiers.contains(.command) else { return .ignored }
+                if press.key == .leftArrow {
+                    onJumpFirst()
+                } else {
+                    onJumpLast()
+                }
+                return .handled
+            }
+            .onKeyPress(keys: [.space, insertKey]) { _ in
+                onToggle()
+                return .handled
+            }
+            .onKeyPress(.escape) {
+                onEscape()
+                return .handled
+            }
     }
 }

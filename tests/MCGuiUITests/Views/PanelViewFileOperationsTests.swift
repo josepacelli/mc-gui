@@ -285,4 +285,27 @@ struct PanelViewFileOperationsTests {
 
         #expect(outcome == .cancelled)
     }
+
+    // MARK: - escapeAction(hasOpenSheet:filterText:hasSelection:) (KN-12, SF-04)
+
+    @Test("escapeAction dismisses an open sheet first, regardless of filter/selection")
+    func escapeActionDismissesSheetFirst() {
+        #expect(PanelView.escapeAction(hasOpenSheet: true, filterText: "abc", hasSelection: true) == .dismissSheet)
+        #expect(PanelView.escapeAction(hasOpenSheet: true, filterText: "", hasSelection: false) == .dismissSheet)
+    }
+
+    @Test("escapeAction clears the filter when no sheet is open but a filter is active")
+    func escapeActionClearsFilterWhenNoSheet() {
+        #expect(PanelView.escapeAction(hasOpenSheet: false, filterText: "abc", hasSelection: true) == .clearFilter)
+    }
+
+    @Test("escapeAction clears the selection when no sheet or filter is active")
+    func escapeActionClearsSelectionWhenNoSheetOrFilter() {
+        #expect(PanelView.escapeAction(hasOpenSheet: false, filterText: "", hasSelection: true) == .clearSelection)
+    }
+
+    @Test("escapeAction does nothing when there's no sheet, filter, or selection")
+    func escapeActionNoneWhenNothingToDo() {
+        #expect(PanelView.escapeAction(hasOpenSheet: false, filterText: "", hasSelection: false) == .none)
+    }
 }
