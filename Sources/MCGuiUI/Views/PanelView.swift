@@ -27,6 +27,8 @@ public struct PanelView: View {
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
+    // KN-05/KN-06: the row Space/Insert last acted on - see `currentRowID`.
+    @State private var cursorID: FileEntry.ID?
 
     @State private var copyMoveViewModel: CopyMoveDialogViewModel?
     // FO-05..FO-09: the conflict dialog shown for each destination-name collision found
@@ -196,6 +198,7 @@ public struct PanelView: View {
             onJumpFirst: { jumpToEdge(first: true) },
             onJumpLast: { jumpToEdge(first: false) },
             onToggle: toggleCurrentSelection,
+            onToggleAndAdvance: toggleAndAdvanceSelection,
             onEscape: handleEscape
         ))
     }
@@ -342,12 +345,35 @@ public struct PanelView: View {
         selection = [target]
     }
 
-    /// KN-05/KN-06: toggles the current row (the sole member of `selection` when there is
-    /// one, otherwise the first row) via `PanelCommands.toggleSelection`. A no-op on an
-    /// empty panel.
+    /// KN-05: Space toggles the current row (`cursorID` when set, else the sole member of
+    /// `selection`, else the first row) via `PanelCommands.toggleSelection`, and does not
+    /// move afterward - `cursorID` is recorded so a following Insert (KN-06) resumes from
+    /// the same row rather than losing track of it once `selection` holds several marks.
+    /// A no-op on an empty panel.
     private func toggleCurrentSelection() {
-        guard let currentID = selection.first ?? displayEntries.first?.id else { return }
+        guard let currentID = currentRowID else { return }
         selection = PanelCommands.toggleSelection(selection, id: currentID, entries: displayEntries)
+        cursorID = currentID
+    }
+
+    /// KN-06: Insert toggles the current row exactly like Space, then additionally
+    /// advances `cursorID` to `PanelCommands.toggleAndAdvance`'s `nextCursor` - unlike
+    /// KN-04/05's shared-handler predecessor, this actually calls the distinct
+    /// `toggleAndAdvance` API so repeated Insert presses mark descending rows without an
+    /// arrow key in between, independent of how many rows `selection` has already
+    /// accumulated (which `selection.first` alone can't track once it's more than one).
+    private func toggleAndAdvanceSelection() {
+        guard let currentID = currentRowID else { return }
+        let result = PanelCommands.toggleAndAdvance(selection, id: currentID, entries: displayEntries)
+        selection = result.selection
+        cursorID = result.nextCursor ?? currentID
+    }
+
+    /// The row Space/Insert act on: `cursorID` (set by the last Space/Insert) when
+    /// present, else whichever single row is currently selected (arrow-key/click
+    /// navigation), else the first row.
+    private var currentRowID: FileEntry.ID? {
+        cursorID ?? selection.first ?? displayEntries.first?.id
     }
 
     /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state.
@@ -658,6 +684,7 @@ private struct PanelSelectionKeys: ViewModifier {
     let onJumpFirst: () -> Void
     let onJumpLast: () -> Void
     let onToggle: () -> Void
+    let onToggleAndAdvance: () -> Void
     let onEscape: () -> Void
 
     func body(content: Content) -> some View {
@@ -671,8 +698,12 @@ private struct PanelSelectionKeys: ViewModifier {
                 }
                 return .handled
             }
-            .onKeyPress(keys: [.space, insertKey]) { _ in
-                onToggle()
+            .onKeyPress(keys: [.space, insertKey]) { press in
+                if press.key == insertKey {
+                    onToggleAndAdvance()
+                } else {
+                    onToggle()
+                }
                 return .handled
             }
             .onKeyPress(.escape) {
