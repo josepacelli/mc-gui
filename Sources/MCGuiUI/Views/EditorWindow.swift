@@ -74,20 +74,20 @@ public struct EditorWindow: View {
     private var toolbar: some View {
         HStack {
             Button { performEditAction("cut:") } label: { Image(systemName: "scissors") }
-                .help("Cut")
+                .help(String(localized: "editor.button.cut.help", bundle: .module, comment: "Cut button tooltip"))
             Button { performEditAction("copy:") } label: { Image(systemName: "doc.on.doc") }
-                .help("Copy")
+                .help(String(localized: "editor.button.copy.help", bundle: .module, comment: "Copy button tooltip"))
             Button { performEditAction("paste:") } label: { Image(systemName: "clipboard") }
-                .help("Paste")
+                .help(String(localized: "editor.button.paste.help", bundle: .module, comment: "Paste button tooltip"))
 
             Divider()
 
             Button { performEditAction("undo:") } label: { Image(systemName: "arrow.uturn.backward") }
-                .help("Undo")
+                .help(String(localized: "editor.button.undo.help", bundle: .module, comment: "Undo button tooltip"))
             Button { performEditAction("redo:") } label: { Image(systemName: "arrow.uturn.forward") }
-                .help("Redo")
+                .help(String(localized: "editor.button.redo.help", bundle: .module, comment: "Redo button tooltip"))
             Button { performEditAction("selectAll:") } label: { Image(systemName: "selection.pin.in.out") }
-                .help("Select All (⌘A)")
+                .help(String(localized: "editor.button.selectAll.help", bundle: .module, comment: "Select All button tooltip (⌘A unchanged)"))
                 .keyboardShortcut("a", modifiers: .command)
 
             Spacer()
@@ -98,7 +98,7 @@ public struct EditorWindow: View {
                 Image(systemName: "square.and.arrow.down")
             }
             .keyboardShortcut("s", modifiers: .command)
-            .help("Save (⌘S)")
+            .help(String(localized: "editor.button.save.help", bundle: .module, comment: "Save button tooltip (⌘S unchanged)"))
 
             Button {
                 openFindBar(replaceMode: false)
@@ -106,7 +106,7 @@ public struct EditorWindow: View {
                 Image(systemName: "magnifyingglass")
             }
             .keyboardShortcut("f", modifiers: .command)
-            .help("Find (⌘F)")
+            .help(String(localized: "editor.button.find.help", bundle: .module, comment: "Find button tooltip (⌘F unchanged)"))
 
             Button {
                 openFindBar(replaceMode: true)
@@ -114,7 +114,7 @@ public struct EditorWindow: View {
                 Image(systemName: "arrow.left.arrow.right")
             }
             .keyboardShortcut("f", modifiers: [.command, .option])
-            .help("Find & Replace (⌥⌘F)")
+            .help(String(localized: "editor.button.findReplace.help", bundle: .module, comment: "Find & Replace button tooltip (⌥⌘F unchanged)"))
         }
         .padding(8)
     }
@@ -130,19 +130,19 @@ public struct EditorWindow: View {
 
     private var findReplaceBar: some View {
         HStack {
-            TextField("Find", text: $findQuery)
+            TextField(String(localized: "editor.field.find", bundle: .module, comment: "Find text field placeholder"), text: $findQuery)
                 .focused($findFieldFocused)
-            Button("Find Next") { findNext() }
+            Button(String(localized: "editor.button.findNext", bundle: .module, comment: "Find the next match")) { findNext() }
                 .disabled(findQuery.isEmpty)
 
             if showReplaceField {
-                TextField("Replace", text: $replaceQuery)
-                Button("Replace All") { replaceAll() }
+                TextField(String(localized: "editor.field.replace", bundle: .module, comment: "Replace text field placeholder"), text: $replaceQuery)
+                Button(String(localized: "editor.button.replaceAll", bundle: .module, comment: "Replace every match")) { replaceAll() }
                     .disabled(findQuery.isEmpty)
             }
 
             Spacer()
-            Button("Done") { showFindBar = false }
+            Button(String(localized: "editor.button.done", bundle: .module, comment: "Close the find/replace bar")) { showFindBar = false }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
@@ -169,7 +169,10 @@ public struct EditorWindow: View {
 
     private var statusBar: some View {
         HStack {
-            Text(viewModel.fileURL.lastPathComponent + (viewModel.isDirty ? " (edited)" : ""))
+            Text(
+                viewModel.fileURL.lastPathComponent
+                    + (viewModel.isDirty ? String(localized: "editor.status.editedSuffix", bundle: .module, comment: "Appended to the file name in the status bar when there are unsaved changes") : "")
+            )
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .foregroundStyle(.red)

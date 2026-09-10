@@ -107,3 +107,20 @@
 "viewer.button.find.help" = "Localizar (⌘F)";
 "viewer.field.search" = "Pesquisar";
 "viewer.search.matchCount" = "%1$d correspondências";
+
+/* EditorWindow.swift (T19) */
+"editor.button.cut.help" = "Cortar";
+"editor.button.copy.help" = "Copiar";
+"editor.button.paste.help" = "Colar";
+"editor.button.undo.help" = "Desfazer";
+"editor.button.redo.help" = "Refazer";
+"editor.button.selectAll.help" = "Selecionar Tudo (⌘A)";
+"editor.button.save.help" = "Guardar (⌘S)";
+"editor.button.find.help" = "Localizar (⌘F)";
+"editor.button.findReplace.help" = "Localizar e Substituir (⌥⌘F)";
+"editor.field.find" = "Localizar";
+"editor.button.findNext" = "Localizar Seguinte";
+"editor.field.replace" = "Substituir";
+"editor.button.replaceAll" = "Substituir Tudo";
+"editor.button.done" = "Concluído";
+"editor.status.editedSuffix" = " (editado)";

@@ -640,6 +640,18 @@ updating. `swift test`: 318 passed, 0 failed.
 **Tests**: none / update existing (`EditorWindowViewModel` tests exist - check for literal-text assertions)
 **Gate**: full
 
+**Confirmed**: 15 keys extracted (9 toolbar button tooltips, 2 find/replace text fields,
+3 find/replace buttons, 1 status-bar "(edited)" dirty-indicator suffix). Keyboard-shortcut
+glyphs inside the tooltip strings (⌘A, ⌘S, ⌘F, ⌥⌘F) stay unchanged, matching precedent
+from `BookmarksView`/`UserMenuView`. `EditorWindowViewModelTests` asserts only ViewModel
+state (`content`, `errorMessage`, etc.), never view body text - confirmed by inspection,
+none needed updating. `swift test`: 318 passed, 0 failed;
+`swift test --filter LocalizationCoverageTests`: all 9 target×language pairs pass key-set
+parity, confirming every key added across T13-T19 is present and translated in all 4
+`MCGuiUI` `.lproj` tables.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T20: Extract `AppCommands.swift` (native menu bar)
