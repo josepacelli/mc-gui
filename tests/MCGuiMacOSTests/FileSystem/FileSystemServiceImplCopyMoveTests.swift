@@ -211,6 +211,75 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(try String(contentsOf: renamedDestURL, encoding: .utf8) == "new-content")
     }
 
+    // MARK: - progress reporting and cancellation (FO-14, FO-16)
+
+    @Test("copy(_:onProgress:) reports one snapshot per source, in order, with the running byte total")
+    func copyWithProgressReportsOneSnapshotPerSource() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        try writeFile(named: "a.txt", content: "1234", in: srcDir)
+        try writeFile(named: "b.txt", content: "12345678", in: srcDir)
+
+        let service = FileSystemServiceImpl()
+        let sources = try await service.listDirectory(srcDir).sorted { $0.name < $1.name }
+
+        // `onProgress` is called synchronously, in order, from within `copy`'s own loop -
+        // no concurrency to guard against, so a plain class is enough to record calls.
+        let recorder = ProgressRecorder()
+        let result = try await service.copy(
+            plan(sources: sources, destination: dstDir, mode: .copy),
+            onProgress: { recorder.snapshots.append($0) }
+        )
+
+        #expect(result.success)
+        #expect(result.processedCount == 2)
+        #expect(recorder.snapshots.count == 2)
+        #expect(recorder.snapshots.map(\.currentFile) == ["a.txt", "b.txt"])
+        #expect(recorder.snapshots.map(\.bytesTransferred) == [4, 12])
+        #expect(recorder.snapshots.allSatisfy { $0.totalBytes == 12 })
+    }
+
+    @Test("cancelling the calling Task stops copy(_:onProgress:) before processing every source")
+    func copyWithProgressStopsOnCancellation() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        try writeFile(named: "a.txt", content: "1", in: srcDir)
+        try writeFile(named: "b.txt", content: "2", in: srcDir)
+
+        let service = FileSystemServiceImpl()
+        let sources = try await service.listDirectory(srcDir).sorted { $0.name < $1.name }
+
+        let task = Task {
+            try await service.copy(
+                plan(sources: sources, destination: dstDir, mode: .copy),
+                onProgress: { _ in }
+            )
+        }
+        task.cancel()
+
+        do {
+            _ = try await task.value
+            Issue.record("Expected CancellationError to be thrown")
+        } catch is CancellationError {
+            // expected - checkCancellation() fires before the first source is processed
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+
+        #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("a.txt").path) == false)
+        #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("b.txt").path) == false)
+    }
+
     // MARK: - EBUSY-simulated retry
 
     @Test("copy retries a transient EBUSY failure and succeeds once the file is free")
@@ -305,4 +374,9 @@ struct FileSystemServiceImplCopyMoveTests {
 private final class CallRecorder {
     var copyCalls = 0
     var moveCalls = 0
+}
+
+/// Records `onProgress` snapshots in call order - see the "progress reporting" tests.
+private final class ProgressRecorder {
+    var snapshots: [OperationProgress] = []
 }

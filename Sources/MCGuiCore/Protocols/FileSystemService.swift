@@ -30,7 +30,42 @@ public protocol FileSystemService {
 
     func move(_ plan: CopyMovePlan) async throws -> OperationResult
 
+    // FO-14, FO-16: progress-reporting variants `PanelView`'s `ProgressDialog` consumes -
+    // `onProgress` is called once per source processed, and cancelling the enclosing
+    // `Task` (checked between sources) aborts the operation. Default implementations
+    // below fall back to a single before/after snapshot for conformers that don't
+    // override them; `FileSystemServiceImpl` overrides both with real per-file progress.
+    func copy(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult
+
+    func move(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult
+
     func trash(_ urls: [URL]) async throws -> OperationResult
 
     func getVolumes() -> [VolumeInfo]
+}
+
+public extension FileSystemService {
+    func copy(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
+        let result = try await copy(plan)
+        onProgress(Self.finalProgress(for: plan))
+        return result
+    }
+
+    func move(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
+        let result = try await move(plan)
+        onProgress(Self.finalProgress(for: plan))
+        return result
+    }
+
+    private static func finalProgress(for plan: CopyMovePlan) -> OperationProgress {
+        let totalBytes = plan.sources.reduce(Int64(0)) { $0 + $1.size }
+        return OperationProgress(
+            currentFile: plan.sources.last?.name ?? "",
+            totalFiles: plan.sources.count,
+            bytesTransferred: totalBytes,
+            totalBytes: totalBytes,
+            speed: 0,
+            eta: 0
+        )
+    }
 }

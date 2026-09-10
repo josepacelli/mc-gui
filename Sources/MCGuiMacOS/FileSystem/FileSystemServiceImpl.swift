@@ -130,29 +130,42 @@ public final class FileSystemServiceImpl {
 
     // MARK: - copy
 
-    /// Copies `plan.sources` into `plan.destinationDirectory`.
+    /// Copies `plan.sources` into `plan.destinationDirectory`, reporting no progress.
+    public func copy(_ plan: CopyMovePlan) async throws -> OperationResult {
+        try await copy(plan, onProgress: { _ in })
+    }
+
+    /// Copies `plan.sources` into `plan.destinationDirectory`, calling `onProgress` once
+    /// per source processed (FO-14) and checking for cancellation between sources
+    /// (FO-16) - cancelling the calling `Task` throws `CancellationError` at the next
+    /// source boundary, leaving already-copied files in place (matches the spec's "stops"
+    /// behavior; it does not roll back completed files).
     ///
     /// Conflict handling (FO-06/FO-07): with `updateOnly == false` an existing
     /// destination entry is always overwritten; with `updateOnly == true` it is
     /// overwritten only when the source is newer, otherwise skipped. Renaming
     /// (FO-08) and cancelling (FO-09) are resolved upstream, before the plan reaches
     /// this method - `plan.sources`/`destinationDirectory` already reflect that choice.
-    public func copy(_ plan: CopyMovePlan) async throws -> OperationResult {
+    public func copy(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
         try ensureSufficientSpace(for: plan)
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
+        let progress = OperationProgressTracker(sources: plan.sources)
 
         for source in plan.sources {
+            try Task.checkCancellation()
             let destination = plan.destinationDirectory.appendingPathComponent(plan.renames[source.id] ?? source.name)
             do {
                 if try resolveExistingDestination(source: source, destination: destination, options: plan.options) == .skip {
                     processedCount += 1
+                    onProgress(progress.recordProcessed(source))
                     continue
                 }
 
                 try await copySingleFile(source, to: destination, options: plan.options)
                 processedCount += 1
+                onProgress(progress.recordProcessed(source))
             } catch {
                 failedItems.append(FailedItem(path: source.path.path, reason: describe(error)))
             }
@@ -168,19 +181,28 @@ public final class FileSystemServiceImpl {
 
     // MARK: - move
 
-    /// Moves `plan.sources` into `plan.destinationDirectory`: renames within the same
-    /// volume, copies then deletes the original across volumes (FO-04).
+    /// Moves `plan.sources` into `plan.destinationDirectory`, reporting no progress.
     public func move(_ plan: CopyMovePlan) async throws -> OperationResult {
+        try await move(plan, onProgress: { _ in })
+    }
+
+    /// Moves `plan.sources` into `plan.destinationDirectory`: renames within the same
+    /// volume, copies then deletes the original across volumes (FO-04). Reports progress
+    /// and checks cancellation the same way `copy(_:onProgress:)` does (FO-14, FO-16).
+    public func move(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
         try ensureSufficientSpace(for: plan)
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
+        let progress = OperationProgressTracker(sources: plan.sources)
 
         for source in plan.sources {
+            try Task.checkCancellation()
             let destination = plan.destinationDirectory.appendingPathComponent(plan.renames[source.id] ?? source.name)
             do {
                 if try resolveExistingDestination(source: source, destination: destination, options: plan.options) == .skip {
                     processedCount += 1
+                    onProgress(progress.recordProcessed(source))
                     continue
                 }
 
@@ -193,6 +215,7 @@ public final class FileSystemServiceImpl {
                     try fileManager.removeItem(at: source.path)
                 }
                 processedCount += 1
+                onProgress(progress.recordProcessed(source))
             } catch {
                 failedItems.append(FailedItem(path: source.path.path, reason: describe(error)))
             }
@@ -334,3 +357,42 @@ public final class FileSystemServiceImpl {
 }
 
 extension FileSystemServiceImpl: FileSystemService {}
+
+/// Accumulates copy/move progress across sources for the `onProgress` callback (FO-14):
+/// running byte total, elapsed-time-based transfer speed, and a simple remaining-bytes /
+/// speed ETA. A small reference type (not a struct) so `recordProcessed` can update
+/// running totals without `copy`/`move` needing a mutable local var passed around.
+final class OperationProgressTracker {
+    private let totalFiles: Int
+    private let totalBytes: Int64
+    private let startTime: Date
+    private let now: () -> Date
+    private var bytesTransferred: Int64 = 0
+
+    /// - Parameter now: injectable clock (defaults to the real `Date()`) so tests can
+    ///   control elapsed time deterministically instead of racing a wall clock.
+    init(sources: [FileEntry], now: @escaping () -> Date = Date.init) {
+        totalFiles = sources.count
+        totalBytes = sources.reduce(Int64(0)) { $0 + ($1.type == .directory ? 0 : $1.size) }
+        self.now = now
+        startTime = now()
+    }
+
+    /// Records `source` as processed and returns the resulting `OperationProgress`
+    /// snapshot. `speed`/`eta` are `0` until any time has elapsed since construction.
+    func recordProcessed(_ source: FileEntry) -> OperationProgress {
+        bytesTransferred += source.type == .directory ? 0 : source.size
+        let elapsed = now().timeIntervalSince(startTime)
+        let speed = elapsed > 0 ? Double(bytesTransferred) / elapsed : 0
+        let remainingBytes = totalBytes - bytesTransferred
+        let eta = speed > 0 ? Double(remainingBytes) / speed : 0
+        return OperationProgress(
+            currentFile: source.name,
+            totalFiles: totalFiles,
+            bytesTransferred: bytesTransferred,
+            totalBytes: totalBytes,
+            speed: speed,
+            eta: eta
+        )
+    }
+}

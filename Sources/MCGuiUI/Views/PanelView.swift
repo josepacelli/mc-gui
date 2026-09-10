@@ -35,6 +35,11 @@ public struct PanelView: View {
     @State private var mkdirViewModel: MkdirDialogViewModel?
     @State private var deleteViewModel: DeleteConfirmDialogViewModel?
     @State private var operationErrorMessage: String?
+    // FO-14, FO-16: shown while a copy/move batch (post-conflict-resolution) is running;
+    // `operationTask` is the actual running copy/move, cancelled by the dialog's Cancel
+    // button via `ProgressDialogViewModel.onCancel`.
+    @State private var progressViewModel: ProgressDialogViewModel?
+    @State private var operationTask: Task<OperationResult, Error>?
 
     public init(
         viewModel: PanelViewModel,
@@ -133,6 +138,11 @@ public struct PanelView: View {
         .sheet(isPresented: presented($conflictDialogViewModel)) {
             if let conflictDialogViewModel {
                 ConflictDialog(viewModel: conflictDialogViewModel)
+            }
+        }
+        .sheet(isPresented: presented($progressViewModel)) {
+            if let progressViewModel {
+                ProgressDialog(viewModel: progressViewModel)
             }
         }
         .sheet(isPresented: presented($mkdirViewModel)) {
@@ -344,6 +354,12 @@ public struct PanelView: View {
     private func handleEscape() {
         switch Self.escapeAction(hasOpenSheet: hasOpenSheet, filterText: viewModel.filterText, hasSelection: !selection.isEmpty) {
         case .dismissSheet:
+            if let progressViewModel {
+                // FO-16: an in-progress operation isn't just dismissed - Escape cancels
+                // it the same way the dialog's own Cancel button does, so the running
+                // Task actually stops instead of continuing headless.
+                progressViewModel.cancel()
+            }
             conflictDialogViewModel = nil
             copyMoveViewModel = nil
             mkdirViewModel = nil
@@ -358,7 +374,8 @@ public struct PanelView: View {
     }
 
     private var hasOpenSheet: Bool {
-        conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil || deleteViewModel != nil
+        conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil
+            || deleteViewModel != nil || progressViewModel != nil
     }
 
     /// FO-05..FO-09: resolves every destination-name conflict (one dialog at a time) before
@@ -399,16 +416,43 @@ public struct PanelView: View {
                 options: dialogViewModel.options,
                 renames: renames
             )
-            do {
-                let result = dialogViewModel.mode == .copy
-                    ? try await fileSystemService.copy(plan)
-                    : try await fileSystemService.move(plan)
-                operationErrorMessage = Self.fo15Message(from: result)
-            } catch {
-                operationErrorMessage = error.localizedDescription
-            }
+            await runWithProgress(plan, mode: dialogViewModel.mode)
             await viewModel.load()
         }
+    }
+
+    /// FO-14, FO-16: runs `plan` through `fileSystemService`'s progress-reporting
+    /// copy/move, showing `ProgressDialog` for the duration and wiring its Cancel button
+    /// to `operationTask.cancel()`. `fileSystemService.copy`/`move` check for cancellation
+    /// between sources (`FileSystemServiceImpl`) - already-processed files stay in place.
+    private func runWithProgress(_ plan: CopyMovePlan, mode: OperationMode) async {
+        var continuation: AsyncStream<OperationProgress>.Continuation!
+        let stream = AsyncStream<OperationProgress> { continuation = $0 }
+
+        let task = Task<OperationResult, Error> {
+            defer { continuation.finish() }
+            return mode == .copy
+                ? try await fileSystemService.copy(plan, onProgress: { continuation.yield($0) })
+                : try await fileSystemService.move(plan, onProgress: { continuation.yield($0) })
+        }
+        operationTask = task
+
+        let progressViewModel = ProgressDialogViewModel(onCancel: { task.cancel() })
+        self.progressViewModel = progressViewModel
+        async let consuming: Void = progressViewModel.consume(stream)
+
+        do {
+            let result = try await task.value
+            operationErrorMessage = Self.fo15Message(from: result)
+        } catch is CancellationError {
+            // FO-16: cancelled by the user - not a failure to surface as an error.
+        } catch {
+            operationErrorMessage = error.localizedDescription
+        }
+
+        await consuming
+        operationTask = nil
+        self.progressViewModel = nil
     }
 
     /// Presents `ConflictDialog` for `destinationPath` and suspends until the user picks
