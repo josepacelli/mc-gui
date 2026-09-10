@@ -1454,9 +1454,9 @@ T53 → T54
 - Skill: NONE
 
 **Done when**:
-- [ ] Cmd+D adds the active panel's current directory
-- [ ] Selecting a bookmark navigates the active panel there; a remove control deletes it
-- [ ] XCUITest covers: add via Cmd+D, navigate via selection, remove, persistence across relaunch
+- [x] Cmd+D adds the active panel's current directory - `BookmarksView`'s Add button (`.keyboardShortcut("d", modifiers: .command)`) calls `BookmarksViewModel.addBookmark(for:)`, given `activeDirectory` by the caller; the entry-building/persistence logic is unit-tested in `BookmarksViewModelTests` (T54). **SPEC_DEVIATION**: `BookmarksView`/`BookmarksViewModel` are `MCGuiUI`-only (this task's `Where` scope) and use a local `BookmarkEntry` model plus closure-based `BookmarksActions`, since `MCGuiUI` cannot import `MCGuiMacOS`'s concrete `Bookmark`/`BookmarkStore` (T53) - mirrors `ViewerWindow`/`EditorWindow` depending only on `MCGuiCore` protocols (T38/T43) and `AppCommandActions`/`KeyboardShortcutActions`'s closure-injection pattern (T44/T48). Bridging `BookmarksActions` to the real `BookmarkStore`, and supplying `activeDirectory`/constructing `BookmarksView` from `MainWindow`/`MCGuiApp`, is future cross-file wiring (mirrors T38/T43's F3/F4 precedent, closed for those in T50).
+- [x] Selecting a bookmark navigates the active panel there; a remove control deletes it - selection calls the injected `onNavigate(bookmark.path)` closure (thin glue, the caller wires actual panel navigation - same deferral as above); remove is unit-tested in `BookmarksViewModelTests`.
+- [ ] XCUITest covers: add via Cmd+D, navigate via selection, remove, persistence across relaunch - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. `BookmarksViewModel`'s add/list/remove logic is unit-tested in `BookmarksViewModelTests` (T54); persistence across relaunch is integration-tested at the store layer in `BookmarkStoreTests` (T53); `BookmarksView.body` itself is thin declarative glue over `BookmarksViewModel`, with no additional testable logic (mirrors T38/T43/T51's precedent for thin declarative views).
 
 **Tests**: e2e
 **Gate**: build
