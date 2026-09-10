@@ -107,7 +107,12 @@ O `mc-gui` hoje roda apenas via `dotnet run`/publish manual — não há um arte
 
 **Acceptance Criteria**:
 
-1. The workflow SHALL run on `macos` runners, check out the repo, install .NET, and execute the same `packaging/build-macos.sh`. <!-- ubiquitous -->
+1. The workflow SHALL run on `macos` runners, check out the repo, and execute the same `packaging/build-macos.sh`. <!-- ubiquitous -->
+   <!-- Updated post-AD-002 (STATE.md): the app is now Swift/SwiftUI (Swift Package
+   Manager), not .NET/Avalonia - `macos-14` runners ship Xcode/Swift preinstalled, so
+   there is no separate toolchain-install step anymore (there was a `Setup .NET` step
+   when this AC was written). `packaging/build-macos.sh` itself was updated to
+   `swift build -c release` instead of `dotnet publish`. -->
 2. WHEN the workflow finishes successfully THEN it SHALL upload the produced `.dmg` as a build artifact. <!-- event-driven -->
 3. WHEN the workflow runs on a git tag THEN it SHALL attach the `.dmg` to a GitHub Release. <!-- event-driven -->
 
