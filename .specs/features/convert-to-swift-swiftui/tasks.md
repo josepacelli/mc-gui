@@ -1431,8 +1431,8 @@ T53 → T54
 - Skill: NONE
 
 **Done when**:
-- [ ] Add/remove/list persist to `~/Library/Application Support/MCGui/bookmarks.json`
-- [ ] Integration tests cover: add+persist+reload, remove, corrupt-file recovery to empty list
+- [x] Add/remove/list persist to `~/Library/Application Support/MCGui/bookmarks.json`
+- [x] Integration tests cover: add+persist+reload, remove, corrupt-file recovery to empty list
 
 **Tests**: integration
 **Gate**: full

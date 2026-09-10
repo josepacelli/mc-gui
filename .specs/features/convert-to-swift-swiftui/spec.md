@@ -404,10 +404,10 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | SF-02 | P2: Search/Filter | Execute | Verified |
 | SF-03 | P2: Search/Filter | Execute | Verified |
 | SF-04 | P2: Search/Filter | Execute | Verified |
-| BM-01 | P3: Bookmarks | Design | Pending |
+| BM-01 | P3: Bookmarks | Execute | Implementing |
 | BM-02 | P3: Bookmarks | Design | Pending |
-| BM-03 | P3: Bookmarks | Design | Pending |
-| BM-04 | P3: Bookmarks | Design | Pending |
+| BM-03 | P3: Bookmarks | Execute | Implementing |
+| BM-04 | P3: Bookmarks | Execute | Implementing |
 
 **Coverage:** 93 total, 92 mapped to tasks, 1 unmapped to a task's `Requirement` field (FS-06) - functionally covered as of T50 (Cmd+Up in `AppCommands`' Go menu, wired to real parent-directory navigation in `AppEntry`), though no task explicitly cites it. VL-01 stays `Implementing` (not `Verified`) per T51's SPEC_DEVIATION: volumes are listed in `MainWindow`'s own `Menu("Go")` control (this task's `Where` scope), not the literal AppKit menu-bar Go menu (`AppCommands.swift`/`AppEntry.swift`, Phase 11, out of scope) - closing that gap is future cross-file work.
 
