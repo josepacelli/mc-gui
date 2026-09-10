@@ -1242,8 +1242,8 @@ T46 → T47
 - Skill: NONE
 
 **Done when**:
-- [ ] Defaults to System; persists across relaunch via `@AppStorage`
-- [ ] Unit tests cover default value and persistence round-trip (via `UserDefaults` suite injection)
+- [x] Defaults to System; persists across relaunch via `@AppStorage`
+- [x] Unit tests cover default value and persistence round-trip (via `UserDefaults` suite injection)
 
 **Tests**: unit
 **Gate**: quick
