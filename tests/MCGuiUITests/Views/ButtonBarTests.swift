@@ -21,8 +21,9 @@ struct ButtonBarTests {
         }
     }
 
-    @Test("buttons 3-8 map to the matching PanelAction (CL-05)")
+    @Test("buttons 2-8 map to the matching PanelAction (CL-05)")
     func actionForNumberMapsPanelKeys() {
+        #expect(ButtonBar.action(for: 2) == .userMenu)
         #expect(ButtonBar.action(for: 3) == .view)
         #expect(ButtonBar.action(for: 4) == .edit)
         #expect(ButtonBar.action(for: 5) == .copy)
@@ -31,20 +32,17 @@ struct ButtonBarTests {
         #expect(ButtonBar.action(for: 8) == .delete)
     }
 
-    @Test("buttons 1, 2, 9, 10 have no PanelAction")
+    @Test("buttons 1, 9, 10 have no PanelAction")
     func actionForNumberNilForUnimplementedAndQuit() {
         #expect(ButtonBar.action(for: 1) == nil)
-        #expect(ButtonBar.action(for: 2) == nil)
         #expect(ButtonBar.action(for: 9) == nil)
         #expect(ButtonBar.action(for: 10) == nil)
     }
 
-    @Test("buttons 1, 2, 9 are disabled; the rest are not (CL-07)")
+    @Test("only button 9 is disabled (CL-07)")
     func isDisabledMatchesUnimplementedButtons() {
-        for number in [1, 2, 9] {
-            #expect(ButtonBar.isDisabled(number))
-        }
-        for number in [3, 4, 5, 6, 7, 8, 10] {
+        #expect(ButtonBar.isDisabled(9))
+        for number in [1, 2, 3, 4, 5, 6, 7, 8, 10] {
             #expect(!ButtonBar.isDisabled(number))
         }
     }

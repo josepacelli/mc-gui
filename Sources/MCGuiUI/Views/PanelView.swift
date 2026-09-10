@@ -27,6 +27,12 @@ public struct PanelView: View {
     // which can create a real standalone `NSWindow`, lives in `MCGuiApp`, unreachable
     // from here).
     public var onShowProgress: (ProgressDialogViewModel) -> Void
+    // F1: opens the (context-free, singleton) Help window - mirrors `onViewFile`/
+    // `onEditFile`/`onShowProgress`. Not a `PanelAction` since it needs no panel context.
+    public var onHelp: () -> Void
+    // F2: opens the User Menu with this panel's current context (%f/%d/%D) - routed
+    // through `PanelAction.userMenu`/`perform` like F3-F8, see `beginUserMenu`.
+    public var onUserMenu: (UserMenuContext) -> Void
     // classic-layout-parity CL-05: lets an outside caller (`MainWindow`, routing
     // `ButtonBar`/`TopBar` clicks for whichever panel is active) trigger the same F3-F8
     // handling physical key presses already run below - see `PanelAction`.
@@ -65,6 +71,8 @@ public struct PanelView: View {
         onViewFile: @escaping (FileEntry) -> Void = { _ in },
         onEditFile: @escaping (FileEntry) -> Void = { _ in },
         onShowProgress: @escaping (ProgressDialogViewModel) -> Void = { _ in },
+        onHelp: @escaping () -> Void = {},
+        onUserMenu: @escaping (UserMenuContext) -> Void = { _ in },
         pendingAction: Binding<PanelAction?> = .constant(nil),
         otherPanelPath: URL? = nil
     ) {
@@ -74,6 +82,8 @@ public struct PanelView: View {
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
         self.onShowProgress = onShowProgress
+        self.onHelp = onHelp
+        self.onUserMenu = onUserMenu
         self.pendingAction = pendingAction
         self.otherPanelPath = otherPanelPath
     }
@@ -83,6 +93,8 @@ public struct PanelView: View {
     // NSF3FunctionKey..NSF8FunctionKey are AppKit's Unicode private-use-area scalars for
     // the physical F3-F8 keys; SwiftUI's `KeyEquivalent` has no dedicated function-key
     // constants, so this is the standard technique for binding to them via `.onKeyPress`.
+    private static let f1Key = KeyEquivalent(Character(UnicodeScalar(NSF1FunctionKey)!))
+    private static let f2Key = KeyEquivalent(Character(UnicodeScalar(NSF2FunctionKey)!))
     private static let f3Key = KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!))
     private static let f4Key = KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!))
     private static let f5Key = KeyEquivalent(Character(UnicodeScalar(NSF5FunctionKey)!))
@@ -212,7 +224,7 @@ public struct PanelView: View {
             if focused { onActivate() }
         }
         .modifier(PanelPrimaryKeys(
-            functionKeys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key],
+            functionKeys: [Self.f1Key, Self.f2Key, Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key],
             onFunctionKey: handleFunctionKey,
             onReturn: activateSelected,
             onBackspace: navigateToParent
@@ -263,6 +275,11 @@ public struct PanelView: View {
     }
 
     private func handleFunctionKey(_ key: KeyEquivalent) {
+        // F1 is not a PanelAction (it needs no panel context - see onHelp's doc comment).
+        if key.character == Self.f1Key.character {
+            onHelp()
+            return
+        }
         guard let action = Self.action(forKey: key) else { return }
         perform(action)
     }
@@ -277,9 +294,11 @@ public struct PanelView: View {
         return true
     }
 
-    /// Maps a physical F3-F8 key press to the `PanelAction` it triggers.
+    /// Maps a physical F2-F8 key press to the `PanelAction` it triggers (F1 is handled
+    /// separately in `handleFunctionKey` - it isn't a `PanelAction`).
     static func action(forKey key: KeyEquivalent) -> PanelAction? {
         switch key.character {
+        case Self.f2Key.character: return .userMenu
         case Self.f3Key.character: return .view
         case Self.f4Key.character: return .edit
         case Self.f5Key.character: return .copy
@@ -290,7 +309,7 @@ public struct PanelView: View {
         }
     }
 
-    /// Runs `action` through the same handlers physical F3-F8 already use (CL-05) -
+    /// Runs `action` through the same handlers physical F2-F8 already use (CL-05) -
     /// shared by `handleFunctionKey` and the `pendingAction` binding.
     private func perform(_ action: PanelAction) {
         switch action {
@@ -300,7 +319,20 @@ public struct PanelView: View {
         case .move: beginCopyOrMove(.move)
         case .mkdir: beginMkdir()
         case .delete: beginDelete()
+        case .userMenu: beginUserMenu()
         }
+    }
+
+    /// F2: opens the User Menu with this panel's current context - the first selected
+    /// entry's path (`%f`, `nil` when nothing is selected - the command author decides
+    /// whether that's fine), this panel's current directory (`%d`), and the other
+    /// panel's (`%D`).
+    private func beginUserMenu() {
+        onUserMenu(UserMenuContext(
+            currentFile: selectedEntries.first?.path,
+            currentDir: viewModel.currentPath,
+            otherDir: otherPanelPath ?? viewModel.currentPath
+        ))
     }
 
     /// F3: opens the viewer on the first selected entry (FV-01). A no-op with nothing

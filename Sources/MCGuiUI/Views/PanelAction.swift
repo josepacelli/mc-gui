@@ -14,4 +14,8 @@ public enum PanelAction: Equatable, Sendable {
     case move
     case mkdir
     case delete
+    // F2: opens the User Menu with this panel's current context (%f/%d/%D) - unlike the
+    // others, it doesn't need a selection precondition or dialog of its own; PanelView
+    // just computes the context and forwards it via `onUserMenu`.
+    case userMenu
 }

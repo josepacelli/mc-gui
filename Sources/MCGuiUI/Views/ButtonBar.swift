@@ -4,19 +4,21 @@ import SwiftUI
 /// reproducing the original terminal mc's `WButtonBar` (`lib/widget/buttonbar.c`):
 /// 1 Help, 2 Menu, 3 View, 4 Edit, 5 Copy, 6 RenMov, 7 Mkdir, 8 Delete, 9 PullDn, 10 Quit.
 ///
-/// Buttons 3-8 forward through `onAction`, which the caller (`MainWindow`) routes into
-/// the active panel's `pendingAction` binding - the same path physical F3-F8 already use
-/// inside `PanelView`. Button 10 calls `onQuit` directly. Buttons 1, 2, and 9 have no
-/// backing implementation yet (SPEC_DEVIATION: F1 has no Help viewer, F2 has no user
-/// menu, F9 has no programmatic way to open a SwiftUI `Menu` - matches STATE.md's
-/// existing accepted Known Limitations for the same three keys), so they render
-/// disabled instead of silently doing nothing on click (CL-07).
+/// Buttons 2-8 forward through `onAction`, which the caller (`MainWindow`) routes into
+/// the active panel's `pendingAction` binding - the same path physical F2-F8 already use
+/// inside `PanelView` (button 2 maps to `PanelAction.userMenu`). Button 1 calls `onHelp`
+/// directly (not a `PanelAction` - it needs no panel context). Button 10 calls `onQuit`
+/// directly. Button 9 still has no backing implementation (SPEC_DEVIATION: no
+/// programmatic way to open a SwiftUI `Menu` to pull down the `TopBar` - matches
+/// STATE.md's accepted Known Limitation for this one key), so it renders disabled.
 public struct ButtonBar: View {
     public var onAction: (PanelAction) -> Void
+    public var onHelp: () -> Void
     public var onQuit: () -> Void
 
-    public init(onAction: @escaping (PanelAction) -> Void, onQuit: @escaping () -> Void) {
+    public init(onAction: @escaping (PanelAction) -> Void, onHelp: @escaping () -> Void = {}, onQuit: @escaping () -> Void) {
         self.onAction = onAction
+        self.onHelp = onHelp
         self.onQuit = onQuit
     }
 
@@ -49,16 +51,19 @@ public struct ButtonBar: View {
     private func handle(_ number: Int) {
         if let action = Self.action(for: number) {
             onAction(action)
+        } else if number == 1 {
+            onHelp()
         } else if number == 10 {
             onQuit()
         }
     }
 
-    /// Maps a button number to the `PanelAction` it triggers (CL-05). `nil` for 1/2/9
-    /// (no implementation, CL-07) and for 10 (Quit routes through `onQuit`, not a
-    /// `PanelAction`, since it isn't panel-scoped).
+    /// Maps a button number to the `PanelAction` it triggers (CL-05). `nil` for 1 (Help
+    /// routes through `onHelp`, not a `PanelAction`, since it isn't panel-scoped), 9 (no
+    /// implementation, CL-07), and 10 (Quit routes through `onQuit`).
     static func action(for number: Int) -> PanelAction? {
         switch number {
+        case 2: return .userMenu
         case 3: return .view
         case 4: return .edit
         case 5: return .copy
@@ -71,6 +76,6 @@ public struct ButtonBar: View {
 
     /// Buttons with no backing implementation (CL-07).
     static func isDisabled(_ number: Int) -> Bool {
-        [1, 2, 9].contains(number)
+        [9].contains(number)
     }
 }

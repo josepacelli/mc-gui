@@ -84,6 +84,7 @@ public struct TopBar: View {
                 Button("Forward") { onGoForwardActive() }
                 Divider()
                 Button("Bookmarks…") { onOpenBookmarks() }
+                Button("User Menu…") { onFileAction(.userMenu) }
             }
 
             Menu("Options") {

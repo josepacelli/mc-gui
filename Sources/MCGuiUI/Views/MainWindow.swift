@@ -36,6 +36,11 @@ public struct MainWindow: View {
     // FO-14: forwarded from PanelView's own onShowProgress (see that type) - presents
     // copy/move progress as an independent, non-modal window instead of a blocking sheet.
     public var onShowProgress: (ProgressDialogViewModel) -> Void
+    // F1: forwarded from PanelView's own onHelp - opens the (singleton) Help window.
+    public var onShowHelp: () -> Void
+    // F2: forwarded from PanelView's own onUserMenu - opens the User Menu window with
+    // that panel's current context.
+    public var onShowUserMenu: (UserMenuContext) -> Void
     // BM-01..04: constructed by `MCGuiApp` (real `BookmarkStore`-backed `BookmarksActions`,
     // mirroring the `onViewFile`/`onEditFile` cross-target bridge above) - `MainWindow`
     // only presents it, it never talks to `MCGuiMacOS` directly.
@@ -58,12 +63,16 @@ public struct MainWindow: View {
         onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
         onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
         onShowProgress: @escaping (ProgressDialogViewModel) -> Void = { _ in },
+        onShowHelp: @escaping () -> Void = {},
+        onShowUserMenu: @escaping (UserMenuContext) -> Void = { _ in },
         bookmarksViewModel: BookmarksViewModel
     ) {
         self.viewModel = viewModel
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
         self.onShowProgress = onShowProgress
+        self.onShowHelp = onShowHelp
+        self.onShowUserMenu = onShowUserMenu
         self.bookmarksViewModel = bookmarksViewModel
         _volumesListViewModel = State(initialValue: VolumesListViewModel(fileSystemService: viewModel.leftPanel.fileSystemService))
     }
@@ -107,6 +116,8 @@ public struct MainWindow: View {
                     onViewFile: { entry in onViewFile(entry, .left) },
                     onEditFile: { entry in onEditFile(entry, .left) },
                     onShowProgress: onShowProgress,
+                    onHelp: onShowHelp,
+                    onUserMenu: onShowUserMenu,
                     pendingAction: Binding(
                         get: { viewModel.leftPendingAction },
                         set: { viewModel.leftPendingAction = $0 }
@@ -120,6 +131,8 @@ public struct MainWindow: View {
                     onViewFile: { entry in onViewFile(entry, .right) },
                     onEditFile: { entry in onEditFile(entry, .right) },
                     onShowProgress: onShowProgress,
+                    onHelp: onShowHelp,
+                    onUserMenu: onShowUserMenu,
                     pendingAction: Binding(
                         get: { viewModel.rightPendingAction },
                         set: { viewModel.rightPendingAction = $0 }
@@ -130,7 +143,7 @@ public struct MainWindow: View {
 
             Divider()
             // classic-layout-parity CL-03..CL-07: bottom F1-F10 button row.
-            ButtonBar(onAction: viewModel.triggerActivePanel, onQuit: { NSApp.terminate(nil) })
+            ButtonBar(onAction: viewModel.triggerActivePanel, onHelp: onShowHelp, onQuit: { NSApp.terminate(nil) })
         }
         .onAppear { volumesListViewModel.refresh() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in

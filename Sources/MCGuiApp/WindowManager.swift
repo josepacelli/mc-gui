@@ -21,6 +21,13 @@ public final class WindowManager {
     private var viewerWindows: [NSWindow] = []
     private var editorWindows: [NSWindow] = []
     private var progressWindows: [NSWindow] = []
+    private var userMenuWindows: [NSWindow] = []
+    // F1: a singleton, unlike the arrays above - reopening Help should refocus the one
+    // that's already there, not accumulate duplicates. `helpWindowCloseObserver` keeps
+    // the delegate (see `WindowCloseObserver` below) alive for as long as the window is
+    // open - `NSWindow.delegate` is weak, so nothing else would.
+    private var helpWindow: NSWindow?
+    private var helpWindowCloseObserver: WindowCloseObserver?
 
     public init() {}
 
@@ -32,7 +39,8 @@ public final class WindowManager {
         viewModel: MainWindowViewModel,
         onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
         onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
-        bookmarksViewModel: BookmarksViewModel
+        bookmarksViewModel: BookmarksViewModel,
+        userMenuViewModel: UserMenuViewModel
     ) {
         mainViewModel = viewModel
 
@@ -46,6 +54,8 @@ public final class WindowManager {
             onViewFile: onViewFile,
             onEditFile: onEditFile,
             onShowProgress: { [weak self] progressViewModel in self?.showProgress(progressViewModel) },
+            onShowHelp: { [weak self] in self?.showHelp() },
+            onShowUserMenu: { [weak self] context in self?.showUserMenu(viewModel: userMenuViewModel, context: context) },
             bookmarksViewModel: bookmarksViewModel
         )
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
@@ -133,6 +143,41 @@ public final class WindowManager {
         progressWindows.append(window)
     }
 
+    /// F1: shows the (singleton) Help window, creating it on first call and refocusing it
+    /// on any later call - unlike `showViewer`/`showEditor`/`showUserMenu`, there's only
+    /// ever one, and it has no per-call context to make a fresh window meaningful.
+    public func showHelp() {
+        if let helpWindow {
+            helpWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+
+        let window = NSWindow(contentViewController: NSHostingController(rootView: HelpWindow()))
+        window.title = "Help"
+        window.styleMask = [.titled, .closable, .resizable, .miniaturizable]
+        window.setContentSize(NSSize(width: 480, height: 520))
+        let observer = WindowCloseObserver { [weak self] in self?.helpWindow = nil }
+        window.delegate = observer
+        helpWindowCloseObserver = observer
+        window.makeKeyAndOrderFront(nil)
+        helpWindow = window
+    }
+
+    /// F2: opens a fresh User Menu window bound to `viewModel` (the app-lifetime instance
+    /// `AppDelegate` owns, so item add/remove persists across separate F2 presses) and
+    /// `context` (that specific press's active-panel state) - unlike Help, always a new
+    /// window, since a stale open one would show the wrong %f/%d/%D context.
+    public func showUserMenu(viewModel: UserMenuViewModel, context: UserMenuContext) {
+        let content = UserMenuView(viewModel: viewModel, context: context)
+            .frame(minWidth: 420, minHeight: 320)
+        let window = NSWindow(contentViewController: NSHostingController(rootView: content))
+        window.title = "User Menu"
+        window.styleMask = [.titled, .closable, .resizable, .miniaturizable]
+        window.setContentSize(NSSize(width: 460, height: 360))
+        window.makeKeyAndOrderFront(nil)
+        userMenuWindows.append(window)
+    }
+
     /// Brings the most recently opened viewer window to the front (Window menu > Viewer,
     /// MB-06). A no-op when no viewer is open.
     public func bringViewerToFront() {
@@ -148,5 +193,22 @@ public final class WindowManager {
     private func closeWindow(_ window: NSWindow, from keyPath: ReferenceWritableKeyPath<WindowManager, [NSWindow]>) {
         self[keyPath: keyPath].removeAll { $0 === window }
         window.close()
+    }
+}
+
+/// Runs `onClose` when its window closes for *any* reason, including the native red
+/// close-button (unlike `ViewerWindow`/`EditorWindow`'s `onClose`/`onClosed` closures,
+/// which only fire from a keypress inside their own SwiftUI content). Used for
+/// `WindowManager.showHelp`'s singleton tracking, where a stale reference to an
+/// already-closed window would silently break re-showing it on the next F1 press.
+private final class WindowCloseObserver: NSObject, NSWindowDelegate {
+    private let onClose: () -> Void
+
+    init(onClose: @escaping () -> Void) {
+        self.onClose = onClose
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        onClose()
     }
 }

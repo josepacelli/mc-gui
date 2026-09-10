@@ -43,6 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let windowManager = WindowManager()
     private let mainViewModel: MainWindowViewModel
     private let bookmarksViewModel: BookmarksViewModel
+    private let userMenuViewModel: UserMenuViewModel
     // VL-01, VL-04: the native Go menu's volume list, refreshed on mount/unmount -
     // mirrors `MainWindow`'s own `VolumesListViewModel`, duplicated here because this
     // class (not a View) has no access to that one's `@State` instance.
@@ -64,6 +65,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             list: { try await bookmarkStore.list().map { BookmarkEntry(id: $0.id, name: $0.name, path: $0.path) } },
             add: { entry in try await bookmarkStore.add(Bookmark(id: entry.id, name: entry.name, path: entry.path)) },
             remove: { id in try await bookmarkStore.remove(id: id) }
+        ))
+        // F2: same bridging pattern as Bookmarks above, plus `run` shelling out via
+        // UserMenuRunner (MCGuiMacOS) - MCGuiUI never touches Process directly.
+        let userMenuStore = UserMenuStore()
+        userMenuViewModel = UserMenuViewModel(actions: UserMenuActions(
+            list: { try await userMenuStore.list().map { UserMenuEntry(id: $0.id, label: $0.label, command: $0.command) } },
+            add: { entry in try await userMenuStore.add(UserMenuItem(id: entry.id, label: entry.label, command: entry.command)) },
+            remove: { id in try await userMenuStore.remove(id: id) },
+            run: { entry, context in
+                let result = await UserMenuRunner.run(
+                    command: entry.command,
+                    currentFile: context.currentFile,
+                    currentDir: context.currentDir,
+                    otherDir: context.otherDir
+                )
+                return UserMenuRunResult(output: result.output, exitCode: result.exitCode)
+            }
         ))
         super.init()
         volumes = fileSystemService.getVolumes()
@@ -124,7 +142,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 Task { await mainViewModel.activePanelViewModel.load(volume.mountPoint) }
             },
             showViewerWindow: { [windowManager] in windowManager.bringViewerToFront() },
-            showEditorWindow: { [windowManager] in windowManager.bringEditorToFront() }
+            showEditorWindow: { [windowManager] in windowManager.bringEditorToFront() },
+            showHelp: { [windowManager] in windowManager.showHelp() }
         )
     }
 
@@ -133,7 +152,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             viewModel: mainViewModel,
             onViewFile: { [windowManager] entry, side in windowManager.showViewer(for: entry, panel: side) },
             onEditFile: { [windowManager] entry, _ in windowManager.showEditor(for: entry) },
-            bookmarksViewModel: bookmarksViewModel
+            bookmarksViewModel: bookmarksViewModel,
+            userMenuViewModel: userMenuViewModel
         )
     }
 

@@ -152,8 +152,9 @@ struct PanelViewFileOperationsTests {
         KeyEquivalent(Character(UnicodeScalar(scalar)!))
     }
 
-    @Test("action(forKey:) maps F3-F8 to the matching PanelAction")
+    @Test("action(forKey:) maps F2-F8 to the matching PanelAction")
     func actionForKeyMapsFunctionKeys() {
+        #expect(PanelView.action(forKey: Self.key(NSF2FunctionKey)) == .userMenu)
         #expect(PanelView.action(forKey: Self.key(NSF3FunctionKey)) == .view)
         #expect(PanelView.action(forKey: Self.key(NSF4FunctionKey)) == .edit)
         #expect(PanelView.action(forKey: Self.key(NSF5FunctionKey)) == .copy)

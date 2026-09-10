@@ -33,6 +33,8 @@ public struct AppCommandActions {
     public var goToVolume: (VolumeInfo) -> Void
     public var showViewerWindow: () -> Void
     public var showEditorWindow: () -> Void
+    // MB-01: opens the F1 Help window.
+    public var showHelp: () -> Void
 
     public init(
         view: @escaping () -> Void = {},
@@ -54,7 +56,8 @@ public struct AppCommandActions {
         goComputer: @escaping () -> Void = {},
         goToVolume: @escaping (VolumeInfo) -> Void = { _ in },
         showViewerWindow: @escaping () -> Void = {},
-        showEditorWindow: @escaping () -> Void = {}
+        showEditorWindow: @escaping () -> Void = {},
+        showHelp: @escaping () -> Void = {}
     ) {
         self.view = view
         self.edit = edit
@@ -76,6 +79,7 @@ public struct AppCommandActions {
         self.goToVolume = goToVolume
         self.showViewerWindow = showViewerWindow
         self.showEditorWindow = showEditorWindow
+        self.showHelp = showHelp
     }
 }
 
@@ -178,9 +182,11 @@ public struct AppCommands: Commands {
             Button("Editor") { actions.showEditorWindow() }
         }
 
-        // MB-01: Help menu (presence only - spec.md defines no specific Help content).
+        // MB-01: Help menu - opens the F1 Help window. No .keyboardShortcut(.f1...) here:
+        // PanelView already binds the physical F1 key directly (same caution as Cmd+[/]
+        // above - a second registration risks an ambiguous/duplicate firing).
         CommandMenu("Help") {
-            Button("MCGui Help") {}
+            Button("Midnight Commander Help") { actions.showHelp() }
         }
     }
 
