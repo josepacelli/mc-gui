@@ -848,12 +848,26 @@ to set each of the 4 System Languages and confirm visually per spec.md's Indepen
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] `swift build && swift test` passes (full suite)
-- [ ] DMG built, `.bundle` dirs mechanically confirmed present
+- [x] `swift build && swift test` passes (full suite)
+- [x] DMG built, `.bundle` dirs mechanically confirmed present
 - [ ] User has confirmed at least Portuguese (Brazil) and one other language visually in the installed app
 
 **Tests**: none (mechanical + user UAT)
 **Gate**: build
+
+**Confirmed**: `./packaging/build-macos.sh 0.1.0` succeeded end-to-end (release build,
+icon generation, `.app` assembly, resource-bundle copy, `plutil` bundle verification,
+DMG creation - `artifacts/mc-gui-0.1.0-arm64.dmg`). `find ".../Contents/Resources"
+-name "*.bundle"` confirms all 3 (`MCGui_MCGuiUI.bundle`, `MCGui_MCGuiMacOS.bundle`,
+`MCGui_MCGuiApp.bundle`); each bundle additionally confirmed to carry all 4 `.lproj`
+language directories (`en`, `es`, `pt-br`, `pt-pt` - lowercased region subtags, matching
+T1/T5's confirmed SPM resource-processing behavior). `swift build && swift test`: 318
+passed, 0 failed. The remaining checkbox (visual confirmation of each language in the
+installed app, System Language switching) requires interactive macOS access this agent
+does not have - left for the user, per this task's own scope note and design.md's
+Success Criteria.
+
+**Status**: ✅ Complete (mechanical portion) - visual UAT pending, owned by the user
 
 ---
 
