@@ -98,3 +98,12 @@
 "userMenu.button.remove.help" = "Remove";
 "userMenu.result.noOutput" = "(no output)";
 "userMenu.result.exitCode" = "Exit code: %1$d";
+
+/* ViewerWindow.swift (T18) */
+"viewer.mode.text" = "Text";
+"viewer.mode.image" = "Image";
+"viewer.mode.hex" = "Hex";
+"viewer.picker.mode" = "Mode";
+"viewer.button.find.help" = "Find (⌘F)";
+"viewer.field.search" = "Search";
+"viewer.search.matchCount" = "%1$d matches";

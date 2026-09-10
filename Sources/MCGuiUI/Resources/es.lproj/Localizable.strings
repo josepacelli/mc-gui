@@ -98,3 +98,12 @@
 "userMenu.button.remove.help" = "Quitar";
 "userMenu.result.noOutput" = "(sin salida)";
 "userMenu.result.exitCode" = "Código de Salida: %1$d";
+
+/* ViewerWindow.swift (T18) */
+"viewer.mode.text" = "Texto";
+"viewer.mode.image" = "Imagen";
+"viewer.mode.hex" = "Hex";
+"viewer.picker.mode" = "Modo";
+"viewer.button.find.help" = "Buscar (⌘F)";
+"viewer.field.search" = "Buscar";
+"viewer.search.matchCount" = "%1$d coincidencias";

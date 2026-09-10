@@ -612,6 +612,18 @@ strings. `item.label`/`item.command` (the user's own menu entries) stay untransl
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 7 keys extracted (3 mode names, the Mode picker's accessibility label,
+Find tooltip, Search field placeholder, parameterized match-count). Added a small
+`Self.modeLabel(_:)` helper so the toolbar's Picker segments and the status bar's mode
+indicator both read from the same 3 keys instead of duplicating them - the status bar
+previously derived its text from `viewModel.mode.rawValue.capitalized` (hardcoded English
+"text"/"image"/"hex"), which is now replaced with the localized lookup. `initialURL.
+lastPathComponent` (the viewed file's name) stays untranslated - it's the file being
+browsed, not app UI. No existing test asserted this file's view text - none needed
+updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T19: Extract `EditorWindow.swift`

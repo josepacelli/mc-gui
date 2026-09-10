@@ -56,14 +56,26 @@ public struct ViewerWindow: View {
         .task { await viewModel.load(initialURL) }
     }
 
+    // MARK: - localized labels (I18N-01..04)
+
+    /// Localized mode name, shared between the toolbar's segmented Picker and the status
+    /// bar so both surfaces read the same translated word for the same mode.
+    private static func modeLabel(_ mode: ViewerMode) -> String {
+        switch mode {
+        case .text: return String(localized: "viewer.mode.text", bundle: .module, comment: "Text viewer mode")
+        case .image: return String(localized: "viewer.mode.image", bundle: .module, comment: "Image viewer mode")
+        case .hex: return String(localized: "viewer.mode.hex", bundle: .module, comment: "Hex viewer mode")
+        }
+    }
+
     // MARK: - toolbar: mode tabs (FV-01)
 
     private var toolbar: some View {
         HStack {
-            Picker("Mode", selection: modeBinding) {
-                Text("Text").tag(ViewerMode.text)
-                Text("Image").tag(ViewerMode.image)
-                Text("Hex").tag(ViewerMode.hex)
+            Picker(String(localized: "viewer.picker.mode", bundle: .module, comment: "Mode picker's accessibility/VoiceOver label"), selection: modeBinding) {
+                Text(Self.modeLabel(.text)).tag(ViewerMode.text)
+                Text(Self.modeLabel(.image)).tag(ViewerMode.image)
+                Text(Self.modeLabel(.hex)).tag(ViewerMode.hex)
             }
             .pickerStyle(.segmented)
             .frame(maxWidth: 240)
@@ -76,7 +88,7 @@ public struct ViewerWindow: View {
                 Image(systemName: "magnifyingglass")
             }
             .keyboardShortcut("f", modifiers: .command)
-            .help("Find (⌘F)")
+            .help(String(localized: "viewer.button.find.help", bundle: .module, comment: "Find button tooltip (⌘F unchanged)"))
         }
         .padding(8)
     }
@@ -91,12 +103,21 @@ public struct ViewerWindow: View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
-            TextField("Search", text: searchQueryBinding)
+            TextField(String(localized: "viewer.field.search", bundle: .module, comment: "Search text field placeholder"), text: searchQueryBinding)
                 .focused($searchFieldFocused)
             if !viewModel.searchMatches.isEmpty {
-                Text("\(viewModel.searchMatches.count) matches")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Text(
+                    String(
+                        format: NSLocalizedString(
+                            "viewer.search.matchCount",
+                            bundle: .module,
+                            comment: "Number of search matches found. %1$d is the match count."
+                        ),
+                        viewModel.searchMatches.count
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal, 8)
@@ -193,7 +214,7 @@ public struct ViewerWindow: View {
         HStack {
             Text(initialURL.lastPathComponent)
             Spacer()
-            Text(viewModel.mode.rawValue.capitalized)
+            Text(Self.modeLabel(viewModel.mode))
                 .foregroundStyle(.secondary)
         }
         .font(.caption)
