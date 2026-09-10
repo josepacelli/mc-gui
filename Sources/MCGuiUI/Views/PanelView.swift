@@ -67,8 +67,24 @@ public struct PanelView: View {
         viewModel.entries.filter { selection.contains($0.id) }
     }
 
+    private var selectedDisplayEntries: [FileEntry] {
+        displayEntries.filter { selection.contains($0.id) }
+    }
+
     private var displayedErrorMessage: String? {
         operationErrorMessage ?? viewModel.errorMessage
+    }
+
+    /// The rows the `List` actually shows (FS-04, FS-05, KN-11): a synthetic ".." entry
+    /// first (`nil` at the filesystem root, where there is no parent to go up to),
+    /// followed by `viewModel.entries`. Kept separate from `viewModel.entries` itself so
+    /// counts/selection/file-operation logic elsewhere (footer count, F5-F8) stay exactly
+    /// as before - ".." is a display/navigation-only concept.
+    private var displayEntries: [FileEntry] {
+        if let parentEntry = Self.parentEntry(for: viewModel.currentPath) {
+            return [parentEntry] + viewModel.entries
+        }
+        return viewModel.entries
     }
 
     public var body: some View {
@@ -76,11 +92,12 @@ public struct PanelView: View {
             header
 
             ZStack {
-                List(viewModel.entries, selection: $selection) { entry in
+                List(displayEntries, selection: $selection) { entry in
                     FileRow(entry: entry)
                         .contextMenu {
                             Text(entry.name)
                         }
+                        .onTapGesture(count: 2) { activate(entry) }
                 }
                 .focusable()
                 .focused($isFocused)
@@ -90,6 +107,21 @@ public struct PanelView: View {
                 .onTapGesture { onActivate() }
                 .onKeyPress(keys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key]) { press in
                     handleFunctionKey(press.key)
+                    return .handled
+                }
+                // FS-04, KN-11: Enter navigates into the selected directory (or the ".."
+                // entry) / opens the selected file. Mirrors F3/F4's existing "first
+                // selected entry, no-op when empty" precedent.
+                .onKeyPress(.return) {
+                    guard let entry = Self.targetEntry(selection: selectedDisplayEntries) else { return .ignored }
+                    activate(entry)
+                    return .handled
+                }
+                // FS-05: Backspace always navigates to the parent directory, independent
+                // of selection - mirrors Cmd+Up's existing `navigateToParent` behavior
+                // (AppCommandActions).
+                .onKeyPress(.delete) {
+                    navigateToParent()
                     return .handled
                 }
 
@@ -251,6 +283,25 @@ public struct PanelView: View {
         )
     }
 
+    /// Runs `entry`'s double-click/Enter activation (FS-04, KN-11): navigates into a
+    /// directory (the ".." entry included - it's just a `FileEntry` whose `path` is the
+    /// parent), or opens a file in the viewer (F3's default, the safer of view/edit for
+    /// an implicit "open" trigger the spec doesn't disambiguate further).
+    private func activate(_ entry: FileEntry) {
+        switch Self.activationResult(for: entry) {
+        case .navigate(let target):
+            Task { await viewModel.load(target) }
+        case .view(let file):
+            onViewFile(file)
+        }
+    }
+
+    /// FS-05: Backspace navigates to the parent directory unconditionally (no selection
+    /// precondition), mirroring `AppCommandActions.navigateToParent`.
+    private func navigateToParent() {
+        Task { await viewModel.load(viewModel.currentPath.deletingLastPathComponent()) }
+    }
+
     private func performCopyMove(_ dialogViewModel: CopyMoveDialogViewModel) async {
         copyMoveViewModel = nil
         let plan = CopyMovePlan(
@@ -271,6 +322,44 @@ public struct PanelView: View {
     }
 
     // MARK: - Pure helpers (unit-tested; the body above is thin declarative glue)
+
+    /// What double-click/Enter (`activate`) does with `entry` (FS-04, KN-11): a directory
+    /// (the ".." entry included, since it's just a directory whose path is the parent)
+    /// navigates there; anything else opens in the viewer.
+    enum ActivationResult: Equatable {
+        case navigate(URL)
+        case view(FileEntry)
+    }
+
+    static func activationResult(for entry: FileEntry) -> ActivationResult {
+        entry.type == .directory ? .navigate(entry.path) : .view(entry)
+    }
+
+    /// A fixed identity for the synthetic ".." row so `List`'s diffing treats it as the
+    /// same row across every re-render (a fresh `UUID()` per computed-property evaluation
+    /// would make `List`/`selection` treat it as a new row each time).
+    static let parentEntryID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+
+    /// Builds the synthetic ".." row for `currentPath` (FS-05, KN-11), or `nil` at the
+    /// filesystem root, where `deletingLastPathComponent()` returns the same path and
+    /// there is nothing to go up to.
+    static func parentEntry(for currentPath: URL) -> FileEntry? {
+        let parent = currentPath.deletingLastPathComponent()
+        guard parent.path != currentPath.path else { return nil }
+        return FileEntry(
+            id: parentEntryID,
+            name: "..",
+            path: parent,
+            size: 0,
+            creationDate: .distantPast,
+            modificationDate: .distantPast,
+            permissions: [],
+            type: .directory,
+            isHidden: false,
+            isSymlink: false,
+            symlinkTarget: nil
+        )
+    }
 
     /// The entry F3/F4 should act on (FV-01, ED-01): the first selected entry, or `nil`
     /// when nothing is selected - F3/F4 with an empty selection is a no-op, mirroring

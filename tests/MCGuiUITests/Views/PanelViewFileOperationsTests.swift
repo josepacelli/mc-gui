@@ -166,4 +166,48 @@ struct PanelViewFileOperationsTests {
     func actionForKeyNilForUnrelatedKey() {
         #expect(PanelView.action(forKey: "a") == nil)
     }
+
+    // MARK: - parentEntry(for:) (FS-05, KN-11 - the synthetic ".." row)
+
+    @Test("parentEntry returns a '..' entry pointing at the parent directory")
+    func parentEntryPointsAtParent() {
+        let current = URL(fileURLWithPath: "/Users/pacelli/Documents")
+
+        let entry = PanelView.parentEntry(for: current)
+
+        #expect(entry?.name == "..")
+        #expect(entry?.path == URL(fileURLWithPath: "/Users/pacelli"))
+        #expect(entry?.type == .directory)
+        #expect(entry?.id == PanelView.parentEntryID)
+    }
+
+    @Test("parentEntry returns nil at the filesystem root (nothing to go up to)")
+    func parentEntryNilAtRoot() {
+        let root = URL(fileURLWithPath: "/")
+
+        #expect(PanelView.parentEntry(for: root) == nil)
+    }
+
+    // MARK: - activationResult(for:) (FS-04, KN-11 - double-click/Enter)
+
+    @Test("activationResult for a directory navigates to its path")
+    func activationResultDirectoryNavigates() {
+        let directory = makeTestEntry(name: "Documents", type: .directory)
+
+        #expect(PanelView.activationResult(for: directory) == .navigate(directory.path))
+    }
+
+    @Test("activationResult for the '..' entry navigates to its (parent) path")
+    func activationResultParentEntryNavigates() {
+        let parent = PanelView.parentEntry(for: URL(fileURLWithPath: "/Users/pacelli/Documents"))!
+
+        #expect(PanelView.activationResult(for: parent) == .navigate(parent.path))
+    }
+
+    @Test("activationResult for a file opens it in the viewer")
+    func activationResultFileViews() {
+        let file = makeTestEntry(name: "a.txt", type: .file)
+
+        #expect(PanelView.activationResult(for: file) == .view(file))
+    }
 }
