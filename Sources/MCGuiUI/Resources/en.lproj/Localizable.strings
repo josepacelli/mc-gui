@@ -1,2 +1,5 @@
-/* Placeholder key confirming Bundle.module resource resolution (T1). Replaced by real UI keys starting in Phase 2. */
-"app.placeholder" = "placeholder";
+/* PanelView.swift (T6) */
+"panel.footer.fileCount" = "%1$d files";
+"panel.footer.selectionCount" = "%1$d of %2$d selected";
+"panel.operationFailure.single" = "%1$@: %2$@";
+"panel.operationFailure.multiple" = "%1$@: %2$@ (+%3$d more)";

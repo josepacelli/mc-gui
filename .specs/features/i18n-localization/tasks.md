@@ -275,12 +275,22 @@ with `String(localized:)`/`NSLocalizedString`+`String(format:)` lookups; add the
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] Every real UI string in the file (excluding SF Symbol names/format specifiers) is a localized lookup
-- [ ] Any existing test asserting the old literal English text is updated (behavior-focused, not text-focused, or pinned to the en table)
-- [ ] `swift test` passes
+- [x] Every real UI string in the file (excluding SF Symbol names/format specifiers) is a localized lookup
+- [x] Any existing test asserting the old literal English text is updated (behavior-focused, not text-focused, or pinned to the en table)
+- [x] `swift test` passes
 
 **Tests**: none (view glue, per matrix) - but update any existing test broken by the change, in this same task
 **Gate**: full
+
+**Confirmed**: 4 keys extracted (`panel.footer.fileCount`, `panel.footer.selectionCount`,
+`panel.operationFailure.single`, `panel.operationFailure.multiple`), all parameterized
+(`String(format:)` + `NSLocalizedString`). `entry.name` (context menu) and
+`viewModel.currentPath.path` (header) are file paths/user data, not UI text - left as-is
+per Out of Scope. No existing test asserted the old literal text (`fo15Message` tests use
+`.contains()` on path/reason substrings only) - none needed updating. `swift test`: 318
+passed, 0 failed (was 311).
+
+**Status**: ✅ Complete
 
 ---
 

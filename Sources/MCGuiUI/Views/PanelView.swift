@@ -269,9 +269,27 @@ public struct PanelView: View {
     private var footer: some View {
         HStack {
             if selection.isEmpty {
-                Text("\(viewModel.entries.count) files")
+                Text(
+                    String(
+                        format: NSLocalizedString(
+                            "panel.footer.fileCount",
+                            bundle: .module,
+                            comment: "Panel footer: total entry count when nothing is selected. %1$d is the count."
+                        ),
+                        viewModel.entries.count
+                    )
+                )
             } else {
-                Text("\(selection.count) of \(viewModel.entries.count) selected")
+                Text(
+                    String(
+                        format: NSLocalizedString(
+                            "panel.footer.selectionCount",
+                            bundle: .module,
+                            comment: "Panel footer: selected-of-total count. %1$d is the selected count, %2$d is the total count."
+                        ),
+                        selection.count, viewModel.entries.count
+                    )
+                )
             }
             Spacer()
         }
@@ -728,9 +746,23 @@ public struct PanelView: View {
     static func fo15Message(from result: OperationResult) -> String? {
         guard !result.success, let firstFailure = result.failedItems.first else { return nil }
         if result.failedItems.count == 1 {
-            return "\(firstFailure.path): \(firstFailure.reason)"
+            return String(
+                format: NSLocalizedString(
+                    "panel.operationFailure.single",
+                    bundle: .module,
+                    comment: "FO-15: single file-operation failure. %1$@ is the file path, %2$@ is the failure reason."
+                ),
+                firstFailure.path, firstFailure.reason
+            )
         }
-        return "\(firstFailure.path): \(firstFailure.reason) (+\(result.failedItems.count - 1) more)"
+        return String(
+            format: NSLocalizedString(
+                "panel.operationFailure.multiple",
+                bundle: .module,
+                comment: "FO-15: multiple file-operation failures. %1$@ is the first failing file's path, %2$@ is its failure reason, %3$d is the count of additional failures."
+            ),
+            firstFailure.path, firstFailure.reason, result.failedItems.count - 1
+        )
     }
 }
 
