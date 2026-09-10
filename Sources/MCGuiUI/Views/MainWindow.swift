@@ -39,13 +39,16 @@ public struct MainWindow: View {
     // no direct reference between the two views needed.
     @AppStorage(ThemePreference.storageKey) private var themePreference: ThemePreference = .system
 
-    // SPEC_DEVIATION (T51): VL-01 asks for volumes in "the Go menu" - the app's actual
-    // AppKit menu bar Go menu lives in `AppCommands.swift`/`AppEntry.swift` (Phase 11,
-    // already-committed, out of this task's `Where` scope: `MainWindow.swift` only). The
-    // `Menu("Go")` control below is the quick-access "Go" menu this task's scope can
-    // deliver; wiring live volumes into the real menu-bar Go menu is future cross-file
-    // work. The sidebar below independently satisfies VL-02's "sidebar or toolbar" wording.
+    // classic-layout-parity AD-004/CL-13/CL-14: the former VolumesSidebar is removed to
+    // match the original terminal app's layout; `volumesListViewModel` now only feeds the
+    // in-window `TopBar`'s Left/Right menus (CL-02).
     @State private var volumesListViewModel: VolumesListViewModel
+
+    // classic-layout-parity CL-05: which pending action (if any) each panel should run
+    // next, set by `ButtonBar`/`TopBar`'s File menu for whichever panel is active and
+    // consumed by that `PanelView` via its `pendingAction` binding.
+    @State private var leftPendingAction: PanelAction?
+    @State private var rightPendingAction: PanelAction?
 
     public init(
         viewModel: MainWindowViewModel,
@@ -60,36 +63,43 @@ public struct MainWindow: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Menu("Go") {
-                    ForEach(volumesListViewModel.volumes) { volume in
-                        Button(volume.name) { navigateActivePanel(to: volume) }
-                    }
-                }
-                .disabled(volumesListViewModel.volumes.isEmpty)
-                Spacer()
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            // classic-layout-parity CL-01..CL-02: in-window Left|File|Command|Options|Right
+            // bar, alongside (not instead of) the native macOS menu bar (AD-004).
+            TopBar(
+                leftVolumes: volumesListViewModel.volumes,
+                rightVolumes: volumesListViewModel.volumes,
+                onSelectLeftVolume: { volume in Task { await viewModel.leftPanel.load(volume.mountPoint) } },
+                onSelectRightVolume: { volume in Task { await viewModel.rightPanel.load(volume.mountPoint) } },
+                onRescanLeft: { Task { await viewModel.leftPanel.load() } },
+                onRescanRight: { Task { await viewModel.rightPanel.load() } },
+                onFileAction: triggerActivePanel,
+                onRefreshActive: { Task { await viewModel.activePanelViewModel.load() } },
+                onToggleHiddenFiles: { viewModel.activePanelViewModel.showHidden.toggle() }
+            )
+            Divider()
 
             HSplitView {
-                VolumesSidebar(viewModel: volumesListViewModel, onSelect: navigateActivePanel)
-                    .frame(minWidth: 140, idealWidth: 180, maxWidth: 260)
                 PanelView(
                     viewModel: viewModel.leftPanel,
                     isActive: viewModel.activePanel == .left,
                     onActivate: { viewModel.activate(.left) },
                     onViewFile: { entry in onViewFile(entry, .left) },
-                    onEditFile: { entry in onEditFile(entry, .left) }
+                    onEditFile: { entry in onEditFile(entry, .left) },
+                    pendingAction: $leftPendingAction
                 )
                 PanelView(
                     viewModel: viewModel.rightPanel,
                     isActive: viewModel.activePanel == .right,
                     onActivate: { viewModel.activate(.right) },
                     onViewFile: { entry in onViewFile(entry, .right) },
-                    onEditFile: { entry in onEditFile(entry, .right) }
+                    onEditFile: { entry in onEditFile(entry, .right) },
+                    pendingAction: $rightPendingAction
                 )
             }
+
+            Divider()
+            // classic-layout-parity CL-03..CL-07: bottom F1-F10 button row.
+            ButtonBar(onAction: triggerActivePanel, onQuit: { NSApp.terminate(nil) })
         }
         .onAppear { volumesListViewModel.refresh() }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in
@@ -101,22 +111,12 @@ public struct MainWindow: View {
         .preferredColorScheme(themePreference.colorScheme)
     }
 
-    /// Navigates the active panel to `volume`'s root (VL-03).
-    private func navigateActivePanel(to volume: VolumeInfo) {
-        Task { await viewModel.activePanelViewModel.load(volume.mountPoint) }
-    }
-}
-
-/// Sidebar listing mounted volumes (VL-02); selecting one navigates the active panel to
-/// its root (VL-03).
-private struct VolumesSidebar: View {
-    let viewModel: VolumesListViewModel
-    let onSelect: (VolumeInfo) -> Void
-
-    var body: some View {
-        List(viewModel.volumes) { volume in
-            Button(volume.name) { onSelect(volume) }
-                .buttonStyle(.plain)
+    /// Routes a `ButtonBar`/`TopBar` File-menu action (CL-05) to whichever panel is
+    /// currently active, via that panel's `pendingAction` binding.
+    private func triggerActivePanel(_ action: PanelAction) {
+        switch viewModel.activePanel {
+        case .left: leftPendingAction = action
+        case .right: rightPendingAction = action
         }
     }
 }

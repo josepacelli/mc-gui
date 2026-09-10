@@ -20,6 +20,10 @@ public struct PanelView: View {
     // MCGuiApp) supply that behavior, mirroring `onActivate`'s existing pattern.
     public var onViewFile: (FileEntry) -> Void
     public var onEditFile: (FileEntry) -> Void
+    // classic-layout-parity CL-05: lets an outside caller (`MainWindow`, routing
+    // `ButtonBar`/`TopBar` clicks for whichever panel is active) trigger the same F3-F8
+    // handling physical key presses already run below - see `PanelAction`.
+    public var pendingAction: Binding<PanelAction?>
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
@@ -34,13 +38,15 @@ public struct PanelView: View {
         isActive: Bool,
         onActivate: @escaping () -> Void = {},
         onViewFile: @escaping (FileEntry) -> Void = { _ in },
-        onEditFile: @escaping (FileEntry) -> Void = { _ in }
+        onEditFile: @escaping (FileEntry) -> Void = { _ in },
+        pendingAction: Binding<PanelAction?> = .constant(nil)
     ) {
         self.viewModel = viewModel
         self.isActive = isActive
         self.onActivate = onActivate
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
+        self.pendingAction = pendingAction
     }
 
     // MARK: - F-key handling (FV-01, ED-01, FO-01, FO-02, FO-10, FO-12)
@@ -66,35 +72,46 @@ public struct PanelView: View {
     }
 
     public var body: some View {
-        ZStack {
-            List(viewModel.entries, selection: $selection) { entry in
-                FileRow(entry: entry)
-                    .contextMenu {
-                        Text(entry.name)
-                    }
-            }
-            .focusable()
-            .focused($isFocused)
-            .onChange(of: isFocused) { _, focused in
-                if focused { onActivate() }
-            }
-            .onTapGesture { onActivate() }
-            .onKeyPress(keys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key]) { press in
-                handleFunctionKey(press.key)
-                return .handled
+        VStack(spacing: 0) {
+            header
+
+            ZStack {
+                List(viewModel.entries, selection: $selection) { entry in
+                    FileRow(entry: entry)
+                        .contextMenu {
+                            Text(entry.name)
+                        }
+                }
+                .focusable()
+                .focused($isFocused)
+                .onChange(of: isFocused) { _, focused in
+                    if focused { onActivate() }
+                }
+                .onTapGesture { onActivate() }
+                .onKeyPress(keys: [Self.f3Key, Self.f4Key, Self.f5Key, Self.f6Key, Self.f7Key, Self.f8Key]) { press in
+                    handleFunctionKey(press.key)
+                    return .handled
+                }
+
+                if viewModel.isLoading {
+                    LoadingOverlay()
+                }
+
+                if let displayedErrorMessage {
+                    ErrorAlert(message: displayedErrorMessage)
+                }
             }
 
-            if viewModel.isLoading {
-                LoadingOverlay()
-            }
-
-            if let displayedErrorMessage {
-                ErrorAlert(message: displayedErrorMessage)
-            }
+            footer
         }
         .border(isActive ? Color.accentColor : Color.clear, width: 2)
         .task {
             await viewModel.load()
+        }
+        .onChange(of: pendingAction.wrappedValue) { _, newValue in
+            guard let newValue else { return }
+            perform(newValue)
+            pendingAction.wrappedValue = nil
         }
         .sheet(isPresented: presented($copyMoveViewModel)) {
             if let copyMoveViewModel {
@@ -128,19 +145,68 @@ public struct PanelView: View {
         }
     }
 
+    // MARK: - Classic chrome (classic-layout-parity CL-09..CL-12): header shows the
+    // current path, footer shows the entry count or, once something is selected, the
+    // selected count - mirrors the original terminal panel's title/status-line border.
+
+    private var header: some View {
+        Text(viewModel.currentPath.path)
+            .font(.system(.caption, design: .monospaced))
+            .lineLimit(1)
+            .truncationMode(.head)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(isActive ? Color.accentColor.opacity(0.25) : Color.gray.opacity(0.15))
+    }
+
+    private var footer: some View {
+        HStack {
+            if selection.isEmpty {
+                Text("\(viewModel.entries.count) files")
+            } else {
+                Text("\(selection.count) of \(viewModel.entries.count) selected")
+            }
+            Spacer()
+        }
+        .font(.caption2)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(Color.gray.opacity(0.1))
+    }
+
     private func presented<T>(_ binding: Binding<T?>) -> Binding<Bool> {
         Binding(get: { binding.wrappedValue != nil }, set: { if !$0 { binding.wrappedValue = nil } })
     }
 
     private func handleFunctionKey(_ key: KeyEquivalent) {
+        guard let action = Self.action(forKey: key) else { return }
+        perform(action)
+    }
+
+    /// Maps a physical F3-F8 key press to the `PanelAction` it triggers.
+    static func action(forKey key: KeyEquivalent) -> PanelAction? {
         switch key.character {
-        case Self.f3Key.character: beginView()
-        case Self.f4Key.character: beginEdit()
-        case Self.f5Key.character: beginCopyOrMove(.copy)
-        case Self.f6Key.character: beginCopyOrMove(.move)
-        case Self.f7Key.character: beginMkdir()
-        case Self.f8Key.character: beginDelete()
-        default: break
+        case Self.f3Key.character: return .view
+        case Self.f4Key.character: return .edit
+        case Self.f5Key.character: return .copy
+        case Self.f6Key.character: return .move
+        case Self.f7Key.character: return .mkdir
+        case Self.f8Key.character: return .delete
+        default: return nil
+        }
+    }
+
+    /// Runs `action` through the same handlers physical F3-F8 already use (CL-05) -
+    /// shared by `handleFunctionKey` and the `pendingAction` binding.
+    private func perform(_ action: PanelAction) {
+        switch action {
+        case .view: beginView()
+        case .edit: beginEdit()
+        case .copy: beginCopyOrMove(.copy)
+        case .move: beginCopyOrMove(.move)
+        case .mkdir: beginMkdir()
+        case .delete: beginDelete()
         }
     }
 

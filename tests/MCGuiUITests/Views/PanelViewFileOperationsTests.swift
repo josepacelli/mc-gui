@@ -1,4 +1,6 @@
 import Foundation
+import SwiftUI
+import AppKit
 import Testing
 @testable import MCGuiUI
 import MCGuiCore
@@ -141,5 +143,27 @@ struct PanelViewFileOperationsTests {
 
         #expect(message?.contains("/tmp/dest/a.txt") == true)
         #expect(message?.contains("insufficientDiskSpace") == true)
+    }
+
+    // MARK: - action(forKey:) (classic-layout-parity CL-05 - unifies physical F3-F8 with
+    // ButtonBar/TopBar's PanelAction dispatch)
+
+    private static func key(_ scalar: Int) -> KeyEquivalent {
+        KeyEquivalent(Character(UnicodeScalar(scalar)!))
+    }
+
+    @Test("action(forKey:) maps F3-F8 to the matching PanelAction")
+    func actionForKeyMapsFunctionKeys() {
+        #expect(PanelView.action(forKey: Self.key(NSF3FunctionKey)) == .view)
+        #expect(PanelView.action(forKey: Self.key(NSF4FunctionKey)) == .edit)
+        #expect(PanelView.action(forKey: Self.key(NSF5FunctionKey)) == .copy)
+        #expect(PanelView.action(forKey: Self.key(NSF6FunctionKey)) == .move)
+        #expect(PanelView.action(forKey: Self.key(NSF7FunctionKey)) == .mkdir)
+        #expect(PanelView.action(forKey: Self.key(NSF8FunctionKey)) == .delete)
+    }
+
+    @Test("action(forKey:) returns nil for an unrelated key")
+    func actionForKeyNilForUnrelatedKey() {
+        #expect(PanelView.action(forKey: "a") == nil)
     }
 }
