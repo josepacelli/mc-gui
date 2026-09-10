@@ -20,6 +20,7 @@ public final class WindowManager {
     private var mainViewModel: MainWindowViewModel?
     private var viewerWindows: [NSWindow] = []
     private var editorWindows: [NSWindow] = []
+    private var progressWindows: [NSWindow] = []
 
     public init() {}
 
@@ -44,6 +45,7 @@ public final class WindowManager {
             viewModel: viewModel,
             onViewFile: onViewFile,
             onEditFile: onEditFile,
+            onShowProgress: { [weak self] progressViewModel in self?.showProgress(progressViewModel) },
             bookmarksViewModel: bookmarksViewModel
         )
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
@@ -110,6 +112,25 @@ public final class WindowManager {
     public func showDialog<Content: View>(content: Content) {
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.makeKeyAndOrderFront(nil)
+    }
+
+    /// FO-14: presents a copy/move's progress as an independent, non-modal window (per
+    /// user request - it used to be a `.sheet` blocking the whole main window until the
+    /// operation finished). Closes itself once `progressViewModel.isCompleted` (success or
+    /// cancellation both end the underlying `AsyncStream`, so both reach this the same way).
+    public func showProgress(_ progressViewModel: ProgressDialogViewModel) {
+        var window: NSWindow!
+        let content = ProgressDialog(viewModel: progressViewModel)
+            .onChange(of: progressViewModel.isCompleted) { [weak self] _, completed in
+                if completed {
+                    self?.closeWindow(window, from: \.progressWindows)
+                }
+            }
+        window = NSWindow(contentViewController: NSHostingController(rootView: content))
+        window.title = "Copying…"
+        window.styleMask = [.titled, .closable]
+        window.makeKeyAndOrderFront(nil)
+        progressWindows.append(window)
     }
 
     /// Brings the most recently opened viewer window to the front (Window menu > Viewer,

@@ -20,6 +20,13 @@ public struct PanelView: View {
     // MCGuiApp) supply that behavior, mirroring `onActivate`'s existing pattern.
     public var onViewFile: (FileEntry) -> Void
     public var onEditFile: (FileEntry) -> Void
+    // FO-14: copy/move progress used to be a `.sheet` (modal - blocked interacting with
+    // this panel, effectively the whole window, until the operation finished). Per user
+    // request ("faça a cópia async"), it's now presented as an independent, non-modal
+    // window via this closure (mirrors `onViewFile`/`onEditFile` - `WindowManager`,
+    // which can create a real standalone `NSWindow`, lives in `MCGuiApp`, unreachable
+    // from here).
+    public var onShowProgress: (ProgressDialogViewModel) -> Void
     // classic-layout-parity CL-05: lets an outside caller (`MainWindow`, routing
     // `ButtonBar`/`TopBar` clicks for whichever panel is active) trigger the same F3-F8
     // handling physical key presses already run below - see `PanelAction`.
@@ -45,10 +52,10 @@ public struct PanelView: View {
     @State private var mkdirViewModel: MkdirDialogViewModel?
     @State private var deleteViewModel: DeleteConfirmDialogViewModel?
     @State private var operationErrorMessage: String?
-    // FO-14, FO-16: shown while a copy/move batch (post-conflict-resolution) is running;
-    // `operationTask` is the actual running copy/move, cancelled by the dialog's Cancel
-    // button via `ProgressDialogViewModel.onCancel`.
-    @State private var progressViewModel: ProgressDialogViewModel?
+    // FO-14, FO-16: the actual running copy/move batch (post-conflict-resolution), so a
+    // second F5/F6 press can't start a concurrent operation on the same panel, and so its
+    // dialog's Cancel button (via `ProgressDialogViewModel.onCancel`) has something to
+    // cancel.
     @State private var operationTask: Task<OperationResult, Error>?
 
     public init(
@@ -57,6 +64,7 @@ public struct PanelView: View {
         onActivate: @escaping () -> Void = {},
         onViewFile: @escaping (FileEntry) -> Void = { _ in },
         onEditFile: @escaping (FileEntry) -> Void = { _ in },
+        onShowProgress: @escaping (ProgressDialogViewModel) -> Void = { _ in },
         pendingAction: Binding<PanelAction?> = .constant(nil),
         otherPanelPath: URL? = nil
     ) {
@@ -65,6 +73,7 @@ public struct PanelView: View {
         self.onActivate = onActivate
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
+        self.onShowProgress = onShowProgress
         self.pendingAction = pendingAction
         self.otherPanelPath = otherPanelPath
     }
@@ -150,11 +159,6 @@ public struct PanelView: View {
         .sheet(isPresented: presented($conflictDialogViewModel)) {
             if let conflictDialogViewModel {
                 ConflictDialog(viewModel: conflictDialogViewModel)
-            }
-        }
-        .sheet(isPresented: presented($progressViewModel)) {
-            if let progressViewModel {
-                ProgressDialog(viewModel: progressViewModel)
             }
         }
         .sheet(isPresented: presented($mkdirViewModel)) {
@@ -314,6 +318,10 @@ public struct PanelView: View {
     }
 
     private func beginCopyOrMove(_ mode: OperationMode) {
+        // Progress is a non-modal window now, so - unlike before - the user really can
+        // press F5/F6 again while one is still running on this panel; refuse rather than
+        // race a second `operationTask` into the same @State slot.
+        guard operationTask == nil else { return }
         operationErrorMessage = nil
         // FO-01, FO-02: defaults to the *other* panel's current directory (the classic
         // dual-pane default) via `otherPanelPath`, falling back to this panel's own path
@@ -403,16 +411,12 @@ public struct PanelView: View {
         selection = PanelCommands.invertSelection(selection, entries: viewModel.entries)
     }
 
-    /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state.
+    /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state. Progress
+    /// is no longer part of this - it's a non-modal window now (`onShowProgress`), with
+    /// its own Cancel button; Escape on the panel has nothing to dismiss for it anymore.
     private func handleEscape() {
         switch Self.escapeAction(hasOpenSheet: hasOpenSheet, filterText: viewModel.filterText, hasSelection: !selection.isEmpty) {
         case .dismissSheet:
-            if let progressViewModel {
-                // FO-16: an in-progress operation isn't just dismissed - Escape cancels
-                // it the same way the dialog's own Cancel button does, so the running
-                // Task actually stops instead of continuing headless.
-                progressViewModel.cancel()
-            }
             conflictDialogViewModel = nil
             copyMoveViewModel = nil
             mkdirViewModel = nil
@@ -427,8 +431,7 @@ public struct PanelView: View {
     }
 
     private var hasOpenSheet: Bool {
-        conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil
-            || deleteViewModel != nil || progressViewModel != nil
+        conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil || deleteViewModel != nil
     }
 
     /// FO-05..FO-09: resolves every destination-name conflict (one dialog at a time) before
@@ -475,9 +478,11 @@ public struct PanelView: View {
     }
 
     /// FO-14, FO-16: runs `plan` through `fileSystemService`'s progress-reporting
-    /// copy/move, showing `ProgressDialog` for the duration and wiring its Cancel button
-    /// to `operationTask.cancel()`. `fileSystemService.copy`/`move` check for cancellation
-    /// between sources (`FileSystemServiceImpl`) - already-processed files stay in place.
+    /// copy/move. Per user request, progress is presented as an independent, non-modal
+    /// window (`onShowProgress`) instead of a blocking sheet, so the rest of the app stays
+    /// usable while it runs - its Cancel button wires to `operationTask.cancel()`, and
+    /// `fileSystemService.copy`/`move` check for cancellation between sources
+    /// (`FileSystemServiceImpl`) - already-processed files stay in place.
     private func runWithProgress(_ plan: CopyMovePlan, mode: OperationMode) async {
         var continuation: AsyncStream<OperationProgress>.Continuation!
         let stream = AsyncStream<OperationProgress> { continuation = $0 }
@@ -491,7 +496,7 @@ public struct PanelView: View {
         operationTask = task
 
         let progressViewModel = ProgressDialogViewModel(onCancel: { task.cancel() })
-        self.progressViewModel = progressViewModel
+        onShowProgress(progressViewModel)
         async let consuming: Void = progressViewModel.consume(stream)
 
         do {
@@ -505,7 +510,6 @@ public struct PanelView: View {
 
         await consuming
         operationTask = nil
-        self.progressViewModel = nil
     }
 
     /// Presents `ConflictDialog` for `destinationPath` and suspends until the user picks

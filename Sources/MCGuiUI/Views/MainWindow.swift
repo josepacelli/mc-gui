@@ -33,6 +33,9 @@ public struct MainWindow: View {
     // Tab/Shift+Tab navigation (FV-05).
     public var onViewFile: (FileEntry, PanelSide) -> Void
     public var onEditFile: (FileEntry, PanelSide) -> Void
+    // FO-14: forwarded from PanelView's own onShowProgress (see that type) - presents
+    // copy/move progress as an independent, non-modal window instead of a blocking sheet.
+    public var onShowProgress: (ProgressDialogViewModel) -> Void
     // BM-01..04: constructed by `MCGuiApp` (real `BookmarkStore`-backed `BookmarksActions`,
     // mirroring the `onViewFile`/`onEditFile` cross-target bridge above) - `MainWindow`
     // only presents it, it never talks to `MCGuiMacOS` directly.
@@ -54,11 +57,13 @@ public struct MainWindow: View {
         viewModel: MainWindowViewModel,
         onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
         onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
+        onShowProgress: @escaping (ProgressDialogViewModel) -> Void = { _ in },
         bookmarksViewModel: BookmarksViewModel
     ) {
         self.viewModel = viewModel
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
+        self.onShowProgress = onShowProgress
         self.bookmarksViewModel = bookmarksViewModel
         _volumesListViewModel = State(initialValue: VolumesListViewModel(fileSystemService: viewModel.leftPanel.fileSystemService))
     }
@@ -101,6 +106,7 @@ public struct MainWindow: View {
                     onActivate: { viewModel.activate(.left) },
                     onViewFile: { entry in onViewFile(entry, .left) },
                     onEditFile: { entry in onEditFile(entry, .left) },
+                    onShowProgress: onShowProgress,
                     pendingAction: Binding(
                         get: { viewModel.leftPendingAction },
                         set: { viewModel.leftPendingAction = $0 }
@@ -113,6 +119,7 @@ public struct MainWindow: View {
                     onActivate: { viewModel.activate(.right) },
                     onViewFile: { entry in onViewFile(entry, .right) },
                     onEditFile: { entry in onEditFile(entry, .right) },
+                    onShowProgress: onShowProgress,
                     pendingAction: Binding(
                         get: { viewModel.rightPendingAction },
                         set: { viewModel.rightPendingAction = $0 }
