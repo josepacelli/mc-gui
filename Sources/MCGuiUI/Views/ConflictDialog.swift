@@ -12,19 +12,28 @@ public struct ConflictDialog: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("\"\(viewModel.destinationPath.lastPathComponent)\" already exists")
-                .font(.headline)
+            Text(
+                String(
+                    format: NSLocalizedString(
+                        "conflictDialog.header.alreadyExists",
+                        bundle: .module,
+                        comment: "Conflict dialog header. %1$@ is the conflicting destination file's name."
+                    ),
+                    viewModel.destinationPath.lastPathComponent
+                )
+            )
+            .font(.headline)
             Text(viewModel.destinationPath.deletingLastPathComponent().path)
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             HStack {
-                Button("Cancel", role: .cancel) { viewModel.chooseCancel() }
+                Button(String(localized: "conflictDialog.button.cancel", bundle: .module, comment: "Cancel button"), role: .cancel) { viewModel.chooseCancel() }
                     .keyboardShortcut(.cancelAction)
                 Spacer()
-                Button("Skip") { viewModel.chooseSkip() }
-                Button("Rename") { viewModel.chooseRename() }
-                Button("Overwrite") { viewModel.chooseOverwrite() }
+                Button(String(localized: "conflictDialog.button.skip", bundle: .module, comment: "Skip button")) { viewModel.chooseSkip() }
+                Button(String(localized: "conflictDialog.button.rename", bundle: .module, comment: "Rename button")) { viewModel.chooseRename() }
+                Button(String(localized: "conflictDialog.button.overwrite", bundle: .module, comment: "Overwrite button")) { viewModel.chooseOverwrite() }
                     .keyboardShortcut(.defaultAction)
             }
         }

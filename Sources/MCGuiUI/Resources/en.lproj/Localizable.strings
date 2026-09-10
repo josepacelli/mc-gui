@@ -15,3 +15,10 @@
 "copyMove.toggle.updateOnly" = "Update only (skip up-to-date files)";
 "copyMove.button.cancel" = "Cancel";
 "copyMove.button.background" = "Background";
+
+/* ConflictDialog.swift (T8) */
+"conflictDialog.header.alreadyExists" = "“%1$@” already exists";
+"conflictDialog.button.cancel" = "Cancel";
+"conflictDialog.button.skip" = "Skip";
+"conflictDialog.button.rename" = "Rename";
+"conflictDialog.button.overwrite" = "Overwrite";

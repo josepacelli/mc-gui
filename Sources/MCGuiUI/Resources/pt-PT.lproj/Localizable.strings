@@ -15,3 +15,10 @@
 "copyMove.toggle.updateOnly" = "Apenas Atualizar (ignorar ficheiros já atualizados)";
 "copyMove.button.cancel" = "Cancelar";
 "copyMove.button.background" = "Segundo Plano";
+
+/* ConflictDialog.swift (T8) */
+"conflictDialog.header.alreadyExists" = "“%1$@” já existe";
+"conflictDialog.button.cancel" = "Cancelar";
+"conflictDialog.button.skip" = "Ignorar";
+"conflictDialog.button.rename" = "Mudar o Nome";
+"conflictDialog.button.overwrite" = "Substituir";

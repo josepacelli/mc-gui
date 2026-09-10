@@ -333,12 +333,19 @@ covers ViewModel logic only) - none needed updating. `swift test`: 318 passed, 0
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**: (same shape as T7)
-- [ ] Every UI string extracted to all 4 languages
-- [ ] Any broken existing test updated in this task
-- [ ] `swift test` passes
+- [x] Every UI string extracted to all 4 languages
+- [x] Any broken existing test updated in this task
+- [x] `swift test` passes
 
 **Tests**: none / update existing
 **Gate**: full
+
+**Confirmed**: 5 keys extracted (header + Cancel/Skip/Rename/Overwrite buttons); header
+uses a parameterized `%1$@` with curly quotes, matching T5's `FileSystemServiceError`
+message convention. `ConflictDialogViewModelTests` covers ViewModel logic only, no view
+text assertions - none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
 
 ---
 
