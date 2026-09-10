@@ -24,6 +24,14 @@ public struct PanelView: View {
     // `ButtonBar`/`TopBar` clicks for whichever panel is active) trigger the same F3-F8
     // handling physical key presses already run below - see `PanelAction`.
     public var pendingAction: Binding<PanelAction?>
+    // FO-01, FO-02: the classic dual-pane copy/move default - F5/F6 offers the *other*
+    // panel's current directory as the destination, not this panel's own. `MainWindow`
+    // passes its sibling `PanelViewModel.currentPath` here, re-evaluated on every
+    // `MainWindow.body` render so it always reflects the other panel's live location
+    // (never this struct's own - `PanelView` has no reference to its sibling otherwise).
+    // `nil` (the default) falls back to this panel's own path, matching the prior
+    // behavior for callers/tests that don't wire a sibling.
+    public var otherPanelPath: URL?
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
@@ -49,7 +57,8 @@ public struct PanelView: View {
         onActivate: @escaping () -> Void = {},
         onViewFile: @escaping (FileEntry) -> Void = { _ in },
         onEditFile: @escaping (FileEntry) -> Void = { _ in },
-        pendingAction: Binding<PanelAction?> = .constant(nil)
+        pendingAction: Binding<PanelAction?> = .constant(nil),
+        otherPanelPath: URL? = nil
     ) {
         self.viewModel = viewModel
         self.isActive = isActive
@@ -57,6 +66,7 @@ public struct PanelView: View {
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
         self.pendingAction = pendingAction
+        self.otherPanelPath = otherPanelPath
     }
 
     // MARK: - F-key handling (FV-01, ED-01, FO-01, FO-02, FO-10, FO-12)
@@ -294,15 +304,14 @@ public struct PanelView: View {
 
     private func beginCopyOrMove(_ mode: OperationMode) {
         operationErrorMessage = nil
-        // SPEC_DEVIATION (T33): destination defaults to this panel's own current
-        // directory, not the "other panel" (the classic dual-pane default) - PanelView
-        // has no reference to its sibling panel without MainWindow wiring, which is out
-        // of scope for this task (touches only PanelView.swift). The destination is
-        // editable in CopyMoveDialog's text field before confirming.
+        // FO-01, FO-02: defaults to the *other* panel's current directory (the classic
+        // dual-pane default) via `otherPanelPath`, falling back to this panel's own path
+        // when there is no sibling (e.g. a caller/test that doesn't wire one). Always
+        // editable in CopyMoveDialog's text field before confirming either way.
         copyMoveViewModel = Self.makeCopyMoveDialog(
             selection: selectedEntries,
             mode: mode,
-            destinationDirectory: viewModel.currentPath
+            destinationDirectory: otherPanelPath ?? viewModel.currentPath
         )
     }
 

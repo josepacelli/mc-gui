@@ -85,7 +85,8 @@ public struct MainWindow: View {
                     onActivate: { viewModel.activate(.left) },
                     onViewFile: { entry in onViewFile(entry, .left) },
                     onEditFile: { entry in onEditFile(entry, .left) },
-                    pendingAction: $leftPendingAction
+                    pendingAction: $leftPendingAction,
+                    otherPanelPath: viewModel.rightPanel.currentPath
                 )
                 PanelView(
                     viewModel: viewModel.rightPanel,
@@ -93,7 +94,8 @@ public struct MainWindow: View {
                     onActivate: { viewModel.activate(.right) },
                     onViewFile: { entry in onViewFile(entry, .right) },
                     onEditFile: { entry in onEditFile(entry, .right) },
-                    pendingAction: $rightPendingAction
+                    pendingAction: $rightPendingAction,
+                    otherPanelPath: viewModel.leftPanel.currentPath
                 )
             }
 
