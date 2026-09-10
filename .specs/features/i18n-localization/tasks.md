@@ -502,6 +502,20 @@ none needed updating. `swift test`: 318 passed, 0 failed.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 10 keys extracted, one per F1-F10 label. "RenMov" (F6) uses the glossary's
+"Move / Rename" row's full phrase rather than a new invented abbreviation, per "reuse the
+glossary exactly"; layout wraps per the spec's length-variance edge case rather than
+clipping. "PullDn" (F9, disabled/no backing implementation, CL-07) and "Mkdir" (F7) have
+no glossary row; translated directly (Menu Superior/Menú Superior, and the glossary's
+"New Folder" phrase, respectively). `ButtonBarTests.labelsMatchOriginal` asserts the
+literal English text via `ButtonBar.labels`; verified unmodified against the localized
+build - passes because the `swift test` host resolves `Bundle.module` to `en` by default
+(design.md's documented assumption), confirmed empirically rather than left as untested
+risk. `swift test`: 318 passed, 0 failed (`ButtonBarTests` specifically: 4 passed, 0
+failed).
+
+**Status**: ✅ Complete
+
 ---
 
 ### T15: Extract `MainWindow.swift`

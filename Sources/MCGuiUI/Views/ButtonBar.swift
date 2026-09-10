@@ -22,10 +22,18 @@ public struct ButtonBar: View {
         self.onQuit = onQuit
     }
 
-    /// The original's exact 10 labels, in order (CL-04).
+    /// The original's exact 10 labels, in order (CL-04), localized (I18N-01..04).
     static let labels: [(number: Int, text: String)] = [
-        (1, "Help"), (2, "Menu"), (3, "View"), (4, "Edit"), (5, "Copy"),
-        (6, "RenMov"), (7, "Mkdir"), (8, "Delete"), (9, "PullDn"), (10, "Quit"),
+        (1, String(localized: "buttonBar.label.help", bundle: .module, comment: "F1 button: Help")),
+        (2, String(localized: "buttonBar.label.menu", bundle: .module, comment: "F2 button: User Menu")),
+        (3, String(localized: "buttonBar.label.view", bundle: .module, comment: "F3 button: View")),
+        (4, String(localized: "buttonBar.label.edit", bundle: .module, comment: "F4 button: Edit")),
+        (5, String(localized: "buttonBar.label.copy", bundle: .module, comment: "F5 button: Copy")),
+        (6, String(localized: "buttonBar.label.renMov", bundle: .module, comment: "F6 button: Rename/Move")),
+        (7, String(localized: "buttonBar.label.mkdir", bundle: .module, comment: "F7 button: New Folder")),
+        (8, String(localized: "buttonBar.label.delete", bundle: .module, comment: "F8 button: Delete")),
+        (9, String(localized: "buttonBar.label.pullDn", bundle: .module, comment: "F9 button: Pull Down (disabled, no backing implementation)")),
+        (10, String(localized: "buttonBar.label.quit", bundle: .module, comment: "F10 button: Quit")),
     ]
 
     public var body: some View {

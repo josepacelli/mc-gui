@@ -69,3 +69,15 @@
 "topBar.command.userMenu" = "User Menu…";
 "topBar.options.showHiddenFiles" = "Show Hidden Files";
 "topBar.options.theme" = "Theme";
+
+/* ButtonBar.swift (T14) */
+"buttonBar.label.help" = "Help";
+"buttonBar.label.menu" = "Menu";
+"buttonBar.label.view" = "View";
+"buttonBar.label.edit" = "Edit";
+"buttonBar.label.copy" = "Copy";
+"buttonBar.label.renMov" = "RenMov";
+"buttonBar.label.mkdir" = "Mkdir";
+"buttonBar.label.delete" = "Delete";
+"buttonBar.label.pullDn" = "PullDn";
+"buttonBar.label.quit" = "Quit";

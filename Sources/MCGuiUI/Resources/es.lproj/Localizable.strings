@@ -69,3 +69,15 @@
 "topBar.command.userMenu" = "Menú de Usuario…";
 "topBar.options.showHiddenFiles" = "Mostrar Archivos Ocultos";
 "topBar.options.theme" = "Tema";
+
+/* ButtonBar.swift (T14) */
+"buttonBar.label.help" = "Ayuda";
+"buttonBar.label.menu" = "Menú";
+"buttonBar.label.view" = "Ver";
+"buttonBar.label.edit" = "Editar";
+"buttonBar.label.copy" = "Copiar";
+"buttonBar.label.renMov" = "Mover / Renombrar";
+"buttonBar.label.mkdir" = "Nueva Carpeta";
+"buttonBar.label.delete" = "Eliminar";
+"buttonBar.label.pullDn" = "Menú Superior";
+"buttonBar.label.quit" = "Salir";
