@@ -81,3 +81,8 @@
 "buttonBar.label.delete" = "Delete";
 "buttonBar.label.pullDn" = "PullDn";
 "buttonBar.label.quit" = "Quit";
+
+/* BookmarksView.swift (T16) */
+"bookmarks.header.title" = "Bookmarks";
+"bookmarks.button.add.help" = "Add Bookmark (⌘D)";
+"bookmarks.button.remove.help" = "Remove Bookmark";

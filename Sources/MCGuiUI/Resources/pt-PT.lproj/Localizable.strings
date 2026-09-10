@@ -81,3 +81,8 @@
 "buttonBar.label.delete" = "Eliminar";
 "buttonBar.label.pullDn" = "Menu Superior";
 "buttonBar.label.quit" = "Sair";
+
+/* BookmarksView.swift (T16) */
+"bookmarks.header.title" = "Marcadores";
+"bookmarks.button.add.help" = "Adicionar Marcador (⌘D)";
+"bookmarks.button.remove.help" = "Remover Marcador";

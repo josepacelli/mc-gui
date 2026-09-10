@@ -559,6 +559,14 @@ file - no source change. `MainWindowVolumesTests` (`MainWindow volumes` suite) t
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 3 keys extracted (header title, Add/Remove Bookmark tooltips), reusing the
+glossary's "Bookmarks"/"Remove Bookmark" rows verbatim; "Add Bookmark" built from the
+glossary's "Add" + singular "Bookmark" (per I18N-12, `bookmark.name` itself stays
+untranslated - marked with an inline comment). No existing test asserted this file's view
+text - none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T17: Extract `UserMenuView.swift`

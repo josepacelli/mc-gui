@@ -105,7 +105,8 @@ public struct BookmarksView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Bookmarks").font(.headline)
+                Text(String(localized: "bookmarks.header.title", bundle: .module, comment: "Bookmarks popover title"))
+                    .font(.headline)
                 Spacer()
                 Button {
                     Task { await viewModel.addBookmark(for: activeDirectory) }
@@ -113,7 +114,7 @@ public struct BookmarksView: View {
                     Image(systemName: "plus")
                 }
                 .keyboardShortcut("d", modifiers: .command)
-                .help("Add Bookmark (⌘D)")
+                .help(String(localized: "bookmarks.button.add.help", bundle: .module, comment: "Add-bookmark button tooltip (⌘D unchanged)"))
             }
             .padding(8)
 
@@ -125,6 +126,7 @@ public struct BookmarksView: View {
 
             List(viewModel.bookmarks) { bookmark in
                 HStack {
+                    // I18N-12: bookmark.name is user-authored content, never translated.
                     Button(bookmark.name) { onNavigate(bookmark.path) }
                         .buttonStyle(.plain)
                     Spacer()
@@ -134,7 +136,7 @@ public struct BookmarksView: View {
                         Image(systemName: "minus.circle")
                     }
                     .buttonStyle(.plain)
-                    .help("Remove Bookmark")
+                    .help(String(localized: "bookmarks.button.remove.help", bundle: .module, comment: "Remove-bookmark button tooltip"))
                 }
             }
         }
