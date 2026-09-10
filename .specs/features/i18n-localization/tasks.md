@@ -532,6 +532,17 @@ failed).
 **Tests**: none / update existing (note: `MainWindow volumes` test suite exists - check it doesn't assert literal UI text)
 **Gate**: full
 
+**Confirmed**: `MainWindow.swift` contains zero double-quoted string literals of any kind
+(verified by grep for `"`, `Text(`, `Button(`, `.help(`, `Label(`, `TextField(`,
+`Picker(` - no matches). The "Bookmarks-popover trigger" is the Command menu's
+"Bookmarks…" item, which lives in `TopBar.swift` and was already extracted in T13; the
+popover's own content is `BookmarksView.swift` (T16, next). No extraction needed in this
+file - no source change. `MainWindowVolumesTests` (`MainWindow volumes` suite) tests only
+`VolumesListViewModel`, not view body text - confirmed no literal-text assertion exists.
+`swift test`: 318 passed, 0 failed (unchanged, no code touched).
+
+**Status**: ✅ Complete
+
 ---
 
 ### T16: Extract `BookmarksView.swift`
