@@ -86,3 +86,15 @@
 "bookmarks.header.title" = "Favoritos";
 "bookmarks.button.add.help" = "Adicionar Favorito (⌘D)";
 "bookmarks.button.remove.help" = "Remover Favorito";
+
+/* UserMenuView.swift (T17) */
+"userMenu.header.title" = "Menu do Usuário";
+"userMenu.button.addCommand.help" = "Adicionar Comando";
+"userMenu.field.label" = "Rótulo";
+"userMenu.field.commandPlaceholder" = "Comando (%f arquivo, %d diretório, %D outro diretório)";
+"userMenu.button.cancel" = "Cancelar";
+"userMenu.button.add" = "Adicionar";
+"userMenu.button.run" = "Executar";
+"userMenu.button.remove.help" = "Remover";
+"userMenu.result.noOutput" = "(sem saída)";
+"userMenu.result.exitCode" = "Código de Saída: %1$d";

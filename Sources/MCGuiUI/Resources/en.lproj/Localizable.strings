@@ -86,3 +86,15 @@
 "bookmarks.header.title" = "Bookmarks";
 "bookmarks.button.add.help" = "Add Bookmark (⌘D)";
 "bookmarks.button.remove.help" = "Remove Bookmark";
+
+/* UserMenuView.swift (T17) */
+"userMenu.header.title" = "User Menu";
+"userMenu.button.addCommand.help" = "Add Command";
+"userMenu.field.label" = "Label";
+"userMenu.field.commandPlaceholder" = "Command (%f file, %d dir, %D other dir)";
+"userMenu.button.cancel" = "Cancel";
+"userMenu.button.add" = "Add";
+"userMenu.button.run" = "Run";
+"userMenu.button.remove.help" = "Remove";
+"userMenu.result.noOutput" = "(no output)";
+"userMenu.result.exitCode" = "Exit code: %1$d";

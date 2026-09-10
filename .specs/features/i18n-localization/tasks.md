@@ -583,6 +583,19 @@ text - none needed updating. `swift test`: 318 passed, 0 failed.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 10 keys extracted (header, add-command tooltip, 2 form fields,
+cancel/add/run buttons, remove tooltip, no-output placeholder, parameterized exit-code
+line). The command-field placeholder keeps `%f`/`%d`/`%D` unchanged (literal tokens
+`UserMenuRunner` expands - not Swift format specifiers) while translating the
+"file"/"dir"/"other dir" descriptive words around them, using the same diretório/
+directorio terms the glossary already uses for "Parent directory". "Exit code: %1$d" uses
+`NSLocalizedString` + `String(format:)`, matching AD-005's convention for parameterized
+strings. `item.label`/`item.command` (the user's own menu entries) stay untranslated
+(I18N-12, marked with an inline comment). No existing test asserted this file's view text
+- none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T18: Extract `ViewerWindow.swift`
