@@ -144,11 +144,13 @@ Bookmarks, ...), so every later translation task/worker uses the same wording.
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] Table covers every term expected to recur across ≥3 files, in pt-BR, pt-PT (with real divergence from pt-BR noted, e.g. ficheiro/arquivo), and es
-- [ ] Committed as a plain doc, not code (not built or tested)
+- [x] Table covers every term expected to recur across ≥3 files, in pt-BR, pt-PT (with real divergence from pt-BR noted, e.g. ficheiro/arquivo), and es
+- [x] Committed as a plain doc, not code (not built or tested)
 
 **Tests**: none
 **Gate**: none (docs only)
+
+**Status**: ✅ Complete
 
 ---
 
