@@ -23,9 +23,9 @@ public struct ThemeMenu: View {
 
     static func title(for option: ThemePreference) -> String {
         switch option {
-        case .system: return "Follow System"
-        case .light: return "Light"
-        case .dark: return "Dark"
+        case .system: return String(localized: "themeMenu.option.system", bundle: .module, comment: "Theme menu: follow the macOS system appearance")
+        case .light: return String(localized: "themeMenu.option.light", bundle: .module, comment: "Theme menu: always use the light appearance")
+        case .dark: return String(localized: "themeMenu.option.dark", bundle: .module, comment: "Theme menu: always use the dark appearance")
         }
     }
 }

@@ -189,3 +189,11 @@
 "help.global.addBookmark" = "Add bookmark";
 "help.global.find" = "Find (viewer / editor)";
 "help.global.quit" = "Quit";
+
+/* ThemeMenu.swift (T23) */
+"themeMenu.option.system" = "Follow System";
+"themeMenu.option.light" = "Light";
+"themeMenu.option.dark" = "Dark";
+
+/* SupportComponents.swift (T23) */
+"supportComponents.loading.message" = "Loading…";

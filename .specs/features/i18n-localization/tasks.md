@@ -756,6 +756,23 @@ not UI text - audit before extracting, only translate what's real).
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: `ThemeMenu.swift`: 3 keys extracted (Follow System/Light/Dark), reusing the
+glossary's rows verbatim. `SupportComponents.swift` audit: `FileIcon`'s SF Symbol names
+(`folder.fill`, `doc.fill`, ...) and `PermissionBadge`'s `r`/`w`/`x` triad are not UI text
+(standard Unix permission notation, universal); `SortIndicator.title` and
+`ErrorAlert.message` are caller-supplied, not owned by this file. Only `LoadingOverlay`'s
+default `"Loading…"` message (used at both its call sites, `PanelView.swift:151` and
+`ViewerWindow.swift:138`, with no explicit argument) was genuine UI text - 1 key
+extracted. Its default parameter changed from `message: String = "Loading…"` to
+`message: String? = nil` (default value resolved inside `init`'s body) because a public
+`init`'s default argument cannot reference the internal `Bundle.module` accessor
+directly (SPM-generated, `internal` visibility) - both existing call sites (no argument)
+continue to compile and resolve to the localized string via Optional promotion; not a
+behavior change. No existing test references either file - none needed updating.
+`swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T24: Sweep remaining files for missed literals

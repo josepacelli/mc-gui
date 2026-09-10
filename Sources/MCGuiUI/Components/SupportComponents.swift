@@ -78,8 +78,8 @@ public struct SortIndicator: View {
 public struct LoadingOverlay: View {
     public let message: String
 
-    public init(message: String = "Loading…") {
-        self.message = message
+    public init(message: String? = nil) {
+        self.message = message ?? String(localized: "supportComponents.loading.message", bundle: .module, comment: "Default overlay message shown while a directory listing loads")
     }
 
     public var body: some View {
