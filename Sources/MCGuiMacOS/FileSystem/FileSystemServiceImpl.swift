@@ -167,7 +167,12 @@ public final class FileSystemServiceImpl {
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
-        let progress = OperationProgressTracker(sources: plan.sources)
+        // Bugfix: `totalFiles`/progress used to be one unit per top-level *source*, so
+        // copying a single large folder showed "File 1 of 1" and reported nothing until
+        // the whole (opaque, uninterruptible) `FileManager.copyItem` recursive call
+        // finished - no visible progress, no working Cancel. Expanding to the real leaf
+        // files up front makes both correct.
+        let progress = OperationProgressTracker(sources: expandedFiles(for: plan.sources))
 
         for source in plan.sources {
             try Task.checkCancellation()
@@ -179,9 +184,19 @@ public final class FileSystemServiceImpl {
                     continue
                 }
 
-                try await copySingleFile(source, to: destination, options: plan.options)
+                if source.type == .directory {
+                    try await copyDirectoryContents(source, to: destination, options: plan.options, progress: progress, onProgress: onProgress)
+                } else {
+                    try await copySingleFile(source, to: destination, options: plan.options)
+                    onProgress(progress.recordProcessed(source))
+                }
                 processedCount += 1
-                onProgress(progress.recordProcessed(source))
+            } catch is CancellationError {
+                // Bugfix: cancellation is now also checked *inside* a directory's
+                // per-file walk (`copyDirectoryContents`), not just before each top-level
+                // source - that inner throw must still abort the whole batch (FO-16),
+                // not get swallowed as a single "failed item" like a real copy error.
+                throw CancellationError()
             } catch {
                 failedItems.append(try failedItemOrRethrowIfDisconnected(error, source: source))
             }
@@ -211,7 +226,7 @@ public final class FileSystemServiceImpl {
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
-        let progress = OperationProgressTracker(sources: plan.sources)
+        let progress = OperationProgressTracker(sources: expandedFiles(for: plan.sources))
 
         for source in plan.sources {
             try Task.checkCancellation()
@@ -227,12 +242,27 @@ public final class FileSystemServiceImpl {
                     try await withEBUSYRetry(url: source.path) {
                         try moveItem(source.path, destination)
                     }
+                    // A same-volume rename is atomic and instant regardless of directory
+                    // size - there's nothing to report progress *during*. Still walk the
+                    // now-relocated tree to account for each file it contained, so
+                    // `filesProcessed`/`totalFiles` land on the same total the tracker was
+                    // built with instead of stalling at "File 1 of N".
+                    if source.type == .directory {
+                        reportCompletedDirectory(at: destination, progress: progress, onProgress: onProgress)
+                    } else {
+                        onProgress(progress.recordProcessed(source))
+                    }
+                } else if source.type == .directory {
+                    try await copyDirectoryContents(source, to: destination, options: plan.options, progress: progress, onProgress: onProgress)
+                    try fileManager.removeItem(at: source.path)
                 } else {
                     try await copySingleFile(source, to: destination, options: plan.options)
                     try fileManager.removeItem(at: source.path)
+                    onProgress(progress.recordProcessed(source))
                 }
                 processedCount += 1
-                onProgress(progress.recordProcessed(source))
+            } catch is CancellationError {
+                throw CancellationError()
             } catch {
                 failedItems.append(try failedItemOrRethrowIfDisconnected(error, source: source))
             }
@@ -291,6 +321,90 @@ public final class FileSystemServiceImpl {
                 attributes[.modificationDate] = sourceAttributes[.modificationDate]
             }
             try? fileManager.setAttributes(attributes, ofItemAtPath: destination.path)
+        }
+    }
+
+    /// Recursively lists the real leaf files under `sources`' directories (files and
+    /// symlinks only, never the directory entries themselves) so `OperationProgressTracker`
+    /// can be built from the actual total file count/bytes instead of "1 unit per
+    /// top-level source" - which made copying a single folder report "File 1 of 1" with
+    /// no visible progress until the whole thing finished.
+    private func expandedFiles(for sources: [FileEntry]) -> [FileEntry] {
+        let keys: [URLResourceKey] = [
+            .isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey,
+            .creationDateKey, .contentModificationDateKey, .isHiddenKey
+        ]
+        var result: [FileEntry] = []
+        for source in sources {
+            guard source.type == .directory else {
+                result.append(source)
+                continue
+            }
+            let enumerator = fileManager.enumerator(at: source.path, includingPropertiesForKeys: keys, options: [])
+            while let url = enumerator?.nextObject() as? URL {
+                let entry = buildEntry(for: url, keys: Set(keys))
+                guard entry.type != .directory else { continue }
+                result.append(entry)
+            }
+        }
+        return result
+    }
+
+    /// Copies a directory source file-by-file (mirrors `expandedFiles`' walk) instead of
+    /// one opaque `FileManager.copyItem` call for the whole subtree - that single call
+    /// reported no progress and ignored cancellation until the entire folder finished
+    /// copying. Each nested file goes through `copySingleFile` (so symlink/attribute
+    /// handling stays identical to the single-file path) and reports its own progress.
+    private func copyDirectoryContents(
+        _ source: FileEntry,
+        to destination: URL,
+        options: CopyMoveOptions,
+        progress: OperationProgressTracker,
+        onProgress: (OperationProgress) -> Void
+    ) async throws {
+        try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+
+        let keys: [URLResourceKey] = [
+            .isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey,
+            .creationDateKey, .contentModificationDateKey, .isHiddenKey
+        ]
+        let sourceDepth = source.path.pathComponents.count
+        let enumerator = fileManager.enumerator(at: source.path, includingPropertiesForKeys: keys, options: [])
+
+        while let url = enumerator?.nextObject() as? URL {
+            try Task.checkCancellation()
+            let relativeComponents = url.pathComponents.dropFirst(sourceDepth)
+            let itemDestination = relativeComponents.reduce(destination) { $0.appendingPathComponent($1) }
+            let entry = buildEntry(for: url, keys: Set(keys))
+
+            if entry.type == .directory {
+                try fileManager.createDirectory(at: itemDestination, withIntermediateDirectories: true)
+                continue
+            }
+
+            try await copySingleFile(entry, to: itemDestination, options: options)
+            onProgress(progress.recordProcessed(entry))
+        }
+    }
+
+    /// Accounts for a directory that a same-volume rename already relocated wholesale
+    /// (see `move(_:onProgress:)`) - no I/O here, just walks the now-relocated tree so
+    /// `filesProcessed` reaches the same total the tracker was built with, instead of
+    /// stalling at "File 1 of N" for an operation that in fact already finished.
+    private func reportCompletedDirectory(
+        at destination: URL,
+        progress: OperationProgressTracker,
+        onProgress: (OperationProgress) -> Void
+    ) {
+        let keys: [URLResourceKey] = [
+            .isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey,
+            .creationDateKey, .contentModificationDateKey, .isHiddenKey
+        ]
+        let enumerator = fileManager.enumerator(at: destination, includingPropertiesForKeys: keys, options: [])
+        while let url = enumerator?.nextObject() as? URL {
+            let entry = buildEntry(for: url, keys: Set(keys))
+            guard entry.type != .directory else { continue }
+            onProgress(progress.recordProcessed(entry))
         }
     }
 

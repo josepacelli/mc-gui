@@ -246,6 +246,84 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(recorder.snapshots.allSatisfy { $0.totalFiles == 2 })
     }
 
+    @Test("copy of a directory source reports one progress snapshot per nested file, not one for the whole folder")
+    func copyDirectorySourceReportsOneSnapshotPerNestedFile() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        let subDir = srcDir.appendingPathComponent("sub", isDirectory: true)
+        try FileManager.default.createDirectory(at: subDir, withIntermediateDirectories: true)
+        try writeFile(named: "x.txt", content: "1234", in: subDir)
+        try writeFile(named: "y.txt", content: "12345678", in: subDir)
+
+        let service = FileSystemServiceImpl()
+        let sources = try await service.listDirectory(srcDir)
+
+        let recorder = ProgressRecorder()
+        let result = try await service.copy(
+            plan(sources: sources, destination: dstDir, mode: .copy),
+            onProgress: { recorder.snapshots.append($0) }
+        )
+
+        #expect(result.success)
+        #expect(recorder.snapshots.count == 2)
+        #expect(Set(recorder.snapshots.map(\.currentFile)) == ["x.txt", "y.txt"])
+        #expect(recorder.snapshots.map(\.filesProcessed).sorted() == [1, 2])
+        #expect(recorder.snapshots.allSatisfy { $0.totalFiles == 2 })
+        #expect(recorder.snapshots.allSatisfy { $0.totalBytes == 12 })
+        #expect(recorder.snapshots.last?.bytesTransferred == 12)
+        #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("sub/x.txt").path))
+        #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("sub/y.txt").path))
+    }
+
+    @Test("cancelling mid-directory-copy stops before every nested file is copied")
+    func copyDirectorySourceStopsOnCancellationBetweenNestedFiles() async throws {
+        let srcDir = try makeTempDirectory()
+        let dstDir = try makeTempDirectory()
+        defer {
+            try? FileManager.default.removeItem(at: srcDir)
+            try? FileManager.default.removeItem(at: dstDir)
+        }
+
+        let subDir = srcDir.appendingPathComponent("sub", isDirectory: true)
+        try FileManager.default.createDirectory(at: subDir, withIntermediateDirectories: true)
+        try writeFile(named: "a.txt", content: "1", in: subDir)
+        try writeFile(named: "b.txt", content: "2", in: subDir)
+        try writeFile(named: "c.txt", content: "3", in: subDir)
+
+        let service = FileSystemServiceImpl()
+        let sources = try await service.listDirectory(srcDir)
+
+        final class TaskBox { var task: Task<OperationResult, Error>? }
+        let box = TaskBox()
+        let task = Task<OperationResult, Error> {
+            try await service.copy(
+                plan(sources: sources, destination: dstDir, mode: .copy),
+                // cancels as soon as the first nested file is reported - proves
+                // cancellation is now checked *between* nested files, not only before
+                // the (single, top-level) directory source.
+                onProgress: { _ in box.task?.cancel() }
+            )
+        }
+        box.task = task
+
+        do {
+            _ = try await task.value
+            Issue.record("Expected CancellationError to be thrown")
+        } catch is CancellationError {
+            // expected
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+
+        let copiedNames = (try? FileManager.default.contentsOfDirectory(atPath: dstDir.appendingPathComponent("sub").path)) ?? []
+        #expect(copiedNames.count < 3)
+    }
+
     @Test("cancelling the calling Task stops copy(_:onProgress:) before processing every source")
     func copyWithProgressStopsOnCancellation() async throws {
         let srcDir = try makeTempDirectory()
