@@ -45,6 +45,12 @@ public struct PanelView: View {
     // `nil` (the default) falls back to this panel's own path, matching the prior
     // behavior for callers/tests that don't wire a sibling.
     public var otherPanelPath: URL?
+    // FO-14 bugfix: a copy/move's destination is often the *sibling* panel
+    // (`otherPanelPath`), whose `PanelViewModel` this `PanelView` never holds a reference
+    // to - `performCopyMove`'s own `viewModel.load()` only refreshes this panel's own
+    // (source) listing. `MainWindow` wires this to reload the sibling `PanelViewModel`
+    // directly, so its entries pick up whatever just landed in it.
+    public var onOperationCompleted: () -> Void
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
@@ -74,7 +80,8 @@ public struct PanelView: View {
         onHelp: @escaping () -> Void = {},
         onUserMenu: @escaping (UserMenuContext) -> Void = { _ in },
         pendingAction: Binding<PanelAction?> = .constant(nil),
-        otherPanelPath: URL? = nil
+        otherPanelPath: URL? = nil,
+        onOperationCompleted: @escaping () -> Void = {}
     ) {
         self.viewModel = viewModel
         self.isActive = isActive
@@ -86,6 +93,7 @@ public struct PanelView: View {
         self.onUserMenu = onUserMenu
         self.pendingAction = pendingAction
         self.otherPanelPath = otherPanelPath
+        self.onOperationCompleted = onOperationCompleted
     }
 
     // MARK: - F-key handling (FV-01, ED-01, FO-01, FO-02, FO-10, FO-12)
@@ -506,6 +514,7 @@ public struct PanelView: View {
             )
             await runWithProgress(plan, mode: dialogViewModel.mode)
             await viewModel.load()
+            onOperationCompleted()
         }
     }
 

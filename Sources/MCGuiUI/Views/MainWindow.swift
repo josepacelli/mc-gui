@@ -122,7 +122,8 @@ public struct MainWindow: View {
                         get: { viewModel.leftPendingAction },
                         set: { viewModel.leftPendingAction = $0 }
                     ),
-                    otherPanelPath: viewModel.rightPanel.currentPath
+                    otherPanelPath: viewModel.rightPanel.currentPath,
+                    onOperationCompleted: { Task { await viewModel.rightPanel.load() } }
                 )
                 PanelView(
                     viewModel: viewModel.rightPanel,
@@ -137,7 +138,8 @@ public struct MainWindow: View {
                         get: { viewModel.rightPendingAction },
                         set: { viewModel.rightPendingAction = $0 }
                     ),
-                    otherPanelPath: viewModel.leftPanel.currentPath
+                    otherPanelPath: viewModel.leftPanel.currentPath,
+                    onOperationCompleted: { Task { await viewModel.leftPanel.load() } }
                 )
             }
 

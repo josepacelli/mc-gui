@@ -129,10 +129,25 @@ public final class WindowManager {
     /// operation finished). Closes itself once `progressViewModel.isCompleted` (success or
     /// cancellation both end the underlying `AsyncStream`, so both reach this the same way).
     public func showProgress(_ progressViewModel: ProgressDialogViewModel) {
+        // Bugfix: a fast copy/move (a handful of small local files) can finish before
+        // AppKit ever draws the just-opened window, so it appeared to "not show progress"
+        // at all - it opened and closed within the same run loop pass. Keeping it on
+        // screen for at least `minimumDisplayDuration` guarantees the user sees it.
+        let minimumDisplayDuration: TimeInterval = 0.5
+        let openedAt = Date()
+
         var window: NSWindow!
         let content = ProgressDialog(viewModel: progressViewModel)
             .onChange(of: progressViewModel.isCompleted) { [weak self] _, completed in
-                if completed {
+                guard completed else { return }
+                let elapsed = Date().timeIntervalSince(openedAt)
+                let remaining = minimumDisplayDuration - elapsed
+                guard remaining > 0 else {
+                    self?.closeWindow(window, from: \.progressWindows)
+                    return
+                }
+                Task { [weak self] in
+                    try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
                     self?.closeWindow(window, from: \.progressWindows)
                 }
             }
