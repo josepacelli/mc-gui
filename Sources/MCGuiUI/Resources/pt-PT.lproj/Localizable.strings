@@ -197,3 +197,9 @@
 
 /* SupportComponents.swift (T23) */
 "supportComponents.loading.message" = "A carregar…";
+
+/* MkdirDialogViewModel.swift, DeleteConfirmDialogViewModel.swift, SaveChangesDialogViewModel.swift (T24 sweep gaps) */
+"mkdirValidation.error.empty" = "O nome da pasta não pode estar vazio.";
+"mkdirValidation.error.containsSlash" = "O nome da pasta não pode conter \"/\".";
+"deleteConfirmValidation.noSelection" = "Nenhum ficheiro selecionado.";
+"saveChangesPrompt.message" = "Guardar as alterações em \"%1$@\" antes de fechar?";

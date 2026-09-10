@@ -25,7 +25,7 @@ public final class DeleteConfirmDialogViewModel {
     /// nothing to confirm - by setting `errorMessage` and making no `TrashService` call.
     public func confirm() async {
         guard !entries.isEmpty else {
-            errorMessage = "No files selected."
+            errorMessage = String(localized: "deleteConfirmValidation.noSelection", bundle: .module, comment: "F8 dialog: confirm() was called with an empty selection")
             return
         }
 

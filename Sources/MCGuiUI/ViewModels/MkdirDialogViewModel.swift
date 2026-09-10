@@ -9,8 +9,8 @@ public enum MkdirValidationError: LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .empty: return "Folder name cannot be empty."
-        case .containsPathSeparator: return "Folder name cannot contain \"/\"."
+        case .empty: return String(localized: "mkdirValidation.error.empty", bundle: .module, comment: "F7 dialog: the new-folder name field is empty")
+        case .containsPathSeparator: return String(localized: "mkdirValidation.error.containsSlash", bundle: .module, comment: "F7 dialog: the new-folder name contains a path separator")
         }
     }
 }

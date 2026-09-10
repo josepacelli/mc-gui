@@ -22,7 +22,9 @@ public final class SaveChangesDialogViewModel {
         self.onResolve = onResolve
     }
 
-    public var message: String { "Save changes to \"\(fileName)\" before closing?" }
+    public var message: String {
+        String(format: NSLocalizedString("saveChangesPrompt.message", bundle: .module, comment: "Prompt asking to save unsaved changes before closing. %1$@ is the file name."), fileName)
+    }
 
     public func chooseSave() { resolve(.save) }
     public func chooseDiscard() { resolve(.discard) }

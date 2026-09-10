@@ -197,3 +197,9 @@
 
 /* SupportComponents.swift (T23) */
 "supportComponents.loading.message" = "Cargando…";
+
+/* MkdirDialogViewModel.swift, DeleteConfirmDialogViewModel.swift, SaveChangesDialogViewModel.swift (T24 sweep gaps) */
+"mkdirValidation.error.empty" = "El nombre de la carpeta no puede estar vacío.";
+"mkdirValidation.error.containsSlash" = "El nombre de la carpeta no puede contener \"/\".";
+"deleteConfirmValidation.noSelection" = "Ningún archivo seleccionado.";
+"saveChangesPrompt.message" = "¿Guardar los cambios en \"%1$@\" antes de cerrar?";

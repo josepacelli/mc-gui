@@ -37,7 +37,7 @@ public final class TrashServiceImpl: TrashService {
 
         return OperationResult(
             success: failedItems.isEmpty,
-            errorMessage: failedItems.isEmpty ? nil : "Some items could not be moved to Trash",
+            errorMessage: failedItems.isEmpty ? nil : String(localized: "operationResult.error.trashFailed", bundle: .module, comment: "Summary error when one or more items could not be moved to Trash"),
             processedCount: processedCount,
             failedItems: failedItems
         )

@@ -266,7 +266,7 @@ public final class FileSystemServiceImpl {
 
         return OperationResult(
             success: failedItems.isEmpty,
-            errorMessage: failedItems.isEmpty ? nil : "Some items failed to copy",
+            errorMessage: failedItems.isEmpty ? nil : String(localized: "operationResult.error.copyFailed", bundle: .module, comment: "Summary error when one or more items failed to copy"),
             processedCount: processedCount,
             failedItems: failedItems
         )
@@ -332,7 +332,7 @@ public final class FileSystemServiceImpl {
 
         return OperationResult(
             success: failedItems.isEmpty,
-            errorMessage: failedItems.isEmpty ? nil : "Some items failed to move",
+            errorMessage: failedItems.isEmpty ? nil : String(localized: "operationResult.error.moveFailed", bundle: .module, comment: "Summary error when one or more items failed to move"),
             processedCount: processedCount,
             failedItems: failedItems
         )
@@ -585,7 +585,7 @@ public final class FileSystemServiceImpl {
 
         return OperationResult(
             success: failedItems.isEmpty,
-            errorMessage: failedItems.isEmpty ? nil : "Some items could not be moved to Trash",
+            errorMessage: failedItems.isEmpty ? nil : String(localized: "operationResult.error.trashFailed", bundle: .module, comment: "Summary error when one or more items could not be moved to Trash"),
             processedCount: processedCount,
             failedItems: failedItems
         )

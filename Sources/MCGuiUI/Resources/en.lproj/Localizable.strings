@@ -197,3 +197,9 @@
 
 /* SupportComponents.swift (T23) */
 "supportComponents.loading.message" = "Loading…";
+
+/* MkdirDialogViewModel.swift, DeleteConfirmDialogViewModel.swift, SaveChangesDialogViewModel.swift (T24 sweep gaps) */
+"mkdirValidation.error.empty" = "Folder name cannot be empty.";
+"mkdirValidation.error.containsSlash" = "Folder name cannot contain \"/\".";
+"deleteConfirmValidation.noSelection" = "No files selected.";
+"saveChangesPrompt.message" = "Save changes to \"%1$@\" before closing?";

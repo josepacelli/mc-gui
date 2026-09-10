@@ -8,3 +8,8 @@
 "fileSystemError.insufficientDiskSpace" = "Espaço em disco insuficiente para concluir a operação.";
 "fileSystemError.volumeDisconnected" = "O volume de “%1$@” foi desconectado.";
 "fileSystemError.pathTooLong" = "O caminho de destino “%1$@” é muito longo.";
+
+/* FileSystemServiceImpl.swift, TrashServiceImpl.swift: OperationResult.errorMessage batch summaries (T24 sweep gap) */
+"operationResult.error.copyFailed" = "Alguns itens não puderam ser copiados";
+"operationResult.error.moveFailed" = "Alguns itens não puderam ser movidos";
+"operationResult.error.trashFailed" = "Alguns itens não puderam ser movidos para a Lixeira";

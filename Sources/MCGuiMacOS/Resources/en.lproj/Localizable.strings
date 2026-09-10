@@ -8,3 +8,8 @@
 "fileSystemError.insufficientDiskSpace" = "Not enough disk space to complete the operation.";
 "fileSystemError.volumeDisconnected" = "The volume for “%1$@” was disconnected.";
 "fileSystemError.pathTooLong" = "The destination path “%1$@” is too long.";
+
+/* FileSystemServiceImpl.swift, TrashServiceImpl.swift: OperationResult.errorMessage batch summaries (T24 sweep gap) */
+"operationResult.error.copyFailed" = "Some items failed to copy";
+"operationResult.error.moveFailed" = "Some items failed to move";
+"operationResult.error.trashFailed" = "Some items could not be moved to Trash";

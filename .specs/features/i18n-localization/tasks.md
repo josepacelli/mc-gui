@@ -789,11 +789,48 @@ UI text distinct from its keyword arrays, which stay untranslated per I18N-13).
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] A fresh literal-string grep across the 3 targets shows no remaining real UI text (SF Symbol names, format specifiers, and syntax-highlighter keywords excluded and documented as intentional)
-- [ ] `swift test` passes
+- [x] A fresh literal-string grep across the 3 targets shows no remaining real UI text (SF Symbol names, format specifiers, and syntax-highlighter keywords excluded and documented as intentional)
+- [x] `swift test` passes
 
 **Tests**: none / update existing
 **Gate**: full
+
+**Confirmed**: Fixed the 3 known gaps flagged by Batch 2 (T9/T10/T11's notes):
+`MkdirDialogViewModel.swift`'s 2 validation-error literals (`mkdirValidation.error.empty`,
+`.containsSlash`), `DeleteConfirmDialogViewModel.swift`'s "No files selected." guard
+(`deleteConfirmValidation.noSelection`), and `SaveChangesDialogViewModel.swift`'s
+`message` computed property - the last converted from `String(localized: "text
+\(interpolated)")`-style interpolation to `NSLocalizedString` + `String(format:)` with
+`%1$@` per AD-005 (was already a plain string interpolation, non-conformant to the
+project's parameterized-string convention).
+
+Fresh grep sweep (`Text(`/`Button(`/`Label(`/`.help(`/`messageText =`/placeholder
+patterns, plus a broader capitalized-string-literal sweep) across all 3 targets found 3
+more real gaps outside any prior task's file scope: `FileSystemServiceImpl.swift`'s
+`copy`/`move`/`trash` methods and `TrashServiceImpl.swift`'s `trash` method each
+returned an `OperationResult.errorMessage` batch-summary literal ("Some items failed to
+copy"/"to move"/"could not be moved to Trash") - extracted to 3 shared
+`operationResult.error.*` keys in `MCGuiMacOS`'s tables (`FileSystemServiceImpl.swift`'s
+own `trash` is dead code per its own doc comment, never the canonical path, but carries
+the identical literal - localized anyway for consistency since the fix is mechanical and
+zero-risk). Verified as NOT gaps and left untouched: `SyntaxHighlighter.swift` (only its
+`keywords` set - I18N-13 - and non-linguistic comment-prefix literals `//`/`#`/`--`/`;;`,
+no genuine UI text); `"Midnight Commander"` in `HelpWindow.swift`/`WindowManager.swift`
+(product name, never translated, same precedent as T20-T22); `UserMenuStore.swift`/
+`BookmarkStore.swift`/`PathHistoryStoreImpl.swift`'s `"MCGui"` app-support folder name
+(internal storage path, not UI text); `AppEntry.swift` (pure wiring, no literals).
+
+DeleteConfirmDialogViewModelTests' existing literal comparison
+(`viewModel.errorMessage == "No files selected."`) and SaveChangesDialogViewModelTests'
+`.message.contains("notes.txt")` both still pass unmodified - the en table's text
+matches exactly and `%1$@` substitution still contains the file name. No test asserts
+`OperationResult.errorMessage` (confirmed by inspection: it is set but never read by any
+View or test - `PanelView.fo15Message(from:)` reads `failedItems`, not
+`.errorMessage`). `swift test`: 318 passed, 0 failed;
+`swift test --filter LocalizationCoverageTests`: all 9 target×language pairs pass
+key-set parity.
+
+**Status**: ✅ Complete
 
 ---
 
