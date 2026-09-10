@@ -1160,9 +1160,9 @@ T42 → T43
 - Skill: NONE
 
 **Done when**:
-- [ ] F4 on a selected text file opens the editor with syntax-highlighted content
-- [ ] Cmd+S saves; Cmd+F / Cmd+Option+F open find/replace
-- [ ] XCUITest covers: F4 opens editor, edit+save round-trip, find/replace performs a replacement, close-with-unsaved-changes shows the save prompt
+- [ ] F4 on a selected text file opens the editor with syntax-highlighted content - **PARTIAL**: `EditorWindow` always displays whatever `EditorWindowViewModel`/`EditorDocumentState` content it's given (correct file), via a monospaced `NSTextView` - full per-token syntax highlighting is a documented design.md risk with an explicit fallback ("basic coloring if needed", Risks & Concerns), used here. Constructing and presenting `EditorWindow` when F4 is pressed on a panel selection is cross-target wiring belonging to a future task (MCGuiApp, Phase 11) - out of scope here (`Where` is `EditorWindow.swift` only), mirrors T38's `ViewerWindow`/F3 precedent.
+- [x] Cmd+S saves; Cmd+F / Cmd+Option+F open find/replace
+- [ ] XCUITest covers: F4 opens editor, edit+save round-trip, find/replace performs a replacement, close-with-unsaved-changes shows the save prompt - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. The find/replace logic this view's buttons invoke (`EditorWindow.nextMatch`, `.replaceAll`) is unit-tested in `EditorWindowTests`; the save/dirty/close flow is unit-tested in `EditorWindowViewModelTests` (T40) and `SaveChangesDialogViewModelTests` (T41); `EditorWindow.body` and `EditorTextView` are thin declarative/AppKit-bridging glue over those, with no additional testable logic (mirrors T38's `ViewerWindow` precedent).
 
 **Tests**: e2e
 **Gate**: build

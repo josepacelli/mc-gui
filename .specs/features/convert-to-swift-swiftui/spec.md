@@ -365,8 +365,8 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | ED-06 | P1: Text Editor | Execute | Implementing |
 | ED-07 | P1: Text Editor | Execute | Implementing |
 | ED-08 | P1: Text Editor | Execute | Implementing |
-| ED-09 | P1: Text Editor | Design | Pending |
-| ED-10 | P1: Text Editor | Design | Pending |
+| ED-09 | P1: Text Editor | Execute | Implementing |
+| ED-10 | P1: Text Editor | Execute | Implementing |
 | KN-01 | P1: Keyboard Navigation | Design | Pending |
 | KN-02 | P1: Keyboard Navigation | Design | Pending |
 | KN-03 | P1: Keyboard Navigation | Execute | Implementing |
