@@ -187,6 +187,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 10. The system SHALL support Cmd+Up (parent), Cmd+[ (back), Cmd+] (forward)
 11. The system SHALL support Enter (enter directory / open file)
 12. The system SHALL support Escape to close dialogs / clear selection
+13. The system SHALL support "*" to invert the whole selection (select all from empty, deselect all from fully selected, flip a partial selection entry by entry)
 
 **Independent Test**: Perform all file operations using only keyboard; verify all shortcuts work.
 
@@ -330,9 +331,9 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FS-08 | P1: File System Service | Execute | Implementing |
 | FS-09 | P1: File System Service | Execute | Implementing |
 | FS-10 | P1: File System Service | Execute | Implementing |
-| FS-11 | P1: File System Service | Execute | Implementing |
-| FS-12 | P1: File System Service | Execute | Implementing |
-| FS-13 | P1: File System Service | Execute | Implementing |
+| FS-11 | P1: File System Service | Execute | Verified |
+| FS-12 | P1: File System Service | Execute | Verified |
+| FS-13 | P1: File System Service | Execute | Verified |
 | FO-01 | P1: File Operations | Execute | Implementing |
 | FO-02 | P1: File Operations | Execute | Implementing |
 | FO-03 | P1: File Operations | Execute | Implementing |
@@ -379,6 +380,7 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | KN-10 | P1: Keyboard Navigation | Execute | Implementing |
 | KN-11 | P1: Keyboard Navigation | Execute | Implementing |
 | KN-12 | P1: Keyboard Navigation | Execute | Implementing |
+| KN-13 | P1: Keyboard Navigation | Execute | Verified |
 | TH-01 | P1: Theme Support | Execute | Verified |
 | TH-02 | P1: Theme Support | Execute | Verified |
 | TH-03 | P1: Theme Support | Execute | Verified |
@@ -404,12 +406,12 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | SF-02 | P2: Search/Filter | Execute | Verified |
 | SF-03 | P2: Search/Filter | Execute | Verified |
 | SF-04 | P2: Search/Filter | Execute | Verified |
-| BM-01 | P3: Bookmarks | Execute | Implementing |
-| BM-02 | P3: Bookmarks | Execute | Implementing |
-| BM-03 | P3: Bookmarks | Execute | Implementing |
-| BM-04 | P3: Bookmarks | Execute | Implementing |
+| BM-01 | P3: Bookmarks | Execute | Verified |
+| BM-02 | P3: Bookmarks | Execute | Verified |
+| BM-03 | P3: Bookmarks | Execute | Verified |
+| BM-04 | P3: Bookmarks | Execute | Verified |
 
-**Coverage:** 93 total, 92 mapped to tasks, 1 unmapped to a task's `Requirement` field (FS-06) - functionally covered as of T50 (Cmd+Up in `AppCommands`' Go menu, wired to real parent-directory navigation in `AppEntry`), though no task explicitly cites it. All 93 requirements are now `Phase: Execute` (T1-T54 complete). VL-01 stays `Implementing` (not `Verified`) per T51's SPEC_DEVIATION: volumes are listed in `MainWindow`'s own `Menu("Go")` control (this task's `Where` scope), not the literal AppKit menu-bar Go menu (`AppCommands.swift`/`AppEntry.swift`, Phase 11, out of scope) - closing that gap is future cross-file work. BM-01..04 stay `Implementing` per T54's SPEC_DEVIATION: `BookmarksView`/`BookmarksViewModel` (`MCGuiUI`) use a local `BookmarkEntry` model and closure-based `BookmarksActions`, not yet bridged to `MCGuiMacOS`'s concrete `BookmarkStore` (T53) or constructed from `MainWindow`/`MCGuiApp` - that cross-file wiring, and PH-01..04's `PathHistoryStoreImpl`-to-`PanelViewModel` wiring noted in earlier batches, remain the same class of deferred integration work as VL-01's Go-menu gap.
+**Coverage:** 94 total (93 original + KN-13, added post-launch per user request), 92 mapped to tasks, 2 unmapped to a task's `Requirement` field (FS-06, KN-13) - both functionally covered by later fix commits (FS-06 since T50; KN-13 added directly, not through the tasks.md pipeline). All requirements are `Phase: Execute`. Post-launch fix commits closed several gaps this table used to list as `Implementing`/dead: `FS-11/12/13` (Back/Forward, `fceb268` - `PathHistoryManager` now wired into `PanelViewModel`) and `BM-01..04` (Bookmarks, `8b2a83c` - `BookmarksView` was confirmed dead code, not just a local-model gap; now bridged to the real `BookmarkStore` and reachable via TopBar's Command menu). `VL-01` still stays `Implementing`: volumes are listed in `TopBar`'s Left/Right menus (classic-layout-parity), not the literal AppKit menu-bar Go menu - closing that gap is still future cross-file work.
 
 ---
 

@@ -219,6 +219,7 @@ public struct PanelView: View {
             onJumpLast: { jumpToEdge(first: false) },
             onToggle: toggleCurrentSelection,
             onToggleAndAdvance: toggleAndAdvanceSelection,
+            onInvertAll: invertSelection,
             onEscape: handleEscape
         ))
     }
@@ -393,6 +394,13 @@ public struct PanelView: View {
     /// navigation), else the first row.
     private var currentRowID: FileEntry.ID? {
         cursorID ?? selection.first ?? displayEntries.first?.id
+    }
+
+    /// "*": inverts the whole selection via `PanelCommands.invertSelection`. Deliberately
+    /// scoped to `viewModel.entries` (not `displayEntries`) so the synthetic ".." row is
+    /// never selected by this - a batch operation over ".." would be meaningless.
+    private func invertSelection() {
+        selection = PanelCommands.invertSelection(selection, entries: viewModel.entries)
     }
 
     /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state.
@@ -695,15 +703,17 @@ private struct PanelPrimaryKeys: ViewModifier {
     }
 }
 
-/// KN-04 (Cmd+Left/Right jump), KN-05/KN-06 (Space/Insert toggle), KN-12/SF-04 (Escape) -
-/// the other half of `PanelView.entryList`'s keyboard handling, split for the same reason
-/// as `PanelPrimaryKeys` above.
+/// KN-04 (Cmd+Left/Right jump), KN-05/KN-06 (Space/Insert toggle), "*" (invert/select-all,
+/// see `PanelView.invertSelection`), KN-12/SF-04 (Escape) - the other half of
+/// `PanelView.entryList`'s keyboard handling, split for the same reason as
+/// `PanelPrimaryKeys` above.
 private struct PanelSelectionKeys: ViewModifier {
     let insertKey: KeyEquivalent
     let onJumpFirst: () -> Void
     let onJumpLast: () -> Void
     let onToggle: () -> Void
     let onToggleAndAdvance: () -> Void
+    let onInvertAll: () -> Void
     let onEscape: () -> Void
 
     func body(content: Content) -> some View {
@@ -723,6 +733,10 @@ private struct PanelSelectionKeys: ViewModifier {
                 } else {
                     onToggle()
                 }
+                return .handled
+            }
+            .onKeyPress("*") {
+                onInvertAll()
                 return .handled
             }
             .onKeyPress(.escape) {

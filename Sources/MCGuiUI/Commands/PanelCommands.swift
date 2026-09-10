@@ -89,4 +89,15 @@ public enum PanelCommands {
         let nextCursor = result.nextIndex.map { entries[$0].id }
         return (newSelection, nextCursor)
     }
+
+    /// Inverts the whole selection ("*"), via `SelectionService.invert`: every currently
+    /// unselected entry becomes selected and vice versa. Starting from an empty selection
+    /// selects everything; starting from everything selected deselects everything -
+    /// pressing "*" twice in a row with nothing else changing returns to the original
+    /// selection.
+    public static func invertSelection(_ selection: Set<FileEntry.ID>, entries: [FileEntry]) -> Set<FileEntry.ID> {
+        let indices = Set(selection.compactMap { index(of: $0, in: entries) })
+        let inverted = SelectionService.invert(indices, count: entries.count)
+        return Set(inverted.map { entries[$0].id })
+    }
 }
