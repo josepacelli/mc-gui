@@ -9,6 +9,7 @@ import MCGuiCore
 @Observable
 public final class ProgressDialogViewModel {
     public private(set) var currentFile: String = ""
+    public private(set) var filesProcessed: Int = 0
     public private(set) var totalFiles: Int = 0
     public private(set) var bytesTransferred: Int64 = 0
     public private(set) var totalBytes: Int64 = 0
@@ -34,6 +35,7 @@ public final class ProgressDialogViewModel {
 
     private func apply(_ progress: OperationProgress) {
         currentFile = progress.currentFile
+        filesProcessed = progress.filesProcessed
         totalFiles = progress.totalFiles
         bytesTransferred = progress.bytesTransferred
         totalBytes = progress.totalBytes

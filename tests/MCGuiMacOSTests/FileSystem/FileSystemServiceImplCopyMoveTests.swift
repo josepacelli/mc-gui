@@ -242,6 +242,8 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(recorder.snapshots.map(\.currentFile) == ["a.txt", "b.txt"])
         #expect(recorder.snapshots.map(\.bytesTransferred) == [4, 12])
         #expect(recorder.snapshots.allSatisfy { $0.totalBytes == 12 })
+        #expect(recorder.snapshots.map(\.filesProcessed) == [1, 2])
+        #expect(recorder.snapshots.allSatisfy { $0.totalFiles == 2 })
     }
 
     @Test("cancelling the calling Task stops copy(_:onProgress:) before processing every source")

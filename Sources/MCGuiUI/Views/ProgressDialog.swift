@@ -27,6 +27,10 @@ public struct ProgressDialog: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
 
+            Text("File \(viewModel.filesProcessed) of \(viewModel.totalFiles)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
             HStack {
                 Text(ByteCountFormatter.string(fromByteCount: viewModel.bytesTransferred, countStyle: .file))
                 Text("of")

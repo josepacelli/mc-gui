@@ -60,6 +60,7 @@ struct OperationsTests {
     func operationProgressCodableRoundTrip() throws {
         let original = OperationProgress(
             currentFile: "big.zip",
+            filesProcessed: 3,
             totalFiles: 10,
             bytesTransferred: 1_000,
             totalBytes: 10_000,

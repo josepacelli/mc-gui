@@ -9,6 +9,7 @@ struct ProgressDialogViewModelTests {
 
     private func progress(
         currentFile: String,
+        filesProcessed: Int = 0,
         totalFiles: Int = 10,
         bytesTransferred: Int64 = 0,
         totalBytes: Int64 = 1000,
@@ -17,6 +18,7 @@ struct ProgressDialogViewModelTests {
     ) -> OperationProgress {
         OperationProgress(
             currentFile: currentFile,
+            filesProcessed: filesProcessed,
             totalFiles: totalFiles,
             bytesTransferred: bytesTransferred,
             totalBytes: totalBytes,
@@ -34,16 +36,18 @@ struct ProgressDialogViewModelTests {
 
         let consumeTask = Task { await viewModel.consume(stream) }
 
-        continuation.yield(progress(currentFile: "a.txt", bytesTransferred: 100, speed: 10, eta: 90))
+        continuation.yield(progress(currentFile: "a.txt", filesProcessed: 1, bytesTransferred: 100, speed: 10, eta: 90))
         try? await Task.sleep(nanoseconds: 5_000_000)
         #expect(viewModel.currentFile == "a.txt")
+        #expect(viewModel.filesProcessed == 1)
         #expect(viewModel.bytesTransferred == 100)
 
-        continuation.yield(progress(currentFile: "b.txt", bytesTransferred: 500, speed: 20, eta: 25))
+        continuation.yield(progress(currentFile: "b.txt", filesProcessed: 2, bytesTransferred: 500, speed: 20, eta: 25))
         continuation.finish()
         await consumeTask.value
 
         #expect(viewModel.currentFile == "b.txt")
+        #expect(viewModel.filesProcessed == 2)
         #expect(viewModel.totalFiles == 10)
         #expect(viewModel.bytesTransferred == 500)
         #expect(viewModel.totalBytes == 1000)

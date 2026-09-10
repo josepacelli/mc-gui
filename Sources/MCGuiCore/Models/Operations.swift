@@ -55,6 +55,10 @@ public struct CopyMovePlan: Codable {
 /// A snapshot of an in-progress copy/move operation, suitable for progress UI.
 public struct OperationProgress: Codable, Hashable {
     public var currentFile: String
+    // FO-14: how many sources have been processed so far, out of `totalFiles` - lets the
+    // progress dialog show "file N of M", not just a byte-based progress bar. Defaults to
+    // 0 for existing callers that don't track it explicitly.
+    public var filesProcessed: Int
     public var totalFiles: Int
     public var bytesTransferred: Int64
     public var totalBytes: Int64
@@ -63,6 +67,7 @@ public struct OperationProgress: Codable, Hashable {
 
     public init(
         currentFile: String,
+        filesProcessed: Int = 0,
         totalFiles: Int,
         bytesTransferred: Int64,
         totalBytes: Int64,
@@ -70,6 +75,7 @@ public struct OperationProgress: Codable, Hashable {
         eta: TimeInterval
     ) {
         self.currentFile = currentFile
+        self.filesProcessed = filesProcessed
         self.totalFiles = totalFiles
         self.bytesTransferred = bytesTransferred
         self.totalBytes = totalBytes

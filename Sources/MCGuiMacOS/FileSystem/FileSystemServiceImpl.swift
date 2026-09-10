@@ -407,6 +407,7 @@ final class OperationProgressTracker {
     private let startTime: Date
     private let now: () -> Date
     private var bytesTransferred: Int64 = 0
+    private var filesProcessed: Int = 0
 
     /// - Parameter now: injectable clock (defaults to the real `Date()`) so tests can
     ///   control elapsed time deterministically instead of racing a wall clock.
@@ -421,12 +422,14 @@ final class OperationProgressTracker {
     /// snapshot. `speed`/`eta` are `0` until any time has elapsed since construction.
     func recordProcessed(_ source: FileEntry) -> OperationProgress {
         bytesTransferred += source.type == .directory ? 0 : source.size
+        filesProcessed += 1
         let elapsed = now().timeIntervalSince(startTime)
         let speed = elapsed > 0 ? Double(bytesTransferred) / elapsed : 0
         let remainingBytes = totalBytes - bytesTransferred
         let eta = speed > 0 ? Double(remainingBytes) / speed : 0
         return OperationProgress(
             currentFile: source.name,
+            filesProcessed: filesProcessed,
             totalFiles: totalFiles,
             bytesTransferred: bytesTransferred,
             totalBytes: totalBytes,

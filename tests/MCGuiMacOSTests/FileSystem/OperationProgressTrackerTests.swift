@@ -40,6 +40,19 @@ struct OperationProgressTrackerTests {
         #expect(second.bytesTransferred == 400)
     }
 
+    @Test("recordProcessed increments filesProcessed by one per call, regardless of file size")
+    func recordProcessedIncrementsFilesProcessed() {
+        let a = makeEntry(name: "a.txt", size: 100)
+        let b = makeEntry(name: "b.txt", size: 300)
+        let tracker = OperationProgressTracker(sources: [a, b], now: { Date(timeIntervalSince1970: 0) })
+
+        let first = tracker.recordProcessed(a)
+        #expect(first.filesProcessed == 1)
+
+        let second = tracker.recordProcessed(b)
+        #expect(second.filesProcessed == 2)
+    }
+
     @Test("recordProcessed excludes directory sources from the byte total")
     func recordProcessedExcludesDirectories() {
         let dir = makeEntry(name: "folder", size: 999, type: .directory)

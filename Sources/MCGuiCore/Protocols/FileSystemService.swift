@@ -61,6 +61,7 @@ public extension FileSystemService {
         let totalBytes = plan.sources.reduce(Int64(0)) { $0 + $1.size }
         return OperationProgress(
             currentFile: plan.sources.last?.name ?? "",
+            filesProcessed: plan.sources.count,
             totalFiles: plan.sources.count,
             bytesTransferred: totalBytes,
             totalBytes: totalBytes,
