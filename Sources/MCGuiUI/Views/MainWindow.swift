@@ -74,6 +74,8 @@ public struct MainWindow: View {
                 onRescanRight: { Task { await viewModel.rightPanel.load() } },
                 onFileAction: triggerActivePanel,
                 onRefreshActive: { Task { await viewModel.activePanelViewModel.load() } },
+                onGoBackActive: { Task { await viewModel.activePanelViewModel.goBack() } },
+                onGoForwardActive: { Task { await viewModel.activePanelViewModel.goForward() } },
                 onToggleHiddenFiles: { viewModel.activePanelViewModel.showHidden.toggle() }
             )
             Divider()

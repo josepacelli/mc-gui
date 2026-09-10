@@ -17,6 +17,8 @@ public struct TopBar: View {
     public var onRescanRight: () -> Void
     public var onFileAction: (PanelAction) -> Void
     public var onRefreshActive: () -> Void
+    public var onGoBackActive: () -> Void
+    public var onGoForwardActive: () -> Void
     public var onToggleHiddenFiles: () -> Void
 
     public init(
@@ -28,6 +30,8 @@ public struct TopBar: View {
         onRescanRight: @escaping () -> Void,
         onFileAction: @escaping (PanelAction) -> Void,
         onRefreshActive: @escaping () -> Void,
+        onGoBackActive: @escaping () -> Void = {},
+        onGoForwardActive: @escaping () -> Void = {},
         onToggleHiddenFiles: @escaping () -> Void
     ) {
         self.leftVolumes = leftVolumes
@@ -38,6 +42,8 @@ public struct TopBar: View {
         self.onRescanRight = onRescanRight
         self.onFileAction = onFileAction
         self.onRefreshActive = onRefreshActive
+        self.onGoBackActive = onGoBackActive
+        self.onGoForwardActive = onGoForwardActive
         self.onToggleHiddenFiles = onToggleHiddenFiles
     }
 
@@ -65,6 +71,12 @@ public struct TopBar: View {
 
             Menu("Command") {
                 Button("Refresh") { onRefreshActive() }
+                Divider()
+                // No .keyboardShortcut here - Cmd+[/Cmd+] are already registered by the
+                // native macOS menu bar's Go menu (AppCommands.swift); a second
+                // registration for the same combo risks an ambiguous/duplicate firing.
+                Button("Back") { onGoBackActive() }
+                Button("Forward") { onGoForwardActive() }
             }
 
             Menu("Options") {

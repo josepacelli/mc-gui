@@ -208,4 +208,112 @@ struct PanelViewModelTests {
         #expect(viewModel.filterText == "")
         #expect(viewModel.entries.map(\.name) == ["report.txt", "summary.doc"])
     }
+
+    // MARK: - back/forward history (FS-11, FS-12, FS-13)
+
+    private let pathA = URL(fileURLWithPath: "/tmp/a")
+    private let pathB = URL(fileURLWithPath: "/tmp/b")
+    private let pathC = URL(fileURLWithPath: "/tmp/c")
+
+    @Test("navigating to a new path records the previous path in history.past")
+    func navigatingRecordsHistory() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+        #expect(viewModel.canGoBack == false)
+
+        await viewModel.load(pathB)
+
+        #expect(viewModel.currentPath == pathB)
+        #expect(viewModel.canGoBack == true)
+    }
+
+    @Test("reloading the same path (refresh) does not record history")
+    func reloadingSamePathDoesNotRecordHistory() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+
+        await viewModel.load() // refresh, path == currentPath
+        await viewModel.load(pathA) // explicit but still == currentPath
+
+        #expect(viewModel.canGoBack == false)
+    }
+
+    @Test("goBack with empty history is a no-op")
+    func goBackWithEmptyHistoryIsNoOp() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+
+        await viewModel.goBack()
+
+        #expect(viewModel.currentPath == pathA)
+    }
+
+    @Test("goForward with empty future is a no-op")
+    func goForwardWithEmptyFutureIsNoOp() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+
+        await viewModel.goForward()
+
+        #expect(viewModel.currentPath == pathA)
+    }
+
+    @Test("goBack navigates to the previous path and makes the current path available to goForward")
+    func goBackNavigatesToPreviousPath() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+        await viewModel.load(pathB)
+        await viewModel.load(pathC)
+
+        await viewModel.goBack()
+
+        #expect(viewModel.currentPath == pathB)
+        #expect(viewModel.canGoBack == true) // pathA still in past
+        #expect(viewModel.canGoForward == true) // pathC now in future
+    }
+
+    @Test("goForward after goBack returns to the path that was current before going back")
+    func goForwardAfterGoBackReturnsToLaterPath() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+        await viewModel.load(pathB)
+        await viewModel.load(pathC)
+        await viewModel.goBack()
+
+        await viewModel.goForward()
+
+        #expect(viewModel.currentPath == pathC)
+        #expect(viewModel.canGoForward == false)
+    }
+
+    @Test("navigating to a new path after goBack discards the old forward history")
+    func navigatingAfterGoBackDiscardsForwardHistory() async {
+        let service = MockFileSystemService { _ in [] }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+        await viewModel.load(pathB)
+        await viewModel.load(pathC)
+        await viewModel.goBack() // currentPath = pathB, future = [pathC]
+
+        let pathD = URL(fileURLWithPath: "/tmp/d")
+        await viewModel.load(pathD)
+
+        #expect(viewModel.currentPath == pathD)
+        #expect(viewModel.canGoForward == false) // pathC no longer reachable
+    }
+
+    @Test("a failed goBack leaves currentPath and history unchanged")
+    func failedGoBackLeavesStateUnchanged() async {
+        let service = MockFileSystemService { url in
+            if url == self.pathA { throw MockError(message: "boom") }
+            return []
+        }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
+        await viewModel.load(pathB) // succeeds, history.past = [pathA]
+
+        await viewModel.goBack() // would navigate to pathA, which fails
+
+        #expect(viewModel.currentPath == pathB)
+        #expect(viewModel.canGoBack == true) // history untouched by the failed attempt
+        #expect(viewModel.errorMessage == "boom")
+    }
 }

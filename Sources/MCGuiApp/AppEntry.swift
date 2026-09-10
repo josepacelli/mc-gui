@@ -49,16 +49,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// Menu actions that meaningfully operate on the active panel today (sort, hidden
-    /// toggle, refresh, parent/home/computer navigation) are wired for real. `goBack`/
-    /// `goForward` stay no-op: back/forward history (`PathHistoryManager`, T10) isn't
-    /// wired into `PanelViewModel` yet - out of this batch's scope. `view`/`edit`/`copy`/
-    /// `move`/`mkdir`/`delete` also stay no-op here: triggering them from the menu bar
-    /// would need the active panel's current selection, which lives in `PanelView`'s
-    /// private `@State` (T21/T33) with no accessor exposed upward - lifting that state is
-    /// a larger change out of scope. The physical F3-F8 keys already work correctly via
-    /// `PanelView`'s own `.onKeyPress` handling (T33 for F5-F8, T50 for F3/F4); these menu
-    /// items are secondary/redundant triggers for the same shortcuts and inherit this
-    /// limitation until selection state is lifted in a future task.
+    /// toggle, refresh, parent/home/computer/back/forward navigation) are wired for real.
+    /// `view`/`edit`/`copy`/`move`/`mkdir`/`delete` stay no-op here: triggering them from
+    /// the native menu bar would need the active panel's current selection, which lives in
+    /// `PanelView`'s private `@State` (T21/T33) with no accessor exposed upward - lifting
+    /// that state is a larger change out of scope. The physical F3-F8 keys already work
+    /// correctly via `PanelView`'s own `.onKeyPress` handling (T33 for F5-F8, T50 for
+    /// F3/F4), and classic-layout-parity's `TopBar`/`ButtonBar` also reach them via
+    /// `PanelAction`/`pendingAction` (state that lives on `MainWindow`, not reachable from
+    /// here either); these native menu items are secondary/redundant triggers for the same
+    /// shortcuts and inherit this limitation until selection state is lifted to
+    /// `MainWindowViewModel`.
     var commandActions: AppCommandActions {
         AppCommandActions(
             sortByName: { [mainViewModel] in mainViewModel.activePanelViewModel.sortColumn = .name },
@@ -72,6 +73,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             navigateToParent: { [mainViewModel] in
                 let parent = mainViewModel.activePanelViewModel.currentPath.deletingLastPathComponent()
                 Task { await mainViewModel.activePanelViewModel.load(parent) }
+            },
+            goBack: { [mainViewModel] in
+                Task { await mainViewModel.activePanelViewModel.goBack() }
+            },
+            goForward: { [mainViewModel] in
+                Task { await mainViewModel.activePanelViewModel.goForward() }
             },
             goHome: { [mainViewModel] in
                 Task { await mainViewModel.activePanelViewModel.load(FileManager.default.homeDirectoryForCurrentUser) }
