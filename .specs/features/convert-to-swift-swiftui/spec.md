@@ -400,10 +400,10 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | VL-02 | P2: Volume Listing | Design | Pending |
 | VL-03 | P2: Volume Listing | Design | Pending |
 | VL-04 | P2: Volume Listing | Design | Pending |
-| SF-01 | P2: Search/Filter | Design | Pending |
-| SF-02 | P2: Search/Filter | Design | Pending |
-| SF-03 | P2: Search/Filter | Design | Pending |
-| SF-04 | P2: Search/Filter | Design | Pending |
+| SF-01 | P2: Search/Filter | Execute | Verified |
+| SF-02 | P2: Search/Filter | Execute | Verified |
+| SF-03 | P2: Search/Filter | Execute | Verified |
+| SF-04 | P2: Search/Filter | Execute | Verified |
 | BM-01 | P3: Bookmarks | Design | Pending |
 | BM-02 | P3: Bookmarks | Design | Pending |
 | BM-03 | P3: Bookmarks | Design | Pending |

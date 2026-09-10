@@ -155,4 +155,57 @@ struct PanelViewModelTests {
 
         #expect(Set(viewModel.entries.map(\.name)) == Set(["visible", ".hidden"]))
     }
+
+    // MARK: - live filename filter (SF-01, SF-02, SF-03, SF-04)
+
+    @Test("filterText with a substring match filters entries to matching names anywhere in the name (SF-01, SF-03)")
+    func filterTextMatchesSubstringAnywhere() async {
+        let entries = [makeTestEntry(name: "report.txt"), makeTestEntry(name: "summary.doc"), makeTestEntry(name: "archive.zip")]
+        let service = MockFileSystemService { _ in entries }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: URL(fileURLWithPath: "/tmp"))
+        await viewModel.load()
+
+        viewModel.filterText = "arch"
+
+        #expect(viewModel.entries.map(\.name) == ["archive.zip"])
+    }
+
+    @Test("filterText is case-insensitive (SF-02)")
+    func filterTextIsCaseInsensitive() async {
+        let entries = [makeTestEntry(name: "Report.TXT"), makeTestEntry(name: "summary.doc")]
+        let service = MockFileSystemService { _ in entries }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: URL(fileURLWithPath: "/tmp"))
+        await viewModel.load()
+
+        viewModel.filterText = "REPORT"
+
+        #expect(viewModel.entries.map(\.name) == ["Report.TXT"])
+    }
+
+    @Test("filterText with no matches produces an empty entries list")
+    func filterTextWithNoMatchesProducesEmptyList() async {
+        let entries = [makeTestEntry(name: "report.txt"), makeTestEntry(name: "summary.doc")]
+        let service = MockFileSystemService { _ in entries }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: URL(fileURLWithPath: "/tmp"))
+        await viewModel.load()
+
+        viewModel.filterText = "zzz-no-match"
+
+        #expect(viewModel.entries.isEmpty)
+    }
+
+    @Test("clearFilter restores the full entries list (SF-04, Escape)")
+    func clearFilterRestoresFullList() async {
+        let entries = [makeTestEntry(name: "report.txt"), makeTestEntry(name: "summary.doc")]
+        let service = MockFileSystemService { _ in entries }
+        let viewModel = PanelViewModel(fileSystemService: service, initialPath: URL(fileURLWithPath: "/tmp"))
+        await viewModel.load()
+        viewModel.filterText = "report"
+        #expect(viewModel.entries.count == 1)
+
+        viewModel.clearFilter()
+
+        #expect(viewModel.filterText == "")
+        #expect(viewModel.entries.map(\.name) == ["report.txt", "summary.doc"])
+    }
 }

@@ -1401,9 +1401,9 @@ T52
 - Skill: NONE
 
 **Done when**:
-- [ ] Typing filters `entries` to matching names (case-insensitive substring)
-- [ ] Escape clears the filter and restores the full list
-- [ ] Unit tests cover: no match, partial match, case-insensitivity, Escape-clears
+- [x] Typing filters `entries` to matching names (case-insensitive substring)
+- [x] Escape clears the filter and restores the full list
+- [x] Unit tests cover: no match, partial match, case-insensitivity, Escape-clears
 
 **Tests**: unit
 **Gate**: quick

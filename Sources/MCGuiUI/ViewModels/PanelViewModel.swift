@@ -36,6 +36,12 @@ public final class PanelViewModel {
         didSet { applyFilterAndSort() }
     }
 
+    /// Live filename filter text (SF-01): case-insensitive, substring-anywhere match
+    /// against `FileEntry.name` (SF-02, SF-03). Empty means no filtering.
+    public var filterText: String = "" {
+        didSet { applyFilterAndSort() }
+    }
+
     public init(fileSystemService: FileSystemService, initialPath: URL) {
         self.fileSystemService = fileSystemService
         self.currentPath = initialPath
@@ -64,8 +70,17 @@ public final class PanelViewModel {
         }
     }
 
+    /// Clears the live filename filter (SF-04: Escape), restoring the full (hidden-filtered,
+    /// sorted) entries list.
+    public func clearFilter() {
+        filterText = ""
+    }
+
     private func applyFilterAndSort() {
-        let visible = showHidden ? rawEntries : rawEntries.filter { !$0.isHidden }
+        var visible = showHidden ? rawEntries : rawEntries.filter { !$0.isHidden }
+        if !filterText.isEmpty {
+            visible = visible.filter { $0.name.localizedCaseInsensitiveContains(filterText) }
+        }
         entries = Self.sorted(visible, by: sortColumn, ascending: sortAscending)
     }
 
