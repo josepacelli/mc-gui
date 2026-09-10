@@ -1090,9 +1090,9 @@ T42 → T43
 - Skill: NONE
 
 **Done when**:
-- [ ] Editing content sets `isDirty`; saving clears it
-- [ ] Close-with-unsaved-changes triggers the save-prompt flow (delegated to T41/T42)
-- [ ] Unit tests cover: dirty on edit, clean after save, close with no changes skips prompt
+- [x] Editing content sets `isDirty`; saving clears it
+- [x] Close-with-unsaved-changes triggers the save-prompt flow (delegated to T41/T42)
+- [x] Unit tests cover: dirty on edit, clean after save, close with no changes skips prompt
 
 **Tests**: unit
 **Gate**: quick

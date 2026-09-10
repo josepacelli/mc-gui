@@ -88,6 +88,29 @@ struct MockViewerService: ViewerService {
     func search(_ query: String) -> [SearchMatch] { searchImpl(query) }
 }
 
+/// An `EditorService` test double with injectable `open`/`save`/`close` behaviors.
+struct MockEditorService: EditorService {
+    var openImpl: @Sendable (URL) async throws -> EditorDocumentState
+    var saveImpl: @Sendable (EditorDocumentState) async throws -> Void
+    var closeImpl: @Sendable () -> Void
+
+    init(
+        openImpl: @escaping @Sendable (URL) async throws -> EditorDocumentState = { url in
+            EditorDocumentState(content: "", fileURL: url, isDirty: false, encoding: "UTF-8")
+        },
+        saveImpl: @escaping @Sendable (EditorDocumentState) async throws -> Void = { _ in },
+        closeImpl: @escaping @Sendable () -> Void = {}
+    ) {
+        self.openImpl = openImpl
+        self.saveImpl = saveImpl
+        self.closeImpl = closeImpl
+    }
+
+    func open(_ url: URL) async throws -> EditorDocumentState { try await openImpl(url) }
+    func save(_ state: EditorDocumentState) async throws { try await saveImpl(state) }
+    func close() { closeImpl() }
+}
+
 func makeTestEntry(
     name: String,
     size: Int64 = 0,

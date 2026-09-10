@@ -359,11 +359,11 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | FV-08 | P1: File Viewer | Execute | Implementing |
 | ED-01 | P1: Text Editor | Execute | Implementing |
 | ED-02 | P1: Text Editor | Execute | Implementing |
-| ED-03 | P1: Text Editor | Design | Pending |
+| ED-03 | P1: Text Editor | Execute | Implementing |
 | ED-04 | P1: Text Editor | Execute | Implementing |
-| ED-05 | P1: Text Editor | Design | Pending |
-| ED-06 | P1: Text Editor | Design | Pending |
-| ED-07 | P1: Text Editor | Design | Pending |
+| ED-05 | P1: Text Editor | Execute | Implementing |
+| ED-06 | P1: Text Editor | Execute | Implementing |
+| ED-07 | P1: Text Editor | Execute | Implementing |
 | ED-08 | P1: Text Editor | Design | Pending |
 | ED-09 | P1: Text Editor | Design | Pending |
 | ED-10 | P1: Text Editor | Design | Pending |
