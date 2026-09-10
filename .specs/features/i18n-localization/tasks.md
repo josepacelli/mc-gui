@@ -198,12 +198,19 @@ asserts the two key sets are exactly equal.
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] One `@Test` per (target × language) pair asserting exact key-set equality against that target's en.lproj
-- [ ] Currently green (T1 seeded matching placeholder keys in all languages it created - if T1 only created `en.lproj`, this task also creates the matching empty/placeholder `pt-BR`/`pt-PT`/`es.lproj` files so the suite is green from this task onward, not red until some later task)
-- [ ] `swift test --filter LocalizationCoverageTests` passes
+- [x] One `@Test` per (target × language) pair asserting exact key-set equality against that target's en.lproj
+- [x] Currently green (T1 seeded matching placeholder keys in all languages it created - if T1 only created `en.lproj`, this task also creates the matching empty/placeholder `pt-BR`/`pt-PT`/`es.lproj` files so the suite is green from this task onward, not red until some later task)
+- [x] `swift test --filter LocalizationCoverageTests` passes
 
 **Tests**: unit (this task *is* the test)
 **Gate**: quick
+
+**Confirmed**: `@Test(arguments: targets, languages)` (Swift Testing's cartesian-product
+form) generates the 9 (target × language) cases in one function; parser verified to
+actually catch a divergence (manually appended an orphaned key to a pt-BR.lproj,
+confirmed the suite fails, reverted). `swift test`: 311 passed, 0 failed (was 310).
+
+**Status**: ✅ Complete
 
 ---
 

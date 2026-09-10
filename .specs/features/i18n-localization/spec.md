@@ -120,7 +120,7 @@ without this - it's a maintainability guarantee, not user-visible runtime behavi
 | I18N-06         | P1: Full app in the user's language | Design | Pending |
 | I18N-07         | P1: Full app in the user's language | Design | Pending |
 | I18N-08         | P1: Full app in the user's language | Tasks | Implementing |
-| I18N-09         | P2: Missing translations are discoverable | Design | Pending |
+| I18N-09         | P2: Missing translations are discoverable | Tasks | Implementing |
 | I18N-10         | Edge case: system language change while running | Design | Pending |
 | I18N-11         | Edge case: translated text length variance | Design | Pending |
 | I18N-12         | Edge case: user-authored content never translated | Design | Pending |
