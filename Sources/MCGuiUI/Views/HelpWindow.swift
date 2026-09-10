@@ -10,33 +10,46 @@ public struct HelpWindow: View {
         let action: String
     }
 
-    private static let panelShortcuts: [Shortcut] = [
-        Shortcut(keys: "F2", action: "User menu"),
-        Shortcut(keys: "F3", action: "View file"),
-        Shortcut(keys: "F4", action: "Edit file"),
-        Shortcut(keys: "F5", action: "Copy"),
-        Shortcut(keys: "F6", action: "Move / Rename"),
-        Shortcut(keys: "F7", action: "New folder"),
-        Shortcut(keys: "F8", action: "Delete"),
-        Shortcut(keys: "Enter", action: "Open directory / file"),
-        Shortcut(keys: "Backspace", action: "Parent directory"),
-        Shortcut(keys: "Tab", action: "Switch panel"),
-        Shortcut(keys: "Space", action: "Toggle selection"),
-        Shortcut(keys: "Insert", action: "Toggle selection, move down"),
-        Shortcut(keys: "*", action: "Invert selection (select/deselect all)"),
-        Shortcut(keys: "Escape", action: "Close dialog / clear selection"),
-        Shortcut(keys: "⌘←  /  ⌘→", action: "Jump to first / last row"),
-    ]
+    // MARK: - localized labels (I18N-01..04). Keyboard glyphs (F2, ⌘D, *, ...) are never
+    // translated - only the action description text. "Midnight Commander" (the app name,
+    // below) is likewise never translated per spec.md's confirmed assumption.
 
-    private static let globalShortcuts: [Shortcut] = [
-        Shortcut(keys: "⌘1 – ⌘4", action: "Sort by name / size / date / type"),
-        Shortcut(keys: "⌘.", action: "Toggle hidden files"),
-        Shortcut(keys: "⌘↑", action: "Parent directory"),
-        Shortcut(keys: "⌘[  /  ⌘]", action: "Back / Forward"),
-        Shortcut(keys: "⌘D", action: "Add bookmark"),
-        Shortcut(keys: "⌘F", action: "Find (viewer / editor)"),
-        Shortcut(keys: "⌘Q", action: "Quit"),
-    ]
+    private static var subtitle: String { String(localized: "help.subtitle", bundle: .module, comment: "Help window subtitle under the app name") }
+    private static var panelShortcutsTitle: String { String(localized: "help.section.panelShortcuts", bundle: .module, comment: "Help window: Panel Shortcuts section title") }
+    private static var globalShortcutsTitle: String { String(localized: "help.section.globalShortcuts", bundle: .module, comment: "Help window: Global Shortcuts section title") }
+    private static var parentDirectoryAction: String { String(localized: "help.action.parentDirectory", bundle: .module, comment: "Help window: 'navigate to parent directory' action description, shared by the panel and global shortcut lists") }
+
+    private static var panelShortcuts: [Shortcut] {
+        [
+            Shortcut(keys: "F2", action: String(localized: "help.panel.userMenu", bundle: .module, comment: "Help window: F2 action description")),
+            Shortcut(keys: "F3", action: String(localized: "help.panel.viewFile", bundle: .module, comment: "Help window: F3 action description")),
+            Shortcut(keys: "F4", action: String(localized: "help.panel.editFile", bundle: .module, comment: "Help window: F4 action description")),
+            Shortcut(keys: "F5", action: String(localized: "help.panel.copy", bundle: .module, comment: "Help window: F5 action description")),
+            Shortcut(keys: "F6", action: String(localized: "help.panel.moveRename", bundle: .module, comment: "Help window: F6 action description")),
+            Shortcut(keys: "F7", action: String(localized: "help.panel.newFolder", bundle: .module, comment: "Help window: F7 action description")),
+            Shortcut(keys: "F8", action: String(localized: "help.panel.delete", bundle: .module, comment: "Help window: F8 action description")),
+            Shortcut(keys: "Enter", action: String(localized: "help.panel.openEntry", bundle: .module, comment: "Help window: Enter action description")),
+            Shortcut(keys: "Backspace", action: parentDirectoryAction),
+            Shortcut(keys: "Tab", action: String(localized: "help.panel.switchPanel", bundle: .module, comment: "Help window: Tab action description")),
+            Shortcut(keys: "Space", action: String(localized: "help.panel.toggleSelection", bundle: .module, comment: "Help window: Space action description")),
+            Shortcut(keys: "Insert", action: String(localized: "help.panel.toggleSelectionMoveDown", bundle: .module, comment: "Help window: Insert action description")),
+            Shortcut(keys: "*", action: String(localized: "help.panel.invertSelection", bundle: .module, comment: "Help window: * action description")),
+            Shortcut(keys: "Escape", action: String(localized: "help.panel.closeOrClear", bundle: .module, comment: "Help window: Escape action description")),
+            Shortcut(keys: "⌘←  /  ⌘→", action: String(localized: "help.panel.jumpFirstLast", bundle: .module, comment: "Help window: Cmd+Left/Right action description")),
+        ]
+    }
+
+    private static var globalShortcuts: [Shortcut] {
+        [
+            Shortcut(keys: "⌘1 – ⌘4", action: String(localized: "help.global.sortShortcuts", bundle: .module, comment: "Help window: Cmd+1..4 action description")),
+            Shortcut(keys: "⌘.", action: String(localized: "help.global.toggleHiddenFiles", bundle: .module, comment: "Help window: Cmd+. action description")),
+            Shortcut(keys: "⌘↑", action: parentDirectoryAction),
+            Shortcut(keys: "⌘[  /  ⌘]", action: String(localized: "help.global.backForward", bundle: .module, comment: "Help window: Cmd+[/] action description")),
+            Shortcut(keys: "⌘D", action: String(localized: "help.global.addBookmark", bundle: .module, comment: "Help window: Cmd+D action description")),
+            Shortcut(keys: "⌘F", action: String(localized: "help.global.find", bundle: .module, comment: "Help window: Cmd+F action description")),
+            Shortcut(keys: "⌘Q", action: String(localized: "help.global.quit", bundle: .module, comment: "Help window: Cmd+Q action description")),
+        ]
+    }
 
     public init() {}
 
@@ -45,11 +58,11 @@ public struct HelpWindow: View {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Midnight Commander").font(.largeTitle.bold())
-                    Text("A dual-pane file manager for macOS.").foregroundStyle(.secondary)
+                    Text(Self.subtitle).foregroundStyle(.secondary)
                 }
 
-                shortcutSection(title: "Panel Shortcuts", shortcuts: Self.panelShortcuts)
-                shortcutSection(title: "Global Shortcuts", shortcuts: Self.globalShortcuts)
+                shortcutSection(title: Self.panelShortcutsTitle, shortcuts: Self.panelShortcuts)
+                shortcutSection(title: Self.globalShortcutsTitle, shortcuts: Self.globalShortcuts)
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)

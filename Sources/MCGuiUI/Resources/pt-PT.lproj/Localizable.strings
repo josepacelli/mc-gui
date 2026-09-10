@@ -163,3 +163,29 @@
 "appCommands.window.viewer" = "Visualizador";
 "appCommands.window.editor" = "Editor";
 "appCommands.help.item" = "Ajuda do Midnight Commander";
+
+/* HelpWindow.swift (T22). "Midnight Commander" (app name) and keyboard glyphs are never translated. */
+"help.subtitle" = "Um gestor de ficheiros de painel duplo para macOS.";
+"help.section.panelShortcuts" = "Atalhos do Painel";
+"help.section.globalShortcuts" = "Atalhos Globais";
+"help.action.parentDirectory" = "Diretório superior";
+"help.panel.userMenu" = "Menu do utilizador";
+"help.panel.viewFile" = "Ver ficheiro";
+"help.panel.editFile" = "Editar ficheiro";
+"help.panel.copy" = "Copiar";
+"help.panel.moveRename" = "Mover / Mudar o Nome";
+"help.panel.newFolder" = "Nova pasta";
+"help.panel.delete" = "Eliminar";
+"help.panel.openEntry" = "Abrir diretório / ficheiro";
+"help.panel.switchPanel" = "Alternar painel";
+"help.panel.toggleSelection" = "Alternar seleção";
+"help.panel.toggleSelectionMoveDown" = "Alternar seleção, mover para baixo";
+"help.panel.invertSelection" = "Inverter seleção (selecionar/desmarcar tudo)";
+"help.panel.closeOrClear" = "Fechar diálogo / limpar seleção";
+"help.panel.jumpFirstLast" = "Ir para a primeira / última linha";
+"help.global.sortShortcuts" = "Ordenar por nome / tamanho / data / tipo";
+"help.global.toggleHiddenFiles" = "Alternar ficheiros ocultos";
+"help.global.backForward" = "Retroceder / Avançar";
+"help.global.addBookmark" = "Adicionar marcador";
+"help.global.find" = "Localizar (visualizador / editor)";
+"help.global.quit" = "Sair";

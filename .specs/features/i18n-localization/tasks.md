@@ -727,6 +727,17 @@ in the app - 24 candidate strings, likely more once nested content is counted).
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 24 keys extracted (subtitle, 2 section titles, 21 action descriptions -
+`help.action.parentDirectory` shared between the panel and global shortcut lists since
+both rows are literally the same English action, "Parent directory"). Keyboard glyphs
+(`F2`, `⌘D`, `*`, `Backspace`, ...) stay untouched - not translatable text. `"Midnight
+Commander"` (the app name, in the `Text(...).font(.largeTitle.bold())` line) stays
+literal - product name, never translated per spec.md's confirmed assumption, same
+precedent as T20/T21. No test file references `HelpWindow.swift` - none needed
+updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T23: Extract `SupportComponents.swift` and `ThemeMenu.swift`
