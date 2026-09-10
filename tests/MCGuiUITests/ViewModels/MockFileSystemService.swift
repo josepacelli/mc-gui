@@ -62,6 +62,32 @@ struct MockTrashService: TrashService {
     }
 }
 
+/// A `ViewerService` test double with injectable `load`/`nextFile`/`previousFile`/`search`
+/// behaviors, for `ViewerViewModelTests`.
+struct MockViewerService: ViewerService {
+    var loadImpl: @Sendable (URL) async throws -> ViewerContent
+    var nextFileImpl: @Sendable () async throws -> ViewerContent
+    var previousFileImpl: @Sendable () async throws -> ViewerContent
+    var searchImpl: @Sendable (String) -> [SearchMatch]
+
+    init(
+        loadImpl: @escaping @Sendable (URL) async throws -> ViewerContent = { _ in .text("") },
+        nextFileImpl: @escaping @Sendable () async throws -> ViewerContent = { .text("") },
+        previousFileImpl: @escaping @Sendable () async throws -> ViewerContent = { .text("") },
+        searchImpl: @escaping @Sendable (String) -> [SearchMatch] = { _ in [] }
+    ) {
+        self.loadImpl = loadImpl
+        self.nextFileImpl = nextFileImpl
+        self.previousFileImpl = previousFileImpl
+        self.searchImpl = searchImpl
+    }
+
+    func load(_ url: URL) async throws -> ViewerContent { try await loadImpl(url) }
+    func nextFile() async throws -> ViewerContent { try await nextFileImpl() }
+    func previousFile() async throws -> ViewerContent { try await previousFileImpl() }
+    func search(_ query: String) -> [SearchMatch] { searchImpl(query) }
+}
+
 func makeTestEntry(
     name: String,
     size: Int64 = 0,

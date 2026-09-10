@@ -1007,9 +1007,9 @@ T37 → T38
 - Skill: NONE
 
 **Done when**:
-- [ ] Mode switches update displayed content without reloading from disk when avoidable
-- [ ] Error state surfaces FV-08 failures
-- [ ] Unit tests cover mode switching, search-triggers-scroll, error propagation
+- [x] Mode switches update displayed content without reloading from disk when avoidable
+- [x] Error state surfaces FV-08 failures
+- [x] Unit tests cover mode switching, search-triggers-scroll, error propagation
 
 **Tests**: unit
 **Gate**: quick
