@@ -41,7 +41,7 @@ public final class WindowManager {
 
         let content = MainWindow(viewModel: viewModel, onViewFile: onViewFile, onEditFile: onEditFile)
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
-        window.title = "MCGui"
+        window.title = "Midnight Commander"
         window.setContentSize(NSSize(width: 1024, height: 640))
         window.center()
         window.makeKeyAndOrderFront(nil)

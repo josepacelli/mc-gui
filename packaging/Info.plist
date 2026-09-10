@@ -13,9 +13,9 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>MC GUI</string>
+    <string>Midnight Commander</string>
     <key>CFBundleDisplayName</key>
-    <string>Midnight Commander GUI</string>
+    <string>Midnight Commander</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
