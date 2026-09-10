@@ -30,7 +30,8 @@ public final class WindowManager {
     public func showMainWindow(
         viewModel: MainWindowViewModel,
         onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
-        onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in }
+        onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
+        bookmarksViewModel: BookmarksViewModel
     ) {
         mainViewModel = viewModel
 
@@ -39,7 +40,12 @@ public final class WindowManager {
             return
         }
 
-        let content = MainWindow(viewModel: viewModel, onViewFile: onViewFile, onEditFile: onEditFile)
+        let content = MainWindow(
+            viewModel: viewModel,
+            onViewFile: onViewFile,
+            onEditFile: onEditFile,
+            bookmarksViewModel: bookmarksViewModel
+        )
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.title = "Midnight Commander"
         window.setContentSize(NSSize(width: 1024, height: 640))

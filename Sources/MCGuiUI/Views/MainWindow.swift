@@ -33,6 +33,12 @@ public struct MainWindow: View {
     // Tab/Shift+Tab navigation (FV-05).
     public var onViewFile: (FileEntry, PanelSide) -> Void
     public var onEditFile: (FileEntry, PanelSide) -> Void
+    // BM-01..04: constructed by `MCGuiApp` (real `BookmarkStore`-backed `BookmarksActions`,
+    // mirroring the `onViewFile`/`onEditFile` cross-target bridge above) - `MainWindow`
+    // only presents it, it never talks to `MCGuiMacOS` directly.
+    public let bookmarksViewModel: BookmarksViewModel
+
+    @State private var showBookmarks = false
 
     // TH-05: reading the same `@AppStorage` key `ThemeMenu` (T47) writes to means this
     // view re-renders immediately whenever the user picks a different theme option, with
@@ -53,11 +59,13 @@ public struct MainWindow: View {
     public init(
         viewModel: MainWindowViewModel,
         onViewFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
-        onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in }
+        onEditFile: @escaping (FileEntry, PanelSide) -> Void = { _, _ in },
+        bookmarksViewModel: BookmarksViewModel
     ) {
         self.viewModel = viewModel
         self.onViewFile = onViewFile
         self.onEditFile = onEditFile
+        self.bookmarksViewModel = bookmarksViewModel
         _volumesListViewModel = State(initialValue: VolumesListViewModel(fileSystemService: viewModel.leftPanel.fileSystemService))
     }
 
@@ -76,8 +84,20 @@ public struct MainWindow: View {
                 onRefreshActive: { Task { await viewModel.activePanelViewModel.load() } },
                 onGoBackActive: { Task { await viewModel.activePanelViewModel.goBack() } },
                 onGoForwardActive: { Task { await viewModel.activePanelViewModel.goForward() } },
-                onToggleHiddenFiles: { viewModel.activePanelViewModel.showHidden.toggle() }
+                onToggleHiddenFiles: { viewModel.activePanelViewModel.showHidden.toggle() },
+                onOpenBookmarks: { showBookmarks = true }
             )
+            .popover(isPresented: $showBookmarks) {
+                BookmarksView(
+                    viewModel: bookmarksViewModel,
+                    activeDirectory: viewModel.activePanelViewModel.currentPath,
+                    onNavigate: { path in
+                        Task { await viewModel.activePanelViewModel.load(path) }
+                        showBookmarks = false
+                    }
+                )
+                .frame(minWidth: 280, minHeight: 240)
+            }
             Divider()
 
             HSplitView {

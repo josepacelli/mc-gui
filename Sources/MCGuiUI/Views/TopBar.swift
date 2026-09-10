@@ -20,6 +20,9 @@ public struct TopBar: View {
     public var onGoBackActive: () -> Void
     public var onGoForwardActive: () -> Void
     public var onToggleHiddenFiles: () -> Void
+    // BM-01..04: opens the Bookmarks popover (`MainWindow`) - mirrors real mc's Command
+    // menu "Directory hotlist" entry (Ctrl+\).
+    public var onOpenBookmarks: () -> Void
 
     public init(
         leftVolumes: [VolumeInfo],
@@ -32,7 +35,8 @@ public struct TopBar: View {
         onRefreshActive: @escaping () -> Void,
         onGoBackActive: @escaping () -> Void = {},
         onGoForwardActive: @escaping () -> Void = {},
-        onToggleHiddenFiles: @escaping () -> Void
+        onToggleHiddenFiles: @escaping () -> Void,
+        onOpenBookmarks: @escaping () -> Void = {}
     ) {
         self.leftVolumes = leftVolumes
         self.rightVolumes = rightVolumes
@@ -45,6 +49,7 @@ public struct TopBar: View {
         self.onGoBackActive = onGoBackActive
         self.onGoForwardActive = onGoForwardActive
         self.onToggleHiddenFiles = onToggleHiddenFiles
+        self.onOpenBookmarks = onOpenBookmarks
     }
 
     public var body: some View {
@@ -77,6 +82,8 @@ public struct TopBar: View {
                 // registration for the same combo risks an ambiguous/duplicate firing.
                 Button("Back") { onGoBackActive() }
                 Button("Forward") { onGoForwardActive() }
+                Divider()
+                Button("Bookmarks…") { onOpenBookmarks() }
             }
 
             Menu("Options") {

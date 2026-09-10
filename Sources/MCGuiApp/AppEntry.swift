@@ -36,6 +36,7 @@ struct AppEntry: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let windowManager = WindowManager()
     private let mainViewModel: MainWindowViewModel
+    private let bookmarksViewModel: BookmarksViewModel
 
     override init() {
         let fileSystemService = FileSystemServiceImpl()
@@ -45,6 +46,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             leftInitialPath: homeDirectory,
             rightInitialPath: homeDirectory
         )
+        // BM-01..04: bridges MCGuiUI's BookmarksView/BookmarksViewModel (which cannot
+        // depend on MCGuiMacOS) to the real, disk-persisted BookmarkStore - mirrors
+        // onViewFile/onEditFile's ViewerService/EditorService bridge below.
+        let bookmarkStore = BookmarkStore()
+        bookmarksViewModel = BookmarksViewModel(actions: BookmarksActions(
+            list: { try await bookmarkStore.list().map { BookmarkEntry(id: $0.id, name: $0.name, path: $0.path) } },
+            add: { entry in try await bookmarkStore.add(Bookmark(id: entry.id, name: entry.name, path: entry.path)) },
+            remove: { id in try await bookmarkStore.remove(id: id) }
+        ))
         super.init()
     }
 
@@ -95,7 +105,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         windowManager.showMainWindow(
             viewModel: mainViewModel,
             onViewFile: { [windowManager] entry, side in windowManager.showViewer(for: entry, panel: side) },
-            onEditFile: { [windowManager] entry, _ in windowManager.showEditor(for: entry) }
+            onEditFile: { [windowManager] entry, _ in windowManager.showEditor(for: entry) },
+            bookmarksViewModel: bookmarksViewModel
         )
     }
 
