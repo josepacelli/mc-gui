@@ -1295,9 +1295,9 @@ T49 → T50
 - Skill: NONE
 
 **Done when**:
-- [ ] All 7 top-level menus present with the exact items listed in spec MB-02..MB-06
-- [ ] Every menu item shows its keyboard shortcut
-- [ ] XCUITest covers: each menu is present, a sampled item from each menu triggers its action
+- [x] All 7 top-level menus present with the exact items listed in spec MB-02..MB-06
+- [x] Every menu item shows its keyboard shortcut
+- [ ] XCUITest covers: each menu is present, a sampled item from each menu triggers its action - **DEFERRED**: no Xcode project/scheme exists yet in this pure-SPM setup; `swift build && swift test` gate used instead per batch instructions. `AppCommands` is pure declarative menu/shortcut routing (each item calls exactly one injected `AppCommandActions` closure or a standard AppKit responder-chain selector, mirroring T44's `KeyboardShortcuts` precedent) with no branching/dispatch logic to unit test - no test file was added, per the batch's guidance not to force artificial tests here. `.commandsRemoved()` is applied where `AppCommands` is installed (`MCGuiApp/AppEntry.swift`, T50) so this becomes the sole File/Edit/View/Window/Help menu content, avoiding duplicates with SwiftUI's own defaults.
 
 **Tests**: e2e
 **Gate**: build

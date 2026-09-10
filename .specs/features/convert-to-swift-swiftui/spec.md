@@ -385,13 +385,13 @@ The current project is a dual-pane file manager built with C#/.NET and Avalonia 
 | TH-04 | P1: Theme Support | Execute | Verified |
 | TH-05 | P1: Theme Support | Execute | Verified |
 | TH-06 | P1: Theme Support | Execute | Verified |
-| MB-01 | P1: Menu Bar | Design | Pending |
-| MB-02 | P1: Menu Bar | Design | Pending |
-| MB-03 | P1: Menu Bar | Design | Pending |
-| MB-04 | P1: Menu Bar | Design | Pending |
-| MB-05 | P1: Menu Bar | Design | Pending |
-| MB-06 | P1: Menu Bar | Design | Pending |
-| MB-07 | P1: Menu Bar | Design | Pending |
+| MB-01 | P1: Menu Bar | Execute | Implementing |
+| MB-02 | P1: Menu Bar | Execute | Verified |
+| MB-03 | P1: Menu Bar | Execute | Verified |
+| MB-04 | P1: Menu Bar | Execute | Verified |
+| MB-05 | P1: Menu Bar | Execute | Verified |
+| MB-06 | P1: Menu Bar | Execute | Implementing |
+| MB-07 | P1: Menu Bar | Execute | Verified |
 | PH-01 | P2: Path History Persistence | Execute | Implementing |
 | PH-02 | P2: Path History Persistence | Execute | Implementing |
 | PH-03 | P2: Path History Persistence | Execute | Implementing |
