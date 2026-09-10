@@ -700,6 +700,16 @@ Open %@" message.
 **Tests**: none / update existing
 **Gate**: full
 
+**Confirmed**: 4 keys extracted (`windowManager.title.copying`, `.title.help`,
+`.title.userMenu`, `.alert.couldNotOpen`, the last parameterized with `%1$@` via
+`NSLocalizedString` + `String(format:)`, matching AD-005's convention) into `MCGuiApp`'s
+own 4 `Localizable.strings` (not `MCGuiUI`'s). The main window's `"Midnight Commander"`
+title stays literal - product name, never translated per spec.md's confirmed assumption
+- left untouched, out of this task's `What:` list. No test file references
+`WindowManager.swift` - none needed updating. `swift test`: 318 passed, 0 failed.
+
+**Status**: ✅ Complete
+
 ---
 
 ### T22: Extract `HelpWindow.swift`

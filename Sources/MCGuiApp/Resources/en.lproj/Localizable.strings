@@ -1,2 +1,8 @@
 /* Placeholder key confirming Bundle.module resource resolution (T1). Replaced by real UI keys starting in Phase 4 (WindowManager). */
 "app.placeholder" = "placeholder";
+
+/* WindowManager.swift (T21). %1$@ in the alert is a file name. */
+"windowManager.title.copying" = "Copying…";
+"windowManager.title.help" = "Help";
+"windowManager.title.userMenu" = "User Menu";
+"windowManager.alert.couldNotOpen" = "Could Not Open %1$@";

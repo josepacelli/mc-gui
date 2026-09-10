@@ -111,7 +111,10 @@ public final class WindowManager {
                 editorWindows.append(window)
             } catch {
                 let alert = NSAlert()
-                alert.messageText = "Could Not Open \(entry.name)"
+                alert.messageText = String(
+                    format: NSLocalizedString("windowManager.alert.couldNotOpen", bundle: .module, comment: "Alert title when opening a file in the editor fails. %1$@ is the file name."),
+                    entry.name
+                )
                 alert.informativeText = error.localizedDescription
                 alert.runModal()
             }
@@ -133,7 +136,7 @@ public final class WindowManager {
     public func showProgress(_ progressViewModel: ProgressDialogViewModel) {
         let content = ProgressDialog(viewModel: progressViewModel)
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
-        window.title = "Copying…"
+        window.title = String(localized: "windowManager.title.copying", bundle: .module, comment: "Progress window title shown while a copy/move runs")
         window.styleMask = [.titled, .closable]
         centerOverMainWindow(window)
         window.makeKeyAndOrderFront(nil)
@@ -175,7 +178,7 @@ public final class WindowManager {
         }
 
         let window = NSWindow(contentViewController: NSHostingController(rootView: HelpWindow()))
-        window.title = "Help"
+        window.title = String(localized: "windowManager.title.help", bundle: .module, comment: "F1 Help window title")
         window.styleMask = [.titled, .closable, .resizable, .miniaturizable]
         window.setContentSize(NSSize(width: 480, height: 520))
         let observer = WindowCloseObserver { [weak self] in self?.helpWindow = nil }
@@ -194,7 +197,7 @@ public final class WindowManager {
         let content = UserMenuView(viewModel: viewModel, context: context)
             .frame(minWidth: 420, minHeight: 320)
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
-        window.title = "User Menu"
+        window.title = String(localized: "windowManager.title.userMenu", bundle: .module, comment: "F2 User Menu window title")
         window.styleMask = [.titled, .closable, .resizable, .miniaturizable]
         window.setContentSize(NSSize(width: 460, height: 360))
         centerOverMainWindow(window)
