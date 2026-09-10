@@ -43,11 +43,23 @@ cp "$BIN_PATH/$SPM_PRODUCT_NAME" "$APP_DIR/Contents/MacOS/$APP_EXECUTABLE_NAME"
 
 cp "$ICON_SOURCE_DIR/mc-gui.icns" "$APP_DIR/Contents/Resources/mc-gui.icns"
 
+echo "==> Copy localized resource bundles"
+shopt -s nullglob
+RESOURCE_BUNDLES=("$BIN_PATH"/MCGui_*.bundle)
+shopt -u nullglob
+[ ${#RESOURCE_BUNDLES[@]} -gt 0 ] || { echo "ERROR: no MCGui_*.bundle found in $BIN_PATH." >&2; exit 1; }
+for bundle in "${RESOURCE_BUNDLES[@]}"; do
+    cp -R "$bundle" "$APP_DIR/Contents/Resources/"
+done
+
 sed "s/__VERSION__/$VERSION/g" "$SCRIPT_DIR/Info.plist" > "$APP_DIR/Contents/Info.plist"
 
 echo "==> Verify bundle"
 plutil -lint "$APP_DIR/Contents/Info.plist" >/dev/null
 test -s "$APP_DIR/Contents/Resources/mc-gui.icns" || { echo "ERROR: icns missing." >&2; exit 1; }
+for bundle in "${RESOURCE_BUNDLES[@]}"; do
+    test -d "$APP_DIR/Contents/Resources/$(basename "$bundle")" || { echo "ERROR: $(basename "$bundle") missing from app bundle." >&2; exit 1; }
+done
 BIN_FILE="$(file "$APP_DIR/Contents/MacOS/$APP_EXECUTABLE_NAME")"
 echo "$BIN_FILE"
 case "$BIN_FILE" in

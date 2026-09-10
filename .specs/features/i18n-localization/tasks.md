@@ -168,12 +168,19 @@ name) from the `swift build` bin path into `$APP_DIR/Contents/Resources/`; add
 **Tools**: MCP: NONE. Skill: NONE.
 
 **Done when**:
-- [ ] `./packaging/build-macos.sh 0.1.0` succeeds
-- [ ] `find "artifacts/Midnight Commander GUI.app/Contents/Resources" -name "*.bundle"` lists one bundle per resource-bearing target
-- [ ] `plutil -lint` on the produced `Info.plist` passes (existing bundle-verify step already does this)
+- [x] `./packaging/build-macos.sh 0.1.0` succeeds
+- [x] `find "artifacts/Midnight Commander GUI.app/Contents/Resources" -name "*.bundle"` lists one bundle per resource-bearing target
+- [x] `plutil -lint` on the produced `Info.plist` passes (existing bundle-verify step already does this)
 
 **Tests**: none
 **Gate**: build
+
+**Confirmed**: `MCGui_MCGuiUI.bundle`, `MCGui_MCGuiMacOS.bundle`, `MCGui_MCGuiApp.bundle`
+all present under `Contents/Resources/` after a real `./packaging/build-macos.sh 0.1.0`
+run. `CFBundleDevelopmentRegion` was already `en` in `Info.plist` (pre-existing, not
+added by this task); `CFBundleLocalizations` (en, pt-BR, pt-PT, es) added.
+
+**Status**: ✅ Complete
 
 ---
 
