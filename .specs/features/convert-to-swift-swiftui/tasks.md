@@ -1114,8 +1114,8 @@ T42 → T43
 - Skill: NONE
 
 **Done when**:
-- [ ] Exposes the 3 actions and reports the chosen outcome to the caller
-- [ ] Unit tests cover each of the 3 outcomes
+- [x] Exposes the 3 actions and reports the chosen outcome to the caller
+- [x] Unit tests cover each of the 3 outcomes
 
 **Tests**: unit
 **Gate**: quick
