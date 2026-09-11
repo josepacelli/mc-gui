@@ -203,3 +203,10 @@
 "mkdirValidation.error.containsSlash" = "Folder name cannot contain \"/\".";
 "deleteConfirmValidation.noSelection" = "No files selected.";
 "saveChangesPrompt.message" = "Save changes to \"%1$@\" before closing?";
+
+/* GoToFolderDialog.swift */
+"goToFolder.title" = "Go to Folder";
+"goToFolder.field.path" = "Path";
+"goToFolder.button.cancel" = "Cancel";
+"goToFolder.button.go" = "Go";
+"goToFolder.error.empty" = "Enter a path.";

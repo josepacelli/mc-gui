@@ -203,3 +203,10 @@
 "mkdirValidation.error.containsSlash" = "O nome da pasta não pode conter \"/\".";
 "deleteConfirmValidation.noSelection" = "Nenhum ficheiro selecionado.";
 "saveChangesPrompt.message" = "Guardar as alterações em \"%1$@\" antes de fechar?";
+
+/* GoToFolderDialog.swift */
+"goToFolder.title" = "Ir para Pasta";
+"goToFolder.field.path" = "Caminho";
+"goToFolder.button.cancel" = "Cancelar";
+"goToFolder.button.go" = "Ir";
+"goToFolder.error.empty" = "Introduza um caminho.";

@@ -4,9 +4,11 @@ import MCGuiCore
 @MainActor
 public struct FileRow: View {
     public let entry: FileEntry
+    public let isMarked: Bool
 
-    public init(entry: FileEntry) {
+    public init(entry: FileEntry, isMarked: Bool = false) {
         self.entry = entry
+        self.isMarked = isMarked
     }
 
     private var isBrokenSymlink: Bool {
@@ -17,7 +19,8 @@ public struct FileRow: View {
         HStack {
             FileIcon(type: entry.type, isSymlinkBroken: isBrokenSymlink)
             Text(entry.name)
-                .foregroundStyle(isBrokenSymlink ? AnyShapeStyle(.red) : AnyShapeStyle(.primary))
+                .foregroundStyle(nameColor)
+                .fontWeight(isMarked ? .bold : .regular)
                 .italic(isBrokenSymlink)
             Spacer()
             Text(sizeText)
@@ -27,6 +30,12 @@ public struct FileRow: View {
             PermissionBadge(permissions: entry.permissions)
         }
         .contentShape(Rectangle())
+    }
+
+    private var nameColor: AnyShapeStyle {
+        if isBrokenSymlink { return AnyShapeStyle(.red) }
+        if isMarked { return AnyShapeStyle(.orange) }
+        return AnyShapeStyle(.primary)
     }
 
     private var sizeText: String {

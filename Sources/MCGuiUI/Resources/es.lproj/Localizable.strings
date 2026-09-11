@@ -203,3 +203,10 @@
 "mkdirValidation.error.containsSlash" = "El nombre de la carpeta no puede contener \"/\".";
 "deleteConfirmValidation.noSelection" = "Ningún archivo seleccionado.";
 "saveChangesPrompt.message" = "¿Guardar los cambios en \"%1$@\" antes de cerrar?";
+
+/* GoToFolderDialog.swift */
+"goToFolder.title" = "Ir a Carpeta";
+"goToFolder.field.path" = "Ruta";
+"goToFolder.button.cancel" = "Cancelar";
+"goToFolder.button.go" = "Ir";
+"goToFolder.error.empty" = "Introduce una ruta.";

@@ -18,12 +18,13 @@ public struct PanelView: View {
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
-    @State private var cursorID: FileEntry.ID?
+    @State private var markedIDs: Set<UUID> = []
 
     @State private var copyMoveViewModel: CopyMoveDialogViewModel?
     @State private var conflictDialogViewModel: ConflictDialogViewModel?
     @State private var mkdirViewModel: MkdirDialogViewModel?
     @State private var deleteViewModel: DeleteConfirmDialogViewModel?
+    @State private var goToFolderViewModel: GoToFolderDialogViewModel?
     @State private var operationErrorMessage: String?
     @State private var operationTask: Task<OperationResult, Error>?
 
@@ -72,6 +73,14 @@ public struct PanelView: View {
 
     private var selectedDisplayEntries: [FileEntry] {
         displayEntries.filter { selection.contains($0.id) }
+    }
+
+    private var markedEntries: [FileEntry] {
+        viewModel.entries.filter { markedIDs.contains($0.id) }
+    }
+
+    private var operationEntries: [FileEntry] {
+        markedEntries.isEmpty ? selectedEntries : markedEntries
     }
 
     private var displayedErrorMessage: String? {
@@ -137,22 +146,32 @@ public struct PanelView: View {
                 DeleteConfirmDialog(viewModel: deleteViewModel, onCancel: { self.deleteViewModel = nil })
             }
         }
+        .sheet(isPresented: presented($goToFolderViewModel)) {
+            if let goToFolderViewModel {
+                GoToFolderDialog(viewModel: goToFolderViewModel, onCancel: { self.goToFolderViewModel = nil })
+            }
+        }
         .onChange(of: mkdirViewModel?.isCompleted) { _, completed in
             guard completed == true else { return }
             mkdirViewModel = nil
             Task { await viewModel.load() }
         }
+        .onChange(of: goToFolderViewModel?.isCompleted) { _, completed in
+            guard completed == true, let target = goToFolderViewModel?.resultPath else { return }
+            goToFolderViewModel = nil
+            Task { await viewModel.load(target) }
+        }
         .onChange(of: deleteViewModel?.isCompleted) { _, completed in
             guard completed == true else { return }
             deleteViewModel = nil
-            selection = []
+            markedIDs = []
             Task { await viewModel.load() }
         }
     }
 
     private var entryList: some View {
         List(displayEntries, selection: $selection) { entry in
-            FileRow(entry: entry)
+            FileRow(entry: entry, isMarked: markedIDs.contains(entry.id))
                 .contextMenu {
                     Text(entry.name)
                 }
@@ -184,19 +203,33 @@ public struct PanelView: View {
 
 
     private var header: some View {
-        Text(viewModel.currentPath.path)
-            .font(.system(.caption, design: .monospaced))
-            .lineLimit(1)
-            .truncationMode(.head)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(isActive ? Color.accentColor.opacity(0.25) : Color.gray.opacity(0.15))
+        HStack(spacing: 4) {
+            Text(viewModel.currentPath.path)
+                .font(.system(.caption, design: .monospaced))
+                .lineLimit(1)
+                .truncationMode(.head)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+                .onTapGesture(count: 2, perform: beginGoToFolder)
+
+            Button(action: beginGoToFolder) {
+                Image(systemName: "arrow.right.square")
+            }
+            .buttonStyle(.plain)
+            .help(String(localized: "goToFolder.title", bundle: .module, comment: "Go to Folder dialog title"))
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(isActive ? Color.accentColor.opacity(0.25) : Color.gray.opacity(0.15))
+    }
+
+    private func beginGoToFolder() {
+        goToFolderViewModel = GoToFolderDialogViewModel(fileSystemService: fileSystemService, currentPath: viewModel.currentPath)
     }
 
     private var footer: some View {
         HStack {
-            if selection.isEmpty {
+            if markedIDs.isEmpty {
                 Text(
                     String(
                         format: NSLocalizedString(
@@ -215,7 +248,7 @@ public struct PanelView: View {
                             bundle: .module,
                             comment: "Panel footer: selected-of-total count. %1$d is the selected count, %2$d is the total count."
                         ),
-                        selection.count, viewModel.entries.count
+                        markedIDs.count, viewModel.entries.count
                     )
                 )
             }
@@ -293,7 +326,7 @@ public struct PanelView: View {
         guard operationTask == nil else { return }
         operationErrorMessage = nil
         copyMoveViewModel = Self.makeCopyMoveDialog(
-            selection: selectedEntries,
+            selection: operationEntries,
             mode: mode,
             destinationDirectory: otherPanelPath ?? viewModel.currentPath
         )
@@ -307,7 +340,7 @@ public struct PanelView: View {
     private func beginDelete() {
         operationErrorMessage = nil
         deleteViewModel = Self.makeDeleteDialog(
-            selection: selectedEntries,
+            selection: operationEntries,
             trashService: FileSystemTrashAdapter(fileSystemService: fileSystemService)
         )
     }
@@ -332,35 +365,36 @@ public struct PanelView: View {
 
     private func toggleCurrentSelection() {
         guard let currentID = currentRowID else { return }
-        selection = PanelCommands.toggleSelection(selection, id: currentID, entries: displayEntries)
-        cursorID = currentID
+        markedIDs = PanelCommands.toggleSelection(markedIDs, id: currentID, entries: displayEntries)
     }
 
     private func toggleAndAdvanceSelection() {
         guard let currentID = currentRowID else { return }
-        let result = PanelCommands.toggleAndAdvance(selection, id: currentID, entries: displayEntries)
-        selection = result.selection
-        cursorID = result.nextCursor ?? currentID
+        let result = PanelCommands.toggleAndAdvance(markedIDs, id: currentID, entries: displayEntries)
+        markedIDs = result.selection
+        if let next = result.nextCursor {
+            selection = [next]
+        }
     }
 
     private var currentRowID: FileEntry.ID? {
-        cursorID ?? selection.first ?? displayEntries.first?.id
+        selection.first ?? displayEntries.first?.id
     }
 
     private func selectAllEntries() {
-        selection = PanelCommands.selectAll(entries: viewModel.entries)
+        markedIDs = PanelCommands.selectAll(entries: viewModel.entries)
     }
 
     private func deselectAllEntries() {
-        selection = PanelCommands.deselectAll()
+        markedIDs = PanelCommands.deselectAll()
     }
 
     private func invertSelection() {
-        selection = PanelCommands.invertSelection(selection, entries: viewModel.entries)
+        markedIDs = PanelCommands.invertSelection(markedIDs, entries: viewModel.entries)
     }
 
     private func handleEscape() {
-        switch Self.escapeAction(hasOpenSheet: hasOpenSheet, filterText: viewModel.filterText, hasSelection: !selection.isEmpty) {
+        switch Self.escapeAction(hasOpenSheet: hasOpenSheet, filterText: viewModel.filterText, hasSelection: !markedIDs.isEmpty) {
         case .dismissSheet:
             conflictDialogViewModel = nil
             copyMoveViewModel = nil
@@ -369,7 +403,7 @@ public struct PanelView: View {
         case .clearFilter:
             viewModel.clearFilter()
         case .clearSelection:
-            selection = []
+            markedIDs = []
         case .none:
             break
         }
@@ -377,6 +411,7 @@ public struct PanelView: View {
 
     private var hasOpenSheet: Bool {
         conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil || deleteViewModel != nil
+            || goToFolderViewModel != nil
     }
 
     private func performCopyMove(_ dialogViewModel: CopyMoveDialogViewModel, background: Bool) async {
