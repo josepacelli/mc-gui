@@ -52,12 +52,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     override init() {
         let fileSystemService = FileSystemServiceImpl()
-        let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
+        // Restores the last-used directories, per-panel sort/hidden preference, and
+        // active panel (window geometry itself is restored separately, natively, by
+        // `NSWindow.setFrameAutosaveName` in `WindowManager.showMainWindow`).
+        let settings = AppSettingsStore.load()
         mainViewModel = MainWindowViewModel(
             fileSystemService: fileSystemService,
-            leftInitialPath: homeDirectory,
-            rightInitialPath: homeDirectory
+            leftInitialPath: settings.leftPath,
+            rightInitialPath: settings.rightPath
         )
+        mainViewModel.leftPanel.sortColumn = settings.leftSortColumn
+        mainViewModel.rightPanel.sortColumn = settings.rightSortColumn
+        mainViewModel.leftPanel.showHidden = settings.leftShowHidden
+        mainViewModel.rightPanel.showHidden = settings.rightShowHidden
+        if settings.activePanel == .right {
+            mainViewModel.activate(.right)
+        }
         // BM-01..04: bridges MCGuiUI's BookmarksView/BookmarksViewModel (which cannot
         // depend on MCGuiMacOS) to the real, disk-persisted BookmarkStore - mirrors
         // onViewFile/onEditFile's ViewerService/EditorService bridge below.
@@ -160,5 +170,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        AppSettingsStore.save(mainViewModel)
     }
 }

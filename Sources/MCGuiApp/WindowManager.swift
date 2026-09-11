@@ -61,7 +61,16 @@ public final class WindowManager {
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.title = "Midnight Commander"
         window.setContentSize(NSSize(width: 1024, height: 640))
-        window.center()
+        // Persists window position/size across launches natively via AppKit's own
+        // UserDefaults-backed mechanism - `setFrameUsingName` restores a previously saved
+        // frame (returns false the first launch/if none exists, falling back to the
+        // default centered size above); `setFrameAutosaveName` then keeps saving on every
+        // future move/resize.
+        let autosaveName = "MainWindow"
+        if !window.setFrameUsingName(autosaveName) {
+            window.center()
+        }
+        window.setFrameAutosaveName(autosaveName)
         window.makeKeyAndOrderFront(nil)
         mainWindow = window
     }
