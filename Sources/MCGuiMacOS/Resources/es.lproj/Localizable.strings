@@ -1,0 +1,15 @@
+/* Placeholder key confirming Bundle.module resource resolution (T1/T4). Replaced by real UI keys in a later phase. */
+"app.placeholder" = "marcador de posición";
+
+/* FileSystemServiceError.errorDescription (T5). %1$@ es una ruta de archivo/carpeta. */
+"fileSystemError.permissionDenied" = "Permiso denegado: “%1$@”.";
+"fileSystemError.alreadyExists" = "“%1$@” ya existe.";
+"fileSystemError.fileInUse" = "“%1$@” está en uso por otro proceso.";
+"fileSystemError.insufficientDiskSpace" = "Espacio en disco insuficiente para completar la operación.";
+"fileSystemError.volumeDisconnected" = "El volumen de “%1$@” se desconectó.";
+"fileSystemError.pathTooLong" = "La ruta de destino “%1$@” es demasiado larga.";
+
+/* FileSystemServiceImpl.swift, TrashServiceImpl.swift: OperationResult.errorMessage batch summaries (T24 sweep gap) */
+"operationResult.error.copyFailed" = "Algunos elementos no se pudieron copiar";
+"operationResult.error.moveFailed" = "Algunos elementos no se pudieron mover";
+"operationResult.error.trashFailed" = "Algunos elementos no se pudieron mover a la Papelera";

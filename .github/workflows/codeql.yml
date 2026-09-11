@@ -1,0 +1,33 @@
+name: CodeQL
+
+# Disabled for now - workflow_dispatch only (no automatic push/pull_request/schedule
+# triggers). Flip back on when ready by restoring those triggers.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: swift
+
+      - name: Build
+        run: swift build
+
+      - uses: github/codeql-action/analyze@v3

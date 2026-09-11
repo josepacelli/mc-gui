@@ -1,0 +1,205 @@
+/* PanelView.swift (T6) */
+"panel.footer.fileCount" = "%1$d ficheiros";
+"panel.footer.selectionCount" = "%1$d de %2$d selecionados";
+"panel.operationFailure.single" = "%1$@: %2$@";
+"panel.operationFailure.multiple" = "%1$@: %2$@ (+%3$d mais)";
+
+/* CopyMoveDialog.swift (T7) */
+"copyMove.title.copy" = "Copiar";
+"copyMove.title.move" = "Mover";
+"copyMove.header.singular" = "%1$@ %2$d item";
+"copyMove.header.plural" = "%1$@ %2$d itens";
+"copyMove.field.destination" = "Destino";
+"copyMove.toggle.preserveAttributes" = "Preservar Atributos";
+"copyMove.toggle.followSymlinks" = "Seguir Ligações Simbólicas";
+"copyMove.toggle.updateOnly" = "Apenas Atualizar (ignorar ficheiros já atualizados)";
+"copyMove.button.cancel" = "Cancelar";
+"copyMove.button.background" = "Segundo Plano";
+
+/* ConflictDialog.swift (T8) */
+"conflictDialog.header.alreadyExists" = "“%1$@” já existe";
+"conflictDialog.button.cancel" = "Cancelar";
+"conflictDialog.button.skip" = "Ignorar";
+"conflictDialog.button.rename" = "Mudar o Nome";
+"conflictDialog.button.overwrite" = "Substituir";
+
+/* MkdirDialog.swift (T9) */
+"mkdir.title" = "Nova Pasta";
+"mkdir.field.name" = "Nome da Pasta";
+"mkdir.button.cancel" = "Cancelar";
+"mkdir.button.create" = "Criar";
+
+/* DeleteConfirmDialog.swift (T10) */
+"deleteConfirm.header.singular" = "Mover %1$d item para o Lixo?";
+"deleteConfirm.header.plural" = "Mover %1$d itens para o Lixo?";
+"deleteConfirm.button.cancel" = "Cancelar";
+"deleteConfirm.button.confirm" = "Mover para o Lixo";
+
+/* SaveChangesDialog.swift (T11) */
+"saveChanges.button.cancel" = "Cancelar";
+"saveChanges.button.dontSave" = "Não Guardar";
+"saveChanges.button.save" = "Guardar";
+
+/* ProgressDialog.swift (T12) */
+"progress.title.copying" = "A copiar…";
+"progress.status.scanning" = "A analisar…";
+"progress.status.fileCount" = "Ficheiro %1$d de %2$d";
+"progress.label.of" = "de";
+"progress.label.etaRemaining" = "%1$ds restantes";
+"progress.button.cancel" = "Cancelar";
+
+/* TopBar.swift (T13) */
+"topBar.menu.left" = "Esquerda";
+"topBar.menu.file" = "Ficheiro";
+"topBar.menu.command" = "Comando";
+"topBar.menu.options" = "Opções";
+"topBar.menu.right" = "Direita";
+"topBar.menu.rescan" = "Atualizar";
+"topBar.file.newFolder" = "Nova Pasta";
+"topBar.file.copy" = "Copiar";
+"topBar.file.move" = "Mover";
+"topBar.file.delete" = "Eliminar";
+"topBar.file.view" = "Ver";
+"topBar.file.edit" = "Editar";
+"topBar.file.quit" = "Sair";
+"topBar.command.refresh" = "Atualizar";
+"topBar.command.back" = "Retroceder";
+"topBar.command.forward" = "Avançar";
+"topBar.command.bookmarks" = "Marcadores…";
+"topBar.command.userMenu" = "Menu do Utilizador…";
+"topBar.options.showHiddenFiles" = "Mostrar Ficheiros Ocultos";
+"topBar.options.theme" = "Tema";
+
+/* ButtonBar.swift (T14) */
+"buttonBar.label.help" = "Ajuda";
+"buttonBar.label.menu" = "Menu";
+"buttonBar.label.view" = "Ver";
+"buttonBar.label.edit" = "Editar";
+"buttonBar.label.copy" = "Copiar";
+"buttonBar.label.renMov" = "Mover / Mudar o Nome";
+"buttonBar.label.mkdir" = "Nova Pasta";
+"buttonBar.label.delete" = "Eliminar";
+"buttonBar.label.pullDn" = "Menu Superior";
+"buttonBar.label.quit" = "Sair";
+
+/* BookmarksView.swift (T16) */
+"bookmarks.header.title" = "Marcadores";
+"bookmarks.button.add.help" = "Adicionar Marcador (⌘D)";
+"bookmarks.button.remove.help" = "Remover Marcador";
+
+/* UserMenuView.swift (T17) */
+"userMenu.header.title" = "Menu do Utilizador";
+"userMenu.button.addCommand.help" = "Adicionar Comando";
+"userMenu.field.label" = "Rótulo";
+"userMenu.field.commandPlaceholder" = "Comando (%f ficheiro, %d diretório, %D outro diretório)";
+"userMenu.button.cancel" = "Cancelar";
+"userMenu.button.add" = "Adicionar";
+"userMenu.button.run" = "Executar";
+"userMenu.button.remove.help" = "Remover";
+"userMenu.result.noOutput" = "(sem saída)";
+"userMenu.result.exitCode" = "Código de Saída: %1$d";
+
+/* ViewerWindow.swift (T18) */
+"viewer.mode.text" = "Texto";
+"viewer.mode.image" = "Imagem";
+"viewer.mode.hex" = "Hex";
+"viewer.picker.mode" = "Modo";
+"viewer.button.find.help" = "Localizar (⌘F)";
+"viewer.field.search" = "Pesquisar";
+"viewer.search.matchCount" = "%1$d correspondências";
+
+/* EditorWindow.swift (T19) */
+"editor.button.cut.help" = "Cortar";
+"editor.button.copy.help" = "Copiar";
+"editor.button.paste.help" = "Colar";
+"editor.button.undo.help" = "Desfazer";
+"editor.button.redo.help" = "Refazer";
+"editor.button.selectAll.help" = "Selecionar Tudo (⌘A)";
+"editor.button.save.help" = "Guardar (⌘S)";
+"editor.button.find.help" = "Localizar (⌘F)";
+"editor.button.findReplace.help" = "Localizar e Substituir (⌥⌘F)";
+"editor.field.find" = "Localizar";
+"editor.button.findNext" = "Localizar Seguinte";
+"editor.field.replace" = "Substituir";
+"editor.button.replaceAll" = "Substituir Tudo";
+"editor.button.done" = "Concluído";
+"editor.status.editedSuffix" = " (editado)";
+
+/* AppCommands.swift (T20) */
+"appCommands.menu.file" = "Ficheiro";
+"appCommands.menu.edit" = "Editar";
+"appCommands.menu.view" = "Ver";
+"appCommands.menu.go" = "Ir";
+"appCommands.menu.window" = "Janela";
+"appCommands.menu.help" = "Ajuda";
+"appCommands.menu.sort" = "Ordenar";
+"appCommands.menu.theme" = "Tema";
+"appCommands.file.newFolder" = "Nova Pasta";
+"appCommands.file.copy" = "Copiar";
+"appCommands.file.move" = "Mover";
+"appCommands.file.delete" = "Eliminar";
+"appCommands.file.view" = "Ver";
+"appCommands.file.edit" = "Editar";
+"appCommands.file.quit" = "Sair";
+"appCommands.edit.undo" = "Desfazer";
+"appCommands.edit.redo" = "Refazer";
+"appCommands.edit.cut" = "Cortar";
+"appCommands.edit.copy" = "Copiar";
+"appCommands.edit.paste" = "Colar";
+"appCommands.edit.selectAll" = "Selecionar Tudo";
+"appCommands.view.sortByName" = "Ordenar por Nome";
+"appCommands.view.sortBySize" = "Ordenar por Tamanho";
+"appCommands.view.sortByDate" = "Ordenar por Data";
+"appCommands.view.sortByType" = "Ordenar por Tipo";
+"appCommands.view.showHiddenFiles" = "Mostrar Ficheiros Ocultos";
+"appCommands.view.refresh" = "Atualizar";
+"appCommands.go.back" = "Retroceder";
+"appCommands.go.forward" = "Avançar";
+"appCommands.go.parent" = "Diretório Superior";
+"appCommands.go.home" = "Início";
+"appCommands.go.computer" = "Computador";
+"appCommands.window.minimize" = "Minimizar";
+"appCommands.window.zoom" = "Zoom";
+"appCommands.window.viewer" = "Visualizador";
+"appCommands.window.editor" = "Editor";
+"appCommands.help.item" = "Ajuda do Midnight Commander";
+
+/* HelpWindow.swift (T22). "Midnight Commander" (app name) and keyboard glyphs are never translated. */
+"help.subtitle" = "Um gestor de ficheiros de painel duplo para macOS.";
+"help.section.panelShortcuts" = "Atalhos do Painel";
+"help.section.globalShortcuts" = "Atalhos Globais";
+"help.action.parentDirectory" = "Diretório superior";
+"help.panel.userMenu" = "Menu do utilizador";
+"help.panel.viewFile" = "Ver ficheiro";
+"help.panel.editFile" = "Editar ficheiro";
+"help.panel.copy" = "Copiar";
+"help.panel.moveRename" = "Mover / Mudar o Nome";
+"help.panel.newFolder" = "Nova pasta";
+"help.panel.delete" = "Eliminar";
+"help.panel.openEntry" = "Abrir diretório / ficheiro";
+"help.panel.switchPanel" = "Alternar painel";
+"help.panel.toggleSelection" = "Alternar seleção";
+"help.panel.toggleSelectionMoveDown" = "Alternar seleção, mover para baixo";
+"help.panel.invertSelection" = "Inverter seleção (selecionar/desmarcar tudo)";
+"help.panel.closeOrClear" = "Fechar diálogo / limpar seleção";
+"help.panel.jumpFirstLast" = "Ir para a primeira / última linha";
+"help.global.sortShortcuts" = "Ordenar por nome / tamanho / data / tipo";
+"help.global.toggleHiddenFiles" = "Alternar ficheiros ocultos";
+"help.global.backForward" = "Retroceder / Avançar";
+"help.global.addBookmark" = "Adicionar marcador";
+"help.global.find" = "Localizar (visualizador / editor)";
+"help.global.quit" = "Sair";
+
+/* ThemeMenu.swift (T23) */
+"themeMenu.option.system" = "Seguir o Sistema";
+"themeMenu.option.light" = "Claro";
+"themeMenu.option.dark" = "Escuro";
+
+/* SupportComponents.swift (T23) */
+"supportComponents.loading.message" = "A carregar…";
+
+/* MkdirDialogViewModel.swift, DeleteConfirmDialogViewModel.swift, SaveChangesDialogViewModel.swift (T24 sweep gaps) */
+"mkdirValidation.error.empty" = "O nome da pasta não pode estar vazio.";
+"mkdirValidation.error.containsSlash" = "O nome da pasta não pode conter \"/\".";
+"deleteConfirmValidation.noSelection" = "Nenhum ficheiro selecionado.";
+"saveChangesPrompt.message" = "Guardar as alterações em \"%1$@\" antes de fechar?";

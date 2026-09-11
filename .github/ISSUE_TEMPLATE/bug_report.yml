@@ -1,0 +1,41 @@
+name: Bug report
+description: Something isn't working as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: proof
+    attributes:
+      label: Proof
+      description: Screenshot or steps to reproduce showing the bug.
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: e.g. macOS 14.5, Apple Silicon
+    validations:
+      required: true
+
+  - type: input
+    id: area
+    attributes:
+      label: Suspect area of the code
+      placeholder: e.g. Sources/MCGuiUI/Views/PanelView.swift
+    validations:
+      required: false

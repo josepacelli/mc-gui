@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 16,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::theme structural tests must assert light and dark token values differ not only that the key exists in each variant",
+      "text": "Theme structural tests must assert Light and Dark token values differ, not only that the key exists in each variant.",
+      "signal": "surviving_mutant",
+      "scope": "src/McGui.App/Themes.axaml",
+      "status": "candidate",
+      "features": [
+        "theming"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/McGui.App.Tests/Theming/ThemeResourcesTests.cs:99 (src/McGui.App/Themes.axaml)"
+      ],
+      "created": "2026-09-05T20:20:53Z",
+      "last_seen": "2026-09-05T20:20:53Z"
+    },
+    {
+      "id": "L-002",
+      "key": "spec_precision_gap::do not spec a xaml color literal as a build failure avalonia compiles literals assert the structural scan rejects them",
+      "text": "Do not spec a XAML color literal as a build failure - Avalonia compiles literals; assert the structural scan rejects them.",
+      "signal": "spec_precision_gap",
+      "scope": "Avalonia",
+      "status": "candidate",
+      "features": [
+        "theming"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/theming/spec.md:97 (Avalonia)"
+      ],
+      "created": "2026-09-05T20:20:56Z",
+      "last_seen": "2026-09-05T20:20:56Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_deviation::avalonia 12 removed the menubar control use the top level menu control for a menu bar",
+      "text": "Avalonia 12 removed the MenuBar control; use the top-level Menu control for a menu bar.",
+      "signal": "spec_deviation",
+      "scope": "Avalonia",
+      "status": "candidate",
+      "features": [
+        "theming"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/theming/tasks.md:191 (Avalonia)"
+      ],
+      "created": "2026-09-05T20:20:58Z",
+      "last_seen": "2026-09-05T20:20:58Z"
+    },
+    {
+      "id": "L-004",
+      "key": "surviving_mutant::row view models that gate a spec visible column value empty size for directory and rows need an explicit unit test on the derived property a xaml binding alone does not discriminate a regression",
+      "text": "Row view-models that gate a spec-visible column value (empty size for directory and '..' rows) need an explicit unit test on the derived property; a XAML binding alone does not discriminate a regression.",
+      "signal": "surviving_mutant",
+      "scope": "App view-row layer",
+      "status": "candidate",
+      "features": [
+        "panel-icons-dotdot"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M6: src/McGui.App/ViewModels/PanelEntryRow.cs:15 (App view-row layer)"
+      ],
+      "created": "2026-09-05T21:53:25Z",
+      "last_seen": "2026-09-05T21:53:25Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::every ac that hides or shows a ui column value not just formats it must map to an app layer unit assertion on the row view model never only to the view file",
+      "text": "Every AC that hides or shows a UI column value (not just formats it) must map to an App-layer unit assertion on the row/view-model, never only to the view file.",
+      "signal": "ac_gap",
+      "scope": "spec coverage",
+      "status": "candidate",
+      "features": [
+        "panel-icons-dotdot"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "PII-15: spec.md size AC 2 (spec coverage)"
+      ],
+      "created": "2026-09-05T21:53:29Z",
+      "last_seen": "2026-09-05T21:53:29Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::axaml structural order tests must anchor all 5 top level headers in relative sequence left first right last text window split on first left lets a left file swap pass",
+      "text": "Axaml structural order tests must anchor ALL 5 top-level headers in relative sequence (Left first, Right last); text-window split on first _Left lets a Left<->File swap pass.",
+      "signal": "surviving_mutant",
+      "scope": "MainWindow.axaml tests",
+      "status": "candidate",
+      "features": [
+        "mc-menubar"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/McGui.App.Tests/McMenuDefinitionsTests.cs:161 (MainWindow.axaml tests)"
+      ],
+      "created": "2026-09-05T22:17:05Z",
+      "last_seen": "2026-09-05T22:17:05Z"
+    },
+    {
+      "id": "L-007",
+      "key": "surviving_mutant::containment of node tests need real nesting item before options closing tag not a substring window bounded by the next menu header top level theme placed between options and right evades the check",
+      "text": "Containment-of-node tests need real nesting (item before Options' closing tag), not a substring window bounded by the NEXT menu header; top-level Theme placed between Options and Right evades the check.",
+      "signal": "surviving_mutant",
+      "scope": "MainWindow.axaml tests",
+      "status": "candidate",
+      "features": [
+        "mc-menubar"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/McGui.App.Tests/McMenuDefinitionsTests.cs:175 (MainWindow.axaml tests)"
+      ],
+      "created": "2026-09-05T22:17:05Z",
+      "last_seen": "2026-09-05T22:17:05Z"
+    },
+    {
+      "id": "L-008",
+      "key": "spec_deviation::ci portability beats repo local convenience when a build dependency pil is dropped from packaging update the spec text or add a spec deviation marker at the same commit stale spec lines mislead the verifier",
+      "text": "CI portability beats repo-local convenience: when a build dependency (PIL) is dropped from packaging, update the spec text or add a SPEC_DEVIATION marker at the same commit — stale spec lines mislead the Verifier.",
+      "signal": "spec_deviation",
+      "scope": "",
+      "status": "candidate",
+      "features": [
+        "macos-installer"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:38,95"
+      ],
+      "created": "2026-09-05T22:55:01Z",
+      "last_seen": "2026-09-05T22:55:01Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_precision_gap::when a ui dimension has no avalonia sizing api to confirm it e g a native title bar height estimate pick a literal value flag it as an unverified assumption and treat human visual uat as a non blocking follow up once the underlying mechanism is structurally tested not as a blocking code defect",
+      "text": "When a UI dimension has no Avalonia sizing API to confirm it (e.g. a native title-bar height estimate), pick a literal value, flag it as an unverified assumption, and treat human visual UAT as a non-blocking follow-up once the underlying mechanism is structurally tested - not as a blocking code defect.",
+      "signal": "spec_precision_gap",
+      "scope": "Avalonia window chrome",
+      "status": "candidate",
+      "features": [
+        "macos-native-chrome"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 AC3 (.specs/features/macos-native-chrome/validation.md round 3) (Avalonia window chrome)"
+      ],
+      "created": "2026-09-06T11:34:50Z",
+      "last_seen": "2026-09-06T11:34:50Z"
+    },
+    {
+      "id": "L-010",
+      "key": "ac_gap::before marking a ui flow verified grep the source tree for real callers of its viewmodel dialog outside its own file and tests a fully unit tested component with zero callers in the shipped app is not wired regardless of test coverage",
+      "text": "Before marking a UI flow verified, grep the source tree for real callers of its ViewModel/dialog outside its own file and tests - a fully unit-tested component with zero callers in the shipped app is not wired, regardless of test coverage.",
+      "signal": "ac_gap",
+      "scope": "swiftui-viewmodel-wiring",
+      "status": "candidate",
+      "features": [
+        "convert-to-swift-swiftui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FO-05 (swiftui-viewmodel-wiring)"
+      ],
+      "created": "2026-09-10T01:07:45Z",
+      "last_seen": "2026-09-10T01:07:45Z"
+    },
+    {
+      "id": "L-011",
+      "key": "ac_gap::do not mark a requirement verified in the traceability table until the specific described behavior is confirmed present in source a sibling feature working is not evidence that this one exists",
+      "text": "Do not mark a requirement Verified in the traceability table until the specific described behavior is confirmed present in source - a sibling feature working is not evidence that this one exists.",
+      "signal": "ac_gap",
+      "scope": "requirement-traceability",
+      "status": "candidate",
+      "features": [
+        "convert-to-swift-swiftui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FV-02 (requirement-traceability)"
+      ],
+      "created": "2026-09-10T01:07:45Z",
+      "last_seen": "2026-09-10T01:07:45Z"
+    },
+    {
+      "id": "L-012",
+      "key": "spec_precision_gap::when spec md asks for an explicit user facing offer to retry action an automatic internal retry then fail is not equivalent implement or flag the missing retry affordance separately",
+      "text": "When spec.md asks for an explicit user-facing 'offer to retry' action, an automatic internal retry-then-fail is not equivalent - implement or flag the missing retry affordance separately.",
+      "signal": "spec_precision_gap",
+      "scope": "error-handling",
+      "status": "candidate",
+      "features": [
+        "convert-to-swift-swiftui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Edge Cases 1-2 (error-handling)"
+      ],
+      "created": "2026-09-10T01:07:45Z",
+      "last_seen": "2026-09-10T01:07:45Z"
+    },
+    {
+      "id": "L-013",
+      "key": "ac_gap::when two key bindings share one handler closure verify each key s full spec required behavior is implemented not just the behavior the keys have in common",
+      "text": "When two key bindings share one handler closure, verify each key's full spec-required behavior is implemented, not just the behavior the keys have in common.",
+      "signal": "ac_gap",
+      "scope": "keyboard-handling",
+      "status": "candidate",
+      "features": [
+        "convert-to-swift-swiftui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "KN-06 (validation.md) (keyboard-handling)"
+      ],
+      "created": "2026-09-10T16:07:28Z",
+      "last_seen": "2026-09-10T16:07:28Z"
+    },
+    {
+      "id": "L-014",
+      "key": "spec_deviation::when fixing a gap would require a protocol level signature change out of the current fix pass s budget defer it explicitly with a spec deviation comment rather than applying a half measure that changes nothing observable",
+      "text": "When fixing a gap would require a protocol-level signature change out of the current fix pass's budget, defer it explicitly with a SPEC_DEVIATION comment rather than applying a half-measure that changes nothing observable.",
+      "signal": "spec_deviation",
+      "scope": "fix-cycle-scoping",
+      "status": "candidate",
+      "features": [
+        "convert-to-swift-swiftui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Edge Case 4 (FileSystemServiceImpl.swift:58-69) (fix-cycle-scoping)"
+      ],
+      "created": "2026-09-10T16:07:28Z",
+      "last_seen": "2026-09-10T16:07:28Z"
+    },
+    {
+      "id": "L-015",
+      "key": "surviving_mutant::private swiftui view glue key dispatch closures cursor state helpers survives targeted mutation with no xcuitest harness in place treat it as an accepted coverage gap only when the pure function it calls is independently unit tested otherwise wire a real regression test",
+      "text": "Private SwiftUI view glue (key-dispatch closures, cursor-state helpers) survives targeted mutation with no XCUITest harness in place - treat it as an accepted coverage gap only when the pure function it calls is independently unit-tested; otherwise wire a real regression test.",
+      "signal": "surviving_mutant",
+      "scope": "swiftui-view-glue",
+      "status": "candidate",
+      "features": [
+        "convert-to-swift-swiftui"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "PanelView.swift:365-370,701-708 (validation.md iteration 2) (swiftui-view-glue)"
+      ],
+      "created": "2026-09-10T16:19:44Z",
+      "last_seen": "2026-09-10T16:19:44Z"
+    }
+  ]
+}

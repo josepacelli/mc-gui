@@ -1,0 +1,45 @@
+name: build-macos
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-dmg:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Make packaging scripts executable
+        run: chmod +x packaging/*.sh
+
+      - name: Build DMG
+        env:
+          VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.1.0' }}
+        run: |
+          VERSION="${VERSION#v}"
+          ./packaging/build-macos.sh "$VERSION"
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mc-gui-dmg
+          path: artifacts/*.dmg
+          if-no-files-found: error
+
+      - name: Attach DMG to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          DMG="$(ls artifacts/*.dmg | head -1)"
+          gh release create "${{ github.ref_name }}" "$DMG" \
+            --repo "${{ github.repository }}" \
+            --title "mc-gui ${{ github.ref_name }}" \
+            --notes "Automated macOS (arm64) build."

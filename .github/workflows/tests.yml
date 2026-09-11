@@ -1,0 +1,34 @@
+name: Tests
+
+# Nothing checked pull requests before this - a branch that didn't compile, or a unit
+# test that broke, only surfaced whenever someone happened to build locally.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A superseded run tells us nothing, so drop in-flight runs for the same ref.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      # The macos-14 runner's default Xcode predates Swift Testing (`import Testing`,
+      # Xcode 16+) - without this, every test file fails with "no such module 'Testing'".
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build
+        run: swift build
+
+      - name: Tests
+        run: swift test

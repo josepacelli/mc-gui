@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midnight Commander for macOS — native dual-pane file manager</title>
+<meta name="description" content="A free, open-source, native macOS rewrite of Midnight Commander in Swift/SwiftUI. Classic dual-pane, keyboard-driven file management with F-key shortcuts, a built-in viewer/editor, and 4 languages — no Terminal required.">
+<meta name="keywords" content="Midnight Commander macOS, mc for Mac, dual pane file manager Mac, keyboard file manager macOS, Norton Commander clone Mac, open source file manager Mac, mc-gui">
+<link rel="canonical" href="https://mc.jpmo.dev.br/">
+
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mc.jpmo.dev.br/">
+<meta property="og:site_name" content="Midnight Commander for macOS">
+<meta property="og:title" content="Midnight Commander for macOS — native dual-pane file manager">
+<meta property="og:description" content="A free, open-source, native macOS rewrite of Midnight Commander in Swift/SwiftUI. Classic dual-pane, keyboard-driven file management with F-key shortcuts, a built-in viewer/editor, and 4 languages.">
+<meta property="og:image" content="https://mc.jpmo.dev.br/apple-touch-icon.png">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Midnight Commander for macOS">
+<meta name="twitter:description" content="A free, open-source, native macOS rewrite of Midnight Commander in Swift/SwiftUI — classic dual-pane, keyboard-driven file management.">
+<meta name="twitter:image" content="https://mc.jpmo.dev.br/apple-touch-icon.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Midnight Commander for macOS",
+  "operatingSystem": "macOS 14.0+",
+  "applicationCategory": "UtilitiesApplication",
+  "description": "Open-source native macOS rewrite of Midnight Commander in Swift/SwiftUI: classic dual-pane, keyboard-driven file management with F-key shortcuts, a built-in viewer/editor, and support for Portuguese (Brazil), Portuguese (Portugal), English and Spanish.",
+  "url": "https://mc.jpmo.dev.br/",
+  "downloadUrl": "https://github.com/josepacelli/mc-gui/releases/latest",
+  "license": "https://github.com/josepacelli/mc-gui/blob/main/LICENSE",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jose Pacelli",
+    "url": "https://github.com/josepacelli"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is this the original Midnight Commander?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The original GNU Midnight Commander is a terminal (ncurses) application. This is an independent, from-scratch rewrite in Swift/SwiftUI that reproduces its classic dual-pane layout, F-key shortcuts and keyboard-driven workflow as a native macOS app - no terminal or Homebrew/mc install required."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it need Terminal or Homebrew?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It's a regular native macOS .app with real windows, a native menu bar, and Dock/Finder integration - it just happens to be entirely keyboard-driven, like the original."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What languages does it support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Portuguese (Brazil), Portuguese (Portugal), English and Spanish, matching whatever language macOS itself is set to - no in-app language picker needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it signed/notarized?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not yet - it's an unsigned development build. On first launch, right-click the app and choose Open (instead of double-clicking) to get past Gatekeeper's warning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's the license?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "GPL-3.0. Open source, free to use including commercially; distributed modified versions must remain open source under the same license."
+      }
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="brand">
+      <img class="brand-mark" src="apple-touch-icon.png" alt="">
+      Midnight Commander <span class="brand-sub">for macOS</span>
+    </div>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#install">Install</a>
+      <a href="#compare">Compare</a>
+      <a href="#faq">FAQ</a>
+      <a class="gh-stars" href="https://github.com/josepacelli/mc-gui" id="gh-stars">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        GitHub <span id="gh-stars-count">···</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <span class="status-badge"><span class="dot"></span>Early alpha · actively developed</span>
+    <h1>The classic dual-pane file manager, <em>native</em> on your Mac.</h1>
+    <p class="lead">
+      A free, open-source rewrite of <a href="https://midnight-commander.org/">Midnight Commander</a>
+      in Swift/SwiftUI - the same two-panel layout, the same F-key shortcuts, the same
+      keyboard-first workflow, as a real native macOS app instead of a terminal program.
+      No Homebrew, no <code>mc</code> install, no terminal window required.
+    </p>
+    <div class="specs">
+      <span>macOS 14.0+</span>
+      <span>Apple Silicon (arm64)</span>
+      <span>pt-BR · pt-PT · en · es</span>
+      <span>GPL-3.0</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="#install">
+        Get started
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14m0 0l-6-6m6 6l6-6"></path></svg>
+      </a>
+      <a class="btn ghost" href="https://github.com/josepacelli/mc-gui">
+        View on GitHub
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"></path></svg>
+      </a>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <p class="eyebrow">How it works</p>
+    <h2>Two panels, one keyboard, zero mouse required.</h2>
+    <p class="section-sub">
+      Every screen mirrors the original terminal layout: a top menu row, two file panels
+      side by side, and a numbered button row at the bottom for the F-keys - rebuilt with
+      real SwiftUI windows, a native macOS menu bar, and actual mouse/trackpad support on
+      top of the keyboard-only original.
+    </p>
+    <div class="diagram">
+      <div class="diagram-bar"><span></span><span></span><span></span></div>
+      <pre> Left  File  Command  Options  Right
+
+ <span class="hl">/Users/pacelli/projects</span>        <span class="hl">/Users/pacelli/tmp</span>
+ ..                             ..
+ mc-gui                         backup.zip
+ opendisplay-android            notes.txt
+ opendisplay
+
+ <span class="dim">F1</span>Help <span class="dim">F2</span>Menu <span class="dim">F3</span>View <span class="dim">F4</span>Edit <span class="dim">F5</span>Copy <span class="dim">F6</span>Move <span class="dim">F7</span>Mkdir <span class="dim">F8</span>Delete <span class="dim">F10</span>Quit</pre>
+    </div>
+  </section>
+
+  <section id="install">
+    <p class="eyebrow">Installation</p>
+    <h2>Download and run.</h2>
+    <p class="section-sub">Unsigned development build for now - right-click the app and choose <strong>Open</strong> on first launch to get past Gatekeeper.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="tag">macOS · APPLE SILICON</span>
+        <h3>Midnight Commander.app</h3>
+        <p>Drag-to-Applications DMG, built directly from source by GitHub Actions on every release.</p>
+        <a class="btn primary" href="https://github.com/josepacelli/mc-gui/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+          Download the DMG
+        </a>
+        <p class="step-note">Prefer to build it yourself? <a href="https://github.com/josepacelli/mc-gui#build">Build from source with Swift Package Manager ↗</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <p class="eyebrow">Features</p>
+    <h2>What already works today.</h2>
+    <p class="section-sub">Built and tested against the classic mc workflow, not a spec sheet.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="9" height="16" rx="1.5"></rect><rect x="13" y="4" width="9" height="16" rx="1.5"></rect></svg></div>
+        <div><h4>Classic dual-pane layout</h4><p>Left/File/Command/Options/Right menu bar and the numbered F1-F10 button row, just like the terminal original.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h10M7 13h6"></path></svg></div>
+        <div><h4>Built-in viewer &amp; editor</h4><p>F3/F4 open a native text/hex viewer and a real text editor with heuristic syntax highlighting - no external app needed.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"></path><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg></div>
+        <div><h4>Real copy/move progress</h4><p>Per-file progress and byte counts, a working Cancel mid-copy, and an explicit Background option that runs silently - same as the original.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg></div>
+        <div><h4>Copy/move never blocks</h4><p>Progress runs in an independent, non-modal window - keep browsing and working in both panels while a large transfer finishes.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z"></path></svg></div>
+        <div><h4>Bookmarks &amp; User Menu</h4><p>Save frequent directories, and define your own shell commands with %f/%d/%D macros, run against the current file or panel.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114.9-4"></path><path d="M20 12a8 8 0 01-14.9 4"></path><path d="M18 4v4h-4M6 20v-4h4"></path></svg></div>
+        <div><h4>Back/forward history, sort, hidden files</h4><p>Per-panel navigation history, sort by name/size/date/type, and a hidden-files toggle - all reachable from the keyboard.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a13 13 0 010 18M12 3a13 13 0 000 18"></path></svg></div>
+        <div><h4>4 languages, automatic</h4><p>Portuguese (Brazil), Portuguese (Portugal), English and Spanish - the app follows your Mac's System Language, no picker needed.</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"></path><path d="M10.6 5.1A11 11 0 0112 5c5 0 9 4 10 7-0.5 1.4-1.4 2.9-2.6 4.1M6.6 6.6C4.5 8 3 10 2 12c1 3 5 7 10 7 1.3 0 2.6-.2 3.7-.7"></path><path d="M9.9 9.9a3 3 0 004.2 4.2"></path></svg></div>
+        <div><h4>No account, no telemetry</h4><p>Nothing phoned home. Everything runs and stays on your Mac.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <p class="eyebrow">Compare</p>
+    <h2>Against Finder and other Mac file managers.</h2>
+    <p class="section-sub">For people who miss keyboard-driven, dual-pane file management.</p>
+    <div class="table-scroll">
+      <table class="compare">
+        <thead>
+          <tr><th></th><th>Midnight Commander</th><th>Finder</th><th>Commander One</th></tr>
+        </thead>
+        <tbody>
+          <tr class="self"><td>Price</td><td class="yes">Free</td><td class="yes">Free</td><td class="no">Paid (Pro)</td></tr>
+          <tr class="self"><td>Open source</td><td class="yes">GPL-3.0</td><td class="no">No</td><td class="no">No</td></tr>
+          <tr class="self"><td>Dual-pane</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr class="self"><td>Full keyboard workflow (F-keys)</td><td class="yes">Yes</td><td class="no">Limited</td><td class="yes">Yes</td></tr>
+          <tr class="self"><td>Account required</td><td class="yes">No</td><td class="yes">No</td><td class="no">For Pro features</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="faq">
+    <p class="eyebrow">FAQ</p>
+    <h2>Common questions.</h2>
+
+    <details class="faq">
+      <summary>Is this the original Midnight Commander?
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </summary>
+      <p>No. The original <a href="https://midnight-commander.org/">GNU Midnight Commander</a> is a
+      terminal (ncurses) application. This is an independent, from-scratch rewrite in Swift/SwiftUI
+      that reproduces its classic dual-pane layout, F-key shortcuts and keyboard-driven workflow as
+      a native macOS app - no terminal or Homebrew/<code>mc</code> install required.</p>
+    </details>
+
+    <details class="faq">
+      <summary>Does it need Terminal or Homebrew?
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </summary>
+      <p>No. It's a regular native macOS <code>.app</code> with real windows, a native menu bar, and
+      Dock/Finder integration - it just happens to be entirely keyboard-driven, like the original.</p>
+    </details>
+
+    <details class="faq">
+      <summary>What languages does it support?
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </summary>
+      <p>Portuguese (Brazil), Portuguese (Portugal), English and Spanish, matching whatever language
+      macOS itself is set to (System Settings → General → Language &amp; Region) - no in-app
+      language picker needed.</p>
+    </details>
+
+    <details class="faq">
+      <summary>Is it signed/notarized?
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </summary>
+      <p>Not yet - it's an unsigned development build. On first launch, right-click the app and
+      choose <strong>Open</strong> (instead of double-clicking) to get past Gatekeeper's warning.</p>
+    </details>
+
+    <details class="faq">
+      <summary>What's the license?
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </summary>
+      <p>GPL-3.0. Open source, free to use including commercially; distributed modified versions
+      must remain open source under the same license.</p>
+    </details>
+  </section>
+
+  <section id="contribute">
+    <p class="eyebrow">Contribute</p>
+    <h2>Issues and pull requests welcome.</h2>
+    <p class="section-sub">
+      Bug reports and PRs go on the
+      <a href="https://github.com/josepacelli/mc-gui">GitHub repository</a>, which also has the
+      full build instructions and architecture notes.
+    </p>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://github.com/josepacelli/mc-gui">GitHub</a>
+      <a href="https://github.com/josepacelli/mc-gui/releases">Releases</a>
+      <a href="https://github.com/josepacelli/mc-gui/issues">Issues</a>
+      <a href="https://github.com/josepacelli/mc-gui/blob/main/LICENSE">License (GPL-3.0)</a>
+      <a href="https://midnight-commander.org/">Original project (terminal)</a>
+    </div>
+    <div class="disclaimer">Not affiliated with the GNU Midnight Commander project. Reproduces its classic layout and workflow, maintained separately from scratch.</div>
+  </div>
+</footer>
+
+<script>
+  fetch("https://api.github.com/repos/josepacelli/mc-gui")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (!data || typeof data.stargazers_count !== "number") return;
+      const el = document.getElementById("gh-stars-count");
+      if (el) el.textContent = data.stargazers_count;
+    })
+    .catch(() => {});
+</script>
+</body>
+</html>
