@@ -77,13 +77,62 @@ case "$BIN_FILE" in
 esac
 
 echo "==> Create DMG"
+VOLNAME="Midnight Commander GUI"
+RW_DMG="$ARTIFACTS/mc-gui-rw.dmg"
 rm -rf "$STAGE_DIR"
-mkdir -p "$STAGE_DIR"
+mkdir -p "$STAGE_DIR/.background"
 cp -R "$APP_DIR" "$STAGE_DIR/"
 ln -s /Applications "$STAGE_DIR/Applications"
+cp "$SCRIPT_DIR/dmg-assets/background.png" "$STAGE_DIR/.background/background.png"
+chflags hidden "$STAGE_DIR/.background"
 
-rm -f "$DMG_PATH"
-hdiutil create -volname "$APP_EXECUTABLE_NAME" -srcfolder "$STAGE_DIR" -ov -format UDZO "$DMG_PATH" >/dev/null
+rm -f "$RW_DMG" "$DMG_PATH"
+hdiutil create -volname "$VOLNAME" -srcfolder "$STAGE_DIR" -ov -format UDRW -fs HFS+ "$RW_DMG" >/dev/null
+
+ATTACH_OUTPUT="$(hdiutil attach "$RW_DMG" -readwrite)"
+MOUNT_DIR="$(echo "$ATTACH_OUTPUT" | grep -E '^/dev/' | awk -F'\t' '{print $NF}' | tail -1 | sed 's/^[[:space:]]*//')"
+
+[ -d "$MOUNT_DIR/.fseventsd" ] && chflags hidden "$MOUNT_DIR/.fseventsd"
+
+echo "==> Style DMG window (Finder)"
+osascript <<OSA
+tell application "Finder"
+    tell disk "$VOLNAME"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set the bounds of container window to {200, 120, 700, 770}
+        set theViewOptions to the icon view options of container window
+        set arrangement of theViewOptions to not arranged
+        set icon size of theViewOptions to 128
+        set background picture of theViewOptions to file ".background:background.png"
+        set position of item "$APP_BUNDLE_NAME" of container window to {250, 150}
+        set position of item "Applications" of container window to {250, 500}
+        close
+        open
+        update without registering applications
+        delay 1
+        close
+    end tell
+end tell
+OSA
+
+[ -d "$MOUNT_DIR/.fseventsd" ] && chflags hidden "$MOUNT_DIR/.fseventsd"
+
+sync
+DETACHED=0
+for attempt in 1 2 3 4 5; do
+    if hdiutil detach "$MOUNT_DIR" -quiet 2>/dev/null; then
+        DETACHED=1
+        break
+    fi
+    sleep 2
+done
+[ "$DETACHED" -eq 1 ] || hdiutil detach "$MOUNT_DIR" -force -quiet
+
+hdiutil convert "$RW_DMG" -format UDZO -ov -o "$DMG_PATH" >/dev/null
+rm -f "$RW_DMG"
 
 echo "Done: $DMG_PATH"
 
