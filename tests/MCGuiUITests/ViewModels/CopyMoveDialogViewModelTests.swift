@@ -11,7 +11,6 @@ struct CopyMoveDialogViewModelTests {
         CopyMoveOptions(preserveAttributes: false, followSymlinks: true, updateOnly: false)
     }
 
-    // MARK: - copy mode (FO-01)
 
     @Test("copy mode is held as-is")
     func copyModeIsHeld() {
@@ -25,7 +24,6 @@ struct CopyMoveDialogViewModelTests {
         #expect(viewModel.mode == .copy)
     }
 
-    // MARK: - move mode (FO-02)
 
     @Test("move mode is held as-is")
     func moveModeIsHeld() {
@@ -39,7 +37,6 @@ struct CopyMoveDialogViewModelTests {
         #expect(viewModel.mode == .move)
     }
 
-    // MARK: - options toggling
 
     @Test("options can be read back after construction and after mutation")
     func optionsToggling() {
@@ -63,7 +60,6 @@ struct CopyMoveDialogViewModelTests {
         #expect(viewModel.options.updateOnly == true)
     }
 
-    // MARK: - delegates conflict resolution to ConflictDialogViewModel
 
     @Test("resolveConflict delegates to the injected ConflictDialogViewModel-backed resolver")
     func resolveConflictDelegatesToConflictDialogViewModel() async {

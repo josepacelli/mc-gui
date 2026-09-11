@@ -1,24 +1,12 @@
 import Foundation
 import Testing
 
-/// I18N-09: fails `swift test` when any target's pt-BR/pt-PT/es `Localizable.strings`
-/// is missing a key present in that target's `en.lproj` (or has an extra/orphaned one).
-/// A deterministic, CI-visible substitute for Xcode String Catalog's translation-state
-/// UI, which classic `.strings` files (AD-005) don't have natively.
-///
-/// Reads the `.strings` source files directly (not the built `.bundle`s) via a path
-/// relative to this test file's own location, so it works for all 3 targets
-/// (`MCGuiUI`, `MCGuiApp`, `MCGuiMacOS`) without this test target needing to depend on
-/// `MCGuiApp`/`MCGuiMacOS`.
 @Suite("Localization key-set coverage (I18N-09)")
 struct LocalizationCoverageTests {
 
     private static let targets = ["MCGuiUI", "MCGuiApp", "MCGuiMacOS"]
     private static let languages = ["pt-BR", "pt-PT", "es"]
 
-    /// This file lives at `tests/MCGuiUITests/Localization/LocalizationCoverageTests.swift`;
-    /// walk up 4 path components (file, Localization/, MCGuiUITests/, tests/) to reach
-    /// the repo root.
     private static let repoRoot: URL = {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
@@ -35,9 +23,6 @@ struct LocalizationCoverageTests {
             .appendingPathComponent("\(language).lproj")
     }
 
-    /// Parses a `.strings` file's key set: skips blank lines and comment lines starting
-    /// with `//` or `/*`, splits each remaining line on `" = "`, strips the trailing
-    /// `;` and surrounding quotes from the key.
     private static func keys(in lprojDirectory: URL) -> Set<String> {
         let file = lprojDirectory.appendingPathComponent("Localizable.strings")
         guard let contents = try? String(contentsOf: file, encoding: .utf8) else {

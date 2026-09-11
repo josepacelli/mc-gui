@@ -3,8 +3,6 @@ import Testing
 import MCGuiCore
 @testable import MCGuiMacOS
 
-/// Unit tests for `OperationProgressTracker`'s pure snapshot math (FO-14): running byte
-/// total, elapsed-time-based speed, and remaining-bytes/speed ETA.
 @Suite("OperationProgressTracker")
 struct OperationProgressTrackerTests {
 
@@ -83,11 +81,10 @@ struct OperationProgressTrackerTests {
         var now = Date(timeIntervalSince1970: 0)
         let tracker = OperationProgressTracker(sources: [a, b], now: { now })
 
-        now = Date(timeIntervalSince1970: 10) // 10s elapsed, 100 bytes transferred -> 10 B/s
+        now = Date(timeIntervalSince1970: 10)
         let progress = tracker.recordProcessed(a)
 
         #expect(progress.speed == 10)
-        // 100 bytes remaining at 10 B/s -> 10s ETA
         #expect(progress.eta == 10)
     }
 }

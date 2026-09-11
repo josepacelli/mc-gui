@@ -2,24 +2,6 @@ import SwiftUI
 import AppKit
 import MCGuiCore
 
-/// The text editor window: a toolbar (cut/copy/paste/undo/redo/select-all, save,
-/// find/replace), an `NSTextView` wrapper, a find/replace bar, a status bar, and the
-/// ED-01/ED-09/ED-10 key bindings (F4, Cmd+S, Cmd+F, Cmd+Option+F).
-///
-// SPEC_DEVIATION (T43): design.md's Assumptions table names "TextKit 2" for syntax
-// highlighting but also flags it in Risks & Concerns as a risk with an explicit fallback
-// ("fallback to basic coloring if needed"). `EditorTextView` below uses that documented
-// fallback - a monospaced `NSTextView` (TextKit 2 is NSTextView's default backing store on
-// macOS 14+) without per-token syntax coloring. Full tokenized highlighting is out of this
-// task's budget; this satisfies ED-02 to the degree design.md itself anticipated as
-// acceptable.
-//
-// SPEC_DEVIATION (T43): mirrors T38's `ViewerWindow` precedent - spec.md's ED-01 defines
-// F4 only as the shortcut that *opens* the editor from a panel selection; neither spec.md
-// nor design.md says what F4 does once the editor is already open. Bound here to an
-// attempt-to-close (same self-consistent choice `ViewerWindow` made for F3). Constructing
-// and presenting this window when F4 is pressed on a panel selection is cross-target
-// wiring that belongs to a future task (MCGuiApp, Phase 11) - out of scope here.
 @MainActor
 public struct EditorWindow: View {
     public let viewModel: EditorWindowViewModel
@@ -33,8 +15,6 @@ public struct EditorWindow: View {
     @State private var saveChangesViewModel: SaveChangesDialogViewModel?
     @FocusState private var findFieldFocused: Bool
 
-    // NSF4FunctionKey mirrors PanelView's F5-F8 / ViewerWindow's F3 technique for binding
-    // physical F-keys.
     private static let f4Key = KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!))
 
     public init(viewModel: EditorWindowViewModel, onClosed: @escaping () -> Void = {}) {
@@ -70,7 +50,6 @@ public struct EditorWindow: View {
         }
     }
 
-    // MARK: - toolbar (ED-09: cut/copy/paste/undo/redo/select-all; ED-04: save; ED-10: find/replace)
 
     private var toolbar: some View {
         HStack {
@@ -120,14 +99,10 @@ public struct EditorWindow: View {
         .padding(8)
     }
 
-    /// Forwards a standard AppKit edit action (cut/copy/paste/undo/redo/selectAll) to
-    /// whichever view is currently first responder - the `NSTextView` inside
-    /// `EditorTextView` while the editor has focus (ED-09).
     private func performEditAction(_ selectorName: String) {
         NSApp.sendAction(Selector(selectorName), to: nil, from: nil)
     }
 
-    // MARK: - find/replace bar (ED-10)
 
     private var findReplaceBar: some View {
         HStack {
@@ -166,7 +141,6 @@ public struct EditorWindow: View {
         lastMatchLocation = 0
     }
 
-    // MARK: - status bar
 
     private var statusBar: some View {
         HStack {
@@ -184,7 +158,6 @@ public struct EditorWindow: View {
         .padding(8)
     }
 
-    // MARK: - close flow (ED-05..ED-08)
 
     private func attemptClose() {
         if viewModel.attemptClose() {
@@ -214,20 +187,13 @@ public struct EditorWindow: View {
         Binding(get: { saveChangesViewModel != nil }, set: { if !$0 { saveChangesViewModel = nil } })
     }
 
-    // MARK: - Pure helpers (unit-tested; the body above is thin declarative glue)
 
-    /// Finds the next case-insensitive occurrence of `query` in `text` at or after
-    /// `location`, wrapping to the first occurrence when none remain after that point.
-    /// `nil` when `query` is empty or not present anywhere in `text`.
     nonisolated static func nextMatch(in text: String, query: String, after location: Int) -> SearchMatch? {
         let matches = findMatches(in: text, query: query)
         guard !matches.isEmpty else { return nil }
         return matches.first(where: { $0.location >= location }) ?? matches.first
     }
 
-    /// Replaces every case-insensitive occurrence of `query` with `replacement` in `text`.
-    /// Returns the new text and the number of replacements made (0 for an empty query or
-    /// no matches).
     nonisolated static func replaceAll(in text: String, query: String, replacement: String) -> (text: String, count: Int) {
         let matches = findMatches(in: text, query: query)
         guard !matches.isEmpty else { return (text, 0) }
@@ -244,8 +210,6 @@ public struct EditorWindow: View {
         return (result, matches.count)
     }
 
-    /// All case-insensitive, non-overlapping occurrences of `query` in `text`, in order.
-    /// Mirrors `ViewerServiceImpl.search`'s scanning loop.
     private nonisolated static func findMatches(in text: String, query: String) -> [SearchMatch] {
         guard !query.isEmpty else { return [] }
 
@@ -265,9 +229,6 @@ public struct EditorWindow: View {
     }
 }
 
-/// `NSViewRepresentable` wrapper bridging a plain `NSTextView` (in an `NSScrollView`) to
-/// SwiftUI, with `allowsUndo` enabled so the toolbar's Undo/Redo buttons (ED-09) work via
-/// the standard AppKit responder chain.
 private struct EditorTextView: NSViewRepresentable {
     @Binding var text: String
 

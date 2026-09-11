@@ -1,11 +1,5 @@
 import SwiftUI
 
-/// A bookmarked directory as `BookmarksView` renders it - a lightweight, `MCGuiUI`-local
-/// model decoupled from `MCGuiMacOS`'s `Bookmark` (T53): `MCGuiUI` does not depend on
-/// `MCGuiMacOS`, so this module cannot reference that concrete type directly, mirroring how
-/// `ViewerWindow`/`EditorWindow` depend only on `MCGuiCore` protocols rather than
-/// `MCGuiMacOS`'s service implementations (T38, T43). A future `MCGuiApp` bridge maps
-/// between the two, the same way `WindowManager` bridges `ViewerService`/`EditorService`.
 public struct BookmarkEntry: Identifiable, Hashable {
     public let id: UUID
     public let name: String
@@ -18,9 +12,6 @@ public struct BookmarkEntry: Identifiable, Hashable {
     }
 }
 
-/// Persistence actions `BookmarksViewModel` delegates to - injected by the caller so this
-/// module never needs to import `MCGuiMacOS`'s concrete `BookmarkStore` (mirrors
-/// `AppCommandActions`/`KeyboardShortcutActions`, T44/T48).
 public struct BookmarksActions {
     public var list: () async throws -> [BookmarkEntry]
     public var add: (BookmarkEntry) async throws -> Void
@@ -37,8 +28,6 @@ public struct BookmarksActions {
     }
 }
 
-/// Bookmarks list state (BM-02 data): loads from the injected `BookmarksActions`, and
-/// keeps `bookmarks` in sync after adding (BM-01) or removing (BM-04).
 @MainActor
 @Observable
 public final class BookmarksViewModel {
@@ -50,7 +39,6 @@ public final class BookmarksViewModel {
         self.actions = actions
     }
 
-    /// Reloads `bookmarks` from the injected `list` action.
     public func refresh() async {
         do {
             bookmarks = try await actions.list()
@@ -60,8 +48,6 @@ public final class BookmarksViewModel {
         }
     }
 
-    /// Adds `directory` as a bookmark named after its last path component (BM-01), then
-    /// refreshes `bookmarks` to reflect the persisted state.
     public func addBookmark(for directory: URL) async {
         let entry = BookmarkEntry(name: directory.lastPathComponent, path: directory)
         do {
@@ -72,7 +58,6 @@ public final class BookmarksViewModel {
         }
     }
 
-    /// Removes the bookmark with `id` (BM-04), then refreshes `bookmarks`.
     public func remove(id: UUID) async {
         do {
             try await actions.remove(id)
@@ -83,10 +68,6 @@ public final class BookmarksViewModel {
     }
 }
 
-/// Bookmarks sidebar (BM-02): an "Add" button bound to Cmd+D adds `activeDirectory`
-/// (BM-01), selecting a row navigates there via `onNavigate`, and each row's remove
-/// control deletes it (BM-04). Persistence across launches (BM-03) is the injected
-/// `BookmarksActions`' responsibility (backed by `MCGuiMacOS`'s `BookmarkStore`, T53).
 @MainActor
 public struct BookmarksView: View {
     public let viewModel: BookmarksViewModel
@@ -127,7 +108,6 @@ public struct BookmarksView: View {
 
             List(viewModel.bookmarks) { bookmark in
                 HStack {
-                    // I18N-12: bookmark.name is user-authored content, never translated.
                     Button(bookmark.name) { onNavigate(bookmark.path) }
                         .buttonStyle(.plain)
                     Spacer()

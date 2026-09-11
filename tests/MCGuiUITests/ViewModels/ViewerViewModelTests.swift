@@ -7,7 +7,6 @@ import MCGuiCore
 @MainActor
 struct ViewerViewModelTests {
 
-    // MARK: - load sets content and default mode per content kind (FV-01..FV-04)
 
     @Test("load with text content sets mode to .text")
     func loadTextContentSetsTextMode() async {
@@ -45,7 +44,6 @@ struct ViewerViewModelTests {
         #expect(viewModel.mode == .hex)
     }
 
-    // MARK: - mode switching updates displayed content without reloading (FV-01)
 
     @Test("setMode to .hex on already-loaded text content derives hex bytes without another ViewerService call")
     func setModeToHexOnTextContentDerivesRawDataWithoutReload() async {
@@ -78,7 +76,6 @@ struct ViewerViewModelTests {
         #expect(viewModel.mode == .text)
     }
 
-    // MARK: - navigation (FV-05)
 
     @Test("next loads the following file via ViewerService.nextFile")
     func nextLoadsFollowingFile() async {
@@ -102,7 +99,6 @@ struct ViewerViewModelTests {
         #expect(viewModel.errorMessage == nil)
     }
 
-    // MARK: - search triggers scroll (FV-06)
 
     @Test("setting searchQuery with matches populates searchMatches and scrolls to the first match")
     func searchWithMatchesScrollsToFirstMatch() async {
@@ -153,7 +149,6 @@ struct ViewerViewModelTests {
         #expect(viewModel.searchMatches == [])
     }
 
-    // MARK: - error propagation (FV-08)
 
     @Test("load failure sets errorMessage and leaves content unchanged")
     func loadFailureSetsErrorMessage() async {

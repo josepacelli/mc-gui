@@ -10,7 +10,6 @@ struct UserMenuStoreTests {
             .appendingPathComponent("usermenustore-\(UUID().uuidString)", isDirectory: true)
     }
 
-    // MARK: - add + persist + reload
 
     @Test("add persists an item that a fresh store instance can reload")
     func addPersistsAndReloads() async throws {
@@ -42,7 +41,6 @@ struct UserMenuStoreTests {
         #expect(list == [first, second])
     }
 
-    // MARK: - remove
 
     @Test("remove deletes the item with the given id and persists the change")
     func removeDeletesItemAndPersists() async throws {
@@ -75,7 +73,6 @@ struct UserMenuStoreTests {
         #expect(try await store.list() == [item])
     }
 
-    // MARK: - corrupt-file recovery (mirrors BM-03/PH-04)
 
     @Test("list recovers to an empty array when the JSON file is corrupted")
     func listRecoversFromCorruptedJSON() async throws {

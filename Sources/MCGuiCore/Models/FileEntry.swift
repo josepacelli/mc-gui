@@ -1,6 +1,5 @@
 import Foundation
 
-/// A single file, directory, symlink, or volume entry as shown in a panel.
 public struct FileEntry: Identifiable, Hashable, Codable {
     public let id: UUID
     public let name: String
@@ -41,12 +40,10 @@ public struct FileEntry: Identifiable, Hashable, Codable {
     }
 }
 
-/// The kind of filesystem entry a `FileEntry` represents.
 public enum FileType: String, Codable, CaseIterable {
     case file, directory, symlink, volume, unknown
 }
 
-/// POSIX-style rwx permission bits for owner/group/other.
 public struct FilePermissions: OptionSet, Codable, Hashable {
     public let rawValue: Int
 

@@ -2,9 +2,6 @@ import Foundation
 import Testing
 @testable import MCGuiUI
 
-/// Unit tests for `UserMenuViewModel`, the `@Observable` state `UserMenuView` extracts
-/// for item add/list/remove/run (F2). `UserMenuView.body` itself is thin declarative
-/// glue with no additional testable logic - matches `BookmarksViewModelTests`' precedent.
 @Suite("UserMenuViewModel")
 @MainActor
 struct UserMenuViewModelTests {
@@ -15,7 +12,6 @@ struct UserMenuViewModelTests {
         otherDir: URL(fileURLWithPath: "/tmp/right")
     )
 
-    // MARK: - refresh
 
     @Test("refresh populates items from the injected list action")
     func refreshPopulatesItems() async {
@@ -39,7 +35,6 @@ struct UserMenuViewModelTests {
         #expect(viewModel.errorMessage == "disk error")
     }
 
-    // MARK: - addItem
 
     @Test("addItem with a non-empty label and command adds and refreshes")
     func addItemAddsAndRefreshes() async {
@@ -94,7 +89,6 @@ struct UserMenuViewModelTests {
         #expect(viewModel.errorMessage == "disk full")
     }
 
-    // MARK: - remove
 
     @Test("remove deletes the item with the given id and refreshes the list")
     func removeDeletesItemAndRefreshes() async {
@@ -123,7 +117,6 @@ struct UserMenuViewModelTests {
         #expect(viewModel.errorMessage == "permission denied")
     }
 
-    // MARK: - run
 
     @Test("run records the result and passes the context through to the run action")
     func runRecordsResultAndPassesContext() async {
@@ -143,8 +136,6 @@ struct UserMenuViewModelTests {
     }
 }
 
-/// A mutable box so tests can simulate a backing store's state changing across separate
-/// `list`/`add`/`remove` closure calls (mirrors `BookmarksBox`).
 private final class UserMenuBox {
     var entries: [UserMenuEntry]
     init(entries: [UserMenuEntry]) { self.entries = entries }

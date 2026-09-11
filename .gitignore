@@ -488,3 +488,8 @@ $RECYCLE.BIN/
 # mc-gui macOS packaging
 *.dmg
 *.app/
+
+# Config/doc do Claude Code — fica só local, não versionado (mesmo tratamento
+# do opendisplay-android, pedido do usuário).
+/CLAUDE.md
+/.claude/

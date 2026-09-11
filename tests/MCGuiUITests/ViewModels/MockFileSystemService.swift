@@ -1,17 +1,11 @@
 import Foundation
 import MCGuiCore
 
-/// A `FileSystemService` test double with injectable `listDirectory`/`createDirectory`
-/// behaviors. The other protocol methods aren't exercised by the ViewModel tests in this
-/// target and return trivial success values.
 struct MockFileSystemService: FileSystemService {
     var listDirectoryImpl: @Sendable (URL) async throws -> [FileEntry]
     var createDirectoryImpl: @Sendable (URL) async throws -> Void
     var getVolumesImpl: @Sendable () -> [VolumeInfo]
 
-    // `createDirectoryImpl` and `getVolumesImpl` are declared before `listDirectoryImpl` so
-    // existing unlabeled trailing-closure call sites (`MockFileSystemService { ... }`) keep
-    // binding to `listDirectoryImpl`, the last parameter.
     init(
         createDirectoryImpl: @escaping @Sendable (URL) async throws -> Void = { _ in },
         getVolumesImpl: @escaping @Sendable () -> [VolumeInfo] = { [] },
@@ -50,7 +44,6 @@ struct MockError: LocalizedError {
     var errorDescription: String? { message }
 }
 
-/// A `TrashService` test double with an injectable `trash` behavior.
 struct MockTrashService: TrashService {
     var trashImpl: @Sendable ([URL]) async throws -> OperationResult
 
@@ -65,8 +58,6 @@ struct MockTrashService: TrashService {
     }
 }
 
-/// A `ViewerService` test double with injectable `load`/`nextFile`/`previousFile`/`search`
-/// behaviors, for `ViewerViewModelTests`.
 struct MockViewerService: ViewerService {
     var loadImpl: @Sendable (URL) async throws -> ViewerContent
     var nextFileImpl: @Sendable () async throws -> ViewerContent
@@ -91,7 +82,6 @@ struct MockViewerService: ViewerService {
     func search(_ query: String) -> [SearchMatch] { searchImpl(query) }
 }
 
-/// An `EditorService` test double with injectable `open`/`save`/`close` behaviors.
 struct MockEditorService: EditorService {
     var openImpl: @Sendable (URL) async throws -> EditorDocumentState
     var saveImpl: @Sendable (EditorDocumentState) async throws -> Void

@@ -1,8 +1,6 @@
 import SwiftUI
 import MCGuiCore
 
-/// The F8 delete-confirmation dialog: lists the files about to be trashed, with a
-/// Trash-bound confirm action (FO-12, FO-13).
 @MainActor
 public struct DeleteConfirmDialog: View {
     public let viewModel: DeleteConfirmDialogViewModel

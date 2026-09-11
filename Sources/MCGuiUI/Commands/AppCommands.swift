@@ -2,14 +2,6 @@ import SwiftUI
 import AppKit
 import MCGuiCore
 
-/// Actions the File/View/Go/Window menu items route to (MB-02, MB-04, MB-05, MB-06).
-/// Injected by the caller (`MCGuiApp`, Phase 11) - `MCGuiUI` has no dependency on
-/// `MCGuiMacOS` or app-level window state, so this module can only declare "which menu
-/// item calls which closure", not what the closure ultimately does (mirrors
-/// `KeyboardShortcutActions`, T44). The Edit menu needs no closures here - Undo/Redo/Cut/
-/// Copy/Paste/Select All route through the standard AppKit responder chain instead
-/// (mirrors `EditorWindow.performEditAction`), since they act on whatever view currently
-/// has focus rather than on app-level state.
 public struct AppCommandActions {
     public var view: () -> Void
     public var edit: () -> Void
@@ -28,12 +20,9 @@ public struct AppCommandActions {
     public var goForward: () -> Void
     public var goHome: () -> Void
     public var goComputer: () -> Void
-    // VL-01: navigates the active panel to a mounted volume's root, selected from the
-    // Go menu's dynamic volume list (see `AppCommands.volumes`).
     public var goToVolume: (VolumeInfo) -> Void
     public var showViewerWindow: () -> Void
     public var showEditorWindow: () -> Void
-    // MB-01: opens the F1 Help window.
     public var showHelp: () -> Void
 
     public init(
@@ -83,24 +72,11 @@ public struct AppCommandActions {
     }
 }
 
-/// SwiftUI `Commands` builder for the full native menu bar: File, Edit, View, Go, Window,
-/// Help (MB-01..MB-07). The App menu itself needs no code here - AppKit supplies it
-/// automatically for every app, with or without this `Commands` group installed.
-///
-/// Installed via `.commands { AppCommands(actions: ...) }` on the app's `Scene`
-/// (`MCGuiApp`, Phase 11) alongside `.commandsRemoved()`, which strips SwiftUI's own
-/// default File/Edit/View/Window/Help contributions first - without it, those defaults and
-/// this type's identically-named menus would appear side by side as duplicates.
 @MainActor
 public struct AppCommands: Commands {
     private let actions: AppCommandActions
-    // VL-01: the Go menu's dynamic volume list - a plain array (not itself observed
-    // here), so the caller (`MCGuiApp`) must re-supply `AppCommands` when it changes for
-    // the menu to reflect a mount/unmount.
     private let volumes: [VolumeInfo]
 
-    // NSF3FunctionKey..NSF8FunctionKey mirror PanelView/ViewerWindow/EditorWindow/
-    // KeyboardShortcuts' technique for binding physical F-keys via SwiftUI's `KeyEquivalent`.
     private static let f3Key = KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!))
     private static let f4Key = KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!))
     private static let f5Key = KeyEquivalent(Character(UnicodeScalar(NSF5FunctionKey)!))
@@ -113,8 +89,6 @@ public struct AppCommands: Commands {
         self.volumes = volumes
     }
 
-    // MARK: - localized labels (I18N-01..04). Keyboard shortcuts (below) are never
-    // translated, only these label strings.
 
     private var fileMenuTitle: String { String(localized: "appCommands.menu.file", bundle: .module, comment: "Native File menu title") }
     private var editMenuTitle: String { String(localized: "appCommands.menu.edit", bundle: .module, comment: "Native Edit menu title") }
@@ -161,8 +135,6 @@ public struct AppCommands: Commands {
     private var helpItemLabel: String { String(localized: "appCommands.help.item", bundle: .module, comment: "Help menu: opens the F1 Help window") }
 
     public var body: some Commands {
-        // MB-02: File menu - New Folder (F7), Copy (F5), Move (F6), Delete (F8),
-        // View (F3), Edit (F4), Quit (Cmd+Q).
         CommandMenu(fileMenuTitle) {
             Button(newFolderLabel) { actions.mkdir() }.keyboardShortcut(Self.f7Key, modifiers: [])
             Button(copyLabel) { actions.copy() }.keyboardShortcut(Self.f5Key, modifiers: [])
@@ -175,8 +147,6 @@ public struct AppCommands: Commands {
             Button(quitLabel) { NSApp.terminate(nil) }.keyboardShortcut("q", modifiers: .command)
         }
 
-        // MB-03: Edit menu - Undo, Redo, Cut, Copy, Paste, Select All via the standard
-        // AppKit responder chain.
         CommandMenu(editMenuTitle) {
             Button(undoLabel) { sendEditAction("undo:") }.keyboardShortcut("z", modifiers: .command)
             Button(redoLabel) { sendEditAction("redo:") }.keyboardShortcut("z", modifiers: [.command, .shift])
@@ -188,8 +158,6 @@ public struct AppCommands: Commands {
             Button(selectAllLabel) { sendEditAction("selectAll:") }.keyboardShortcut("a", modifiers: .command)
         }
 
-        // MB-04: View menu - Sort submenu, Show Hidden Files (Cmd+.), Refresh (Cmd+R),
-        // Theme submenu.
         CommandMenu(viewMenuTitle) {
             Menu(sortMenuTitle) {
                 Button(sortByNameLabel) { actions.sortByName() }.keyboardShortcut("1", modifiers: .command)
@@ -205,7 +173,6 @@ public struct AppCommands: Commands {
             }
         }
 
-        // MB-05: Go menu - Back (Cmd+[), Forward (Cmd+]), Parent (Cmd+Up), Home, Computer.
         CommandMenu(goMenuTitle) {
             Button(backLabel) { actions.goBack() }.keyboardShortcut("[", modifiers: .command)
             Button(forwardLabel) { actions.goForward() }.keyboardShortcut("]", modifiers: .command)
@@ -221,7 +188,6 @@ public struct AppCommands: Commands {
             }
         }
 
-        // MB-06: Window menu - Minimize (Cmd+M), Zoom, Viewer, Editor.
         CommandMenu(windowMenuTitle) {
             Button(minimizeLabel) { NSApp.keyWindow?.miniaturize(nil) }.keyboardShortcut("m", modifiers: .command)
             Button(zoomLabel) { NSApp.keyWindow?.zoom(nil) }
@@ -230,16 +196,11 @@ public struct AppCommands: Commands {
             Button(editorWindowLabel) { actions.showEditorWindow() }
         }
 
-        // MB-01: Help menu - opens the F1 Help window. No .keyboardShortcut(.f1...) here:
-        // PanelView already binds the physical F1 key directly (same caution as Cmd+[/]
-        // above - a second registration risks an ambiguous/duplicate firing).
         CommandMenu(helpMenuTitle) {
             Button(helpItemLabel) { actions.showHelp() }
         }
     }
 
-    /// Forwards a standard AppKit edit action to whichever view is currently first
-    /// responder (MB-03), mirroring `EditorWindow.performEditAction`.
     private func sendEditAction(_ selectorName: String) {
         NSApp.sendAction(Selector(selectorName), to: nil, from: nil)
     }

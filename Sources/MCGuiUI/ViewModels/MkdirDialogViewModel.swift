@@ -2,7 +2,6 @@ import Foundation
 import Observation
 import MCGuiCore
 
-/// A reason a candidate new-folder name was rejected (FO-10/FO-11).
 public enum MkdirValidationError: LocalizedError, Equatable {
     case empty
     case containsPathSeparator
@@ -15,8 +14,6 @@ public enum MkdirValidationError: LocalizedError, Equatable {
     }
 }
 
-/// New-folder-name input state for the F7 dialog: validates `name`, then creates the
-/// directory via the injected `FileSystemService` on confirm (FO-10, FO-11).
 @MainActor
 @Observable
 public final class MkdirDialogViewModel {
@@ -32,17 +29,12 @@ public final class MkdirDialogViewModel {
         self.parentDirectory = parentDirectory
     }
 
-    /// Validates a candidate folder name; `nil` means valid. Exposed as `static` so views
-    /// (e.g. to disable a Create button) can check validity without triggering `confirm()`.
     public static func validate(_ name: String) -> MkdirValidationError? {
         if name.isEmpty { return .empty }
         if name.contains("/") { return .containsPathSeparator }
         return nil
     }
 
-    /// Validates `name` and, if valid, creates the directory (FO-11). An invalid name is
-    /// rejected with `errorMessage` set and no filesystem call is made, so the dialog stays
-    /// open (FO-10).
     public func confirm() async {
         if let validationError = Self.validate(name) {
             errorMessage = validationError.errorDescription

@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// The View menu's Theme submenu (MB-04): Follow System / Light / Dark options (TH-02,
-/// TH-03, TH-04), bound via `@AppStorage` to the same `ThemePreference.storageKey` every
-/// other theme-aware view reads. Selecting an option here updates immediately everywhere
-/// (TH-05) - no message-passing needed, since `@AppStorage` on the same key is a shared,
-/// observed value across every view that declares it (here and in `MainWindow`).
 @MainActor
 public struct ThemeMenu: View {
     @AppStorage(ThemePreference.storageKey) private var preference: ThemePreference = .system

@@ -1,11 +1,9 @@
 import Foundation
 
-/// The user's chosen resolution for a destination-already-exists conflict.
 public enum FileConflictResolution: String, Codable, CaseIterable {
     case overwrite, skip, rename, cancel
 }
 
-/// The current state of an open text editor document.
 public struct EditorDocumentState: Codable, Hashable {
     public var content: String
     public var fileURL: URL
@@ -20,23 +18,16 @@ public struct EditorDocumentState: Codable, Hashable {
     }
 }
 
-// SPEC_DEVIATION: `ViewerMode` is not among the 13 domain models spec.md's SWIFT-02
-// enumerates, but design.md's ViewerState bullet ("mode (text/image/hex)") requires a
-// type for that field. Defined here, alongside ViewerState, as the minimal supporting
-// type needed for ViewerState to compile.
-/// Which representation the file viewer is currently displaying.
 public enum ViewerMode: String, Codable, CaseIterable {
     case text, image, hex
 }
 
-/// The content loaded into the file viewer, in one of its supported representations.
 public enum ViewerContent: Codable, Hashable {
     case text(String)
     case image(Data)
     case hexData(Data)
 }
 
-/// The current state of an open file viewer.
 public struct ViewerState: Codable {
     public var mode: ViewerMode
     public var content: ViewerContent?

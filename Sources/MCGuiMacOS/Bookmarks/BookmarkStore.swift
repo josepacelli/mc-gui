@@ -1,6 +1,5 @@
 import Foundation
 
-/// A bookmarked directory (BM-01..04). No C# equivalent exists - this is a new feature.
 public struct Bookmark: Identifiable, Hashable, Codable {
     public let id: UUID
     public let name: String
@@ -13,9 +12,6 @@ public struct Bookmark: Identifiable, Hashable, Codable {
     }
 }
 
-/// JSON-persisted bookmark store (add/remove/list), mirroring `PathHistoryStoreImpl`'s
-/// persistence pattern: bookmarks live at `~/Library/Application Support/MCGui/
-/// bookmarks.json` (BM-03), with corrupt-file recovery to an empty list.
 public final class BookmarkStore {
     private let fileURL: URL
     private let fileManager: FileManager
@@ -32,9 +28,6 @@ public final class BookmarkStore {
         return appSupport.appendingPathComponent("MCGui", isDirectory: true)
     }
 
-    /// Lists all bookmarks (BM-02 data, BM-03 persistence). An empty list when no file
-    /// exists yet, or when the file is corrupted (BM-03's persistence contract mirrors
-    /// `PathHistoryStoreImpl`'s PH-04 corrupt-file recovery).
     public func list() async throws -> [Bookmark] {
         guard fileManager.fileExists(atPath: fileURL.path) else { return [] }
 
@@ -46,14 +39,12 @@ public final class BookmarkStore {
         }
     }
 
-    /// Adds `bookmark` and persists the updated list (BM-01).
     public func add(_ bookmark: Bookmark) async throws {
         var bookmarks = try await list()
         bookmarks.append(bookmark)
         try await save(bookmarks)
     }
 
-    /// Removes the bookmark with `id`, if present, and persists the updated list (BM-04).
     public func remove(id: UUID) async throws {
         var bookmarks = try await list()
         bookmarks.removeAll { $0.id == id }

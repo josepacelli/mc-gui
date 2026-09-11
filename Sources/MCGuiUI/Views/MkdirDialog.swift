@@ -1,8 +1,6 @@
 import SwiftUI
 import MCGuiCore
 
-/// The F7 new-folder dialog: a name field and Create/Cancel actions bound to
-/// `MkdirDialogViewModel` (FO-10).
 @MainActor
 public struct MkdirDialog: View {
     @Bindable public var viewModel: MkdirDialogViewModel

@@ -13,7 +13,6 @@ struct ViewerServiceImplLoadTests {
         return url
     }
 
-    // MARK: - small text file (FV-02)
 
     @Test("load on a small text file returns .text with the file's exact contents")
     func loadSmallTextFile() async throws {
@@ -28,7 +27,6 @@ struct ViewerServiceImplLoadTests {
         #expect(content == .text("hello, viewer"))
     }
 
-    // MARK: - large file, chunked read (FV-07)
 
     @Test("load on a multi-chunk file reads over multiple chunks and reassembles the exact content")
     func loadLargeFileReadsInChunksAndReassemblesContent() async throws {
@@ -36,10 +34,6 @@ struct ViewerServiceImplLoadTests {
         defer { try? FileManager.default.removeItem(at: dir) }
         let fileURL = dir.appendingPathComponent("large.txt")
 
-        // ~3MB of repeating printable ASCII - large enough to require several reads at a
-        // small chunk size, without paying for a literal 100MB file in the test suite
-        // (per the batch's scoping note: a smaller file exercising the same chunked-read
-        // code path, not full wall-clock timing on a real 100MB file).
         let line = String(repeating: "abcdefghij", count: 100) + "\n"
         let content = String(repeating: line, count: 3000)
         try Data(content.utf8).write(to: fileURL)
@@ -60,7 +54,6 @@ struct ViewerServiceImplLoadTests {
         #expect(counter.count > 1)
     }
 
-    // MARK: - unreadable file (FV-08)
 
     @Test("load on a nonexistent file throws ViewerServiceError.cannotRead")
     func loadNonexistentFileThrowsCannotRead() async throws {
@@ -80,7 +73,6 @@ struct ViewerServiceImplLoadTests {
         }
     }
 
-    // MARK: - binary content -> hex mode (FV-04)
 
     @Test("load on a file containing a NUL byte returns .hexData with the exact bytes")
     func loadBinaryFileReturnsHexData() async throws {

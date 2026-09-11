@@ -13,7 +13,6 @@ struct EditorWindowViewModelTests {
         EditorDocumentState(content: content, fileURL: fileURL, isDirty: false, encoding: "UTF-8")
     }
 
-    // MARK: - dirty on edit (ED-03)
 
     @Test("setting content to a different value marks the document dirty")
     func editingContentSetsDirty() {
@@ -33,7 +32,6 @@ struct EditorWindowViewModelTests {
         #expect(viewModel.isDirty == false)
     }
 
-    // MARK: - clean after save (ED-04, ED-06)
 
     @Test("save clears the dirty flag after a successful write")
     func saveClearsDirtyFlag() async {
@@ -64,7 +62,6 @@ struct EditorWindowViewModelTests {
         #expect(viewModel.errorMessage == "disk full")
     }
 
-    // MARK: - close flow (ED-05)
 
     @Test("attemptClose with no unsaved changes closes immediately and skips the save prompt")
     func attemptCloseWithNoChangesClosesImmediately() {

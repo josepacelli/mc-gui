@@ -2,16 +2,10 @@ import Foundation
 import Testing
 @testable import MCGuiUI
 
-/// Unit tests for `BookmarksViewModel`, the `@Observable` state `BookmarksView` extracts
-/// for bookmark add/list/remove (BM-01, BM-02 data, BM-04, T54). `BookmarksView.body`
-/// itself (the Cmd+D button, row rendering, remove control) is thin declarative glue with
-/// no additional testable logic - consistent with the Phase 4/9/12 view precedent, it has
-/// no XCUITest coverage yet (no Xcode project/scheme exists in this pure-SPM setup).
 @Suite("BookmarksViewModel")
 @MainActor
 struct BookmarksViewModelTests {
 
-    // MARK: - refresh (BM-02 data)
 
     @Test("refresh populates bookmarks from the injected list action")
     func refreshPopulatesBookmarks() async {
@@ -35,7 +29,6 @@ struct BookmarksViewModelTests {
         #expect(viewModel.errorMessage == "disk error")
     }
 
-    // MARK: - addBookmark (BM-01)
 
     @Test("addBookmark builds an entry named after the directory's last path component")
     func addBookmarkBuildsEntryFromDirectory() async {
@@ -78,7 +71,6 @@ struct BookmarksViewModelTests {
         #expect(viewModel.errorMessage == "disk full")
     }
 
-    // MARK: - remove (BM-04)
 
     @Test("remove deletes the bookmark with the given id and refreshes the list")
     func removeDeletesBookmarkAndRefreshes() async {
@@ -108,8 +100,6 @@ struct BookmarksViewModelTests {
     }
 }
 
-/// A mutable box so tests can simulate a backing store's state changing across separate
-/// `list`/`add`/`remove` closure calls (mirrors `VolumesBox` in `MainWindowVolumesTests`).
 private final class BookmarksBox {
     var entries: [BookmarkEntry]
     init(entries: [BookmarkEntry]) { self.entries = entries }

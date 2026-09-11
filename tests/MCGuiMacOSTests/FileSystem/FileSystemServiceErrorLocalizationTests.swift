@@ -2,30 +2,12 @@ import Foundation
 import Testing
 @testable import MCGuiMacOS
 
-/// Asserts `FileSystemServiceError.errorDescription`'s exact text per case, in all 4
-/// supported languages (I18N-01..04, T5). Loads each language's `.lproj` sub-bundle
-/// directly (`Bundle(path:)` from `Bundle.module.path(forResource:ofType:"lproj")`) and
-/// applies the same `String(format:)` substitution production code performs, rather
-/// than relying on `Bundle.module`'s live language negotiation - so the pt-BR/pt-PT/es
-/// assertions are deterministic regardless of the test host's actual system locale.
 @Suite("FileSystemServiceError localization (I18N-01..04, T5)")
 struct FileSystemServiceErrorLocalizationTests {
 
     private static let path = "/Users/test/Documents/report.txt"
     private static let url = URL(fileURLWithPath: path)
 
-    /// Loads the `Localizable.strings` table for one language by treating its
-    /// `.lproj` directory itself as a `Bundle` root and reading the table straight
-    /// off disk - deterministic, without going through `Bundle`'s own language
-    /// negotiation (which, tested empirically, resolves back to the base/English
-    /// localization when driven off a bare `.lproj`-rooted `Bundle`'s
-    /// `localizedString(forKey:)` rather than the specific table on disk).
-    ///
-    /// SPM's resource processing was found (empirically) to lowercase the region
-    /// subtag of the on-disk `.lproj` directory name (`pt-BR.lproj` -> `pt-br.lproj`,
-    /// `pt-PT.lproj` -> `pt-pt.lproj`) even though `Bundle`'s own runtime language
-    /// negotiation matches locale identifiers case-insensitively regardless - so the
-    /// exact-cased name is tried first, with a lowercased fallback for the on-disk path.
     private static func table(for language: String) -> [String: String] {
         let lprojPath = Bundle.module.path(forResource: language, ofType: "lproj")
             ?? Bundle.module.path(forResource: language.lowercased(), ofType: "lproj")
@@ -125,8 +107,6 @@ struct FileSystemServiceErrorLocalizationTests {
         #expect(actual == Self.pathTooLongExpected[language])
     }
 
-    // MARK: - Production wiring (host locale defaults to "en" per this project's
-    // established Swift Testing convention - see design.md's Assumptions table)
 
     @Test("errorDescription wires each case to the correct key and formats the URL argument")
     func errorDescriptionWiring() {

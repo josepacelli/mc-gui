@@ -1,13 +1,7 @@
 import Foundation
 import MCGuiCore
 
-/// `TrashService` implementation backed by `FileManager.trashItem(at:resultingItemURL:)`,
-/// moving files to the macOS Trash instead of deleting them permanently (FO-12/FO-13).
 public final class TrashServiceImpl: TrashService {
-    /// Trashes a single item and returns where it landed. Injectable so tests can
-    /// observe the resulting Trash URL directly (`FileManager.fileExists` on a known
-    /// path) without needing to enumerate `~/.Trash`, which TCC can deny independently
-    /// of the (privileged) `trashItem` call itself.
     private let trashItem: (URL) throws -> URL?
 
     public init(fileManager: FileManager = .default) {

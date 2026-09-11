@@ -2,14 +2,9 @@ import Testing
 import SwiftUI
 @testable import MCGuiUI
 
-/// Unit tests for `SyntaxHighlighter.highlight` (FV-02): a heuristic, single-line-scoped
-/// highlighter - not a real tokenizer, so these check the specific comment/string/
-/// keyword/number cases it's designed for rather than exhaustive language grammar.
 @Suite("SyntaxHighlighter")
 struct SyntaxHighlighterTests {
 
-    /// The foreground color SwiftUI applied to the run whose text exactly matches
-    /// `substring`, or `nil` if no such run exists or it has no color attribute.
     private func color(of substring: String, in result: AttributedString) -> Color? {
         for run in result.runs where String(result[run.range].characters) == substring {
             return run.foregroundColor

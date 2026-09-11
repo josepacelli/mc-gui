@@ -7,7 +7,6 @@ import MCGuiCore
 @MainActor
 struct DeleteConfirmDialogViewModelTests {
 
-    // MARK: - single file (FO-13)
 
     @Test("confirm with a single file trashes it and completes")
     func confirmSingleFileTrashesIt() async {
@@ -28,7 +27,6 @@ struct DeleteConfirmDialogViewModelTests {
         #expect(viewModel.errorMessage == nil)
     }
 
-    // MARK: - multiple files (FO-13)
 
     @Test("confirm with multiple files trashes all of them")
     func confirmMultipleFilesTrashesAll() async {
@@ -48,7 +46,6 @@ struct DeleteConfirmDialogViewModelTests {
         #expect(viewModel.isCompleted)
     }
 
-    // MARK: - empty selection guard
 
     @Test("confirm with an empty selection sets an error and does not call TrashService")
     func confirmEmptySelectionIsGuarded() async {
@@ -68,7 +65,6 @@ struct DeleteConfirmDialogViewModelTests {
         #expect(viewModel.result == nil)
     }
 
-    // MARK: - count
 
     @Test("count reflects the number of entries")
     func countReflectsEntries() {

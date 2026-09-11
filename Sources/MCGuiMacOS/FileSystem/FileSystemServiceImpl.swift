@@ -1,29 +1,16 @@
 import Foundation
 import MCGuiCore
 
-/// Typed filesystem errors, mapped from the underlying `CocoaError`/`POSIXError` codes
-/// `FileSystemServiceImpl` can encounter, per design.md's Error Handling Strategy.
 public enum FileSystemServiceError: Error, Equatable {
-    /// Directory read permission denied (`CocoaError` code 257).
     case permissionDenied(URL)
-    /// `createDirectory` target already exists.
     case alreadyExists(URL)
-    /// File in use by another process (`POSIXError.EBUSY`).
     case fileInUse(URL)
-    /// Not enough free space at the destination (`POSIXError.ENOSPC`).
     case insufficientDiskSpace
-    /// The volume was disconnected mid-operation (`POSIXError.ENOTCONN`).
     case volumeDisconnected(URL)
-    /// A planned destination path exceeds the filesystem's maximum path length
-    /// (`PATH_MAX`), per spec.md's Edge Case 7.
     case pathTooLong(URL)
 }
 
 extension FileSystemServiceError: LocalizedError {
-    /// Localized, user-facing message per case (I18N-01..04), backed by MCGuiMacOS's
-    /// own `Localizable.strings` (AD-005) - never MCGuiUI's, keeping AD-002's boundary
-    /// intact (MCGuiUI never imports MCGuiMacOS; it only calls `error.localizedDescription`
-    /// on the `Error` it already has).
     public var errorDescription: String? {
         switch self {
         case .permissionDenied(let url):
@@ -81,7 +68,6 @@ extension FileSystemServiceError: LocalizedError {
     }
 }
 
-/// macOS `FileSystemService` implementation backed by `FileManager`.
 public final class FileSystemServiceImpl {
     private let fileManager: FileManager
     private let copyItem: (URL, URL) throws -> Void
@@ -89,11 +75,6 @@ public final class FileSystemServiceImpl {
     private let availableFreeSpace: (URL) throws -> Int64
     private let isSameVolume: (URL, URL) -> Bool
 
-    /// - Parameters:
-    ///   - copyItem, moveItem, availableFreeSpace, isSameVolume: Injectable seams over
-    ///     the underlying filesystem primitives, defaulting to real `FileManager`/`URL`
-    ///     calls. Tests use these to simulate `EBUSY` retries, `ENOSPC` failures, and
-    ///     same-volume vs. cross-volume moves without needing multiple real volumes.
     public init(
         fileManager: FileManager = .default,
         copyItem: ((URL, URL) throws -> Void)? = nil,
@@ -115,20 +96,7 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    // MARK: - listDirectory
 
-    // SPEC_DEVIATION (Fix 6, validation.md, Edge Case 4): spec.md asks for 10,000+-entry
-    // directories to load incrementally (pagination/virtualization); this still returns
-    // the full listing in one call. Real incremental loading needs an async/paginated
-    // `FileSystemService.listDirectory` signature (an `AsyncSequence` or a cursor-based
-    // page API) plus matching `PanelViewModel` state to accumulate pages as they arrive -
-    // a protocol-level change out of this fix pass's budget (Fix 1/3's `onProgress`
-    // pattern doesn't apply directly here: listing has no natural per-item side effect to
-    // hang a callback off before the array is built). Deliberately deferred rather than a
-    // half-measure (e.g. switching to `FileManager.enumerator` without any caller-facing
-    // change to consume it incrementally would fix nothing observable). `List` itself
-    // still renders lazily once the array is loaded, so the UI doesn't build 10,000 rows
-    // eagerly - only the initial fetch blocks on the full directory read.
     public func listDirectory(_ url: URL) async throws -> [FileEntry] {
         let keys: [URLResourceKey] = [
             .isDirectoryKey,
@@ -195,7 +163,6 @@ public final class FileSystemServiceImpl {
         return result
     }
 
-    // MARK: - createDirectory
 
     public func createDirectory(_ url: URL) async throws {
         do {
@@ -205,35 +172,17 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    // MARK: - copy
 
-    /// Copies `plan.sources` into `plan.destinationDirectory`, reporting no progress.
     public func copy(_ plan: CopyMovePlan) async throws -> OperationResult {
         try await copy(plan, onProgress: { _ in })
     }
 
-    /// Copies `plan.sources` into `plan.destinationDirectory`, calling `onProgress` once
-    /// per source processed (FO-14) and checking for cancellation between sources
-    /// (FO-16) - cancelling the calling `Task` throws `CancellationError` at the next
-    /// source boundary, leaving already-copied files in place (matches the spec's "stops"
-    /// behavior; it does not roll back completed files).
-    ///
-    /// Conflict handling (FO-06/FO-07): with `updateOnly == false` an existing
-    /// destination entry is always overwritten; with `updateOnly == true` it is
-    /// overwritten only when the source is newer, otherwise skipped. Renaming
-    /// (FO-08) and cancelling (FO-09) are resolved upstream, before the plan reaches
-    /// this method - `plan.sources`/`destinationDirectory` already reflect that choice.
     public func copy(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
         try ensureSufficientSpace(for: plan)
         try ensureValidPathLengths(for: plan)
 
         var failedItems: [FailedItem] = []
         var processedCount = 0
-        // Bugfix: `totalFiles`/progress used to be one unit per top-level *source*, so
-        // copying a single large folder showed "File 1 of 1" and reported nothing until
-        // the whole (opaque, uninterruptible) `FileManager.copyItem` recursive call
-        // finished - no visible progress, no working Cancel. Expanding to the real leaf
-        // files up front makes both correct.
         let progress = OperationProgressTracker(sources: expandedFiles(for: plan.sources))
 
         for source in plan.sources {
@@ -254,10 +203,6 @@ public final class FileSystemServiceImpl {
                 }
                 processedCount += 1
             } catch is CancellationError {
-                // Bugfix: cancellation is now also checked *inside* a directory's
-                // per-file walk (`copyDirectoryContents`), not just before each top-level
-                // source - that inner throw must still abort the whole batch (FO-16),
-                // not get swallowed as a single "failed item" like a real copy error.
                 throw CancellationError()
             } catch {
                 failedItems.append(try failedItemOrRethrowIfDisconnected(error, source: source))
@@ -272,16 +217,11 @@ public final class FileSystemServiceImpl {
         )
     }
 
-    // MARK: - move
 
-    /// Moves `plan.sources` into `plan.destinationDirectory`, reporting no progress.
     public func move(_ plan: CopyMovePlan) async throws -> OperationResult {
         try await move(plan, onProgress: { _ in })
     }
 
-    /// Moves `plan.sources` into `plan.destinationDirectory`: renames within the same
-    /// volume, copies then deletes the original across volumes (FO-04). Reports progress
-    /// and checks cancellation the same way `copy(_:onProgress:)` does (FO-14, FO-16).
     public func move(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult {
         try ensureSufficientSpace(for: plan)
         try ensureValidPathLengths(for: plan)
@@ -304,11 +244,6 @@ public final class FileSystemServiceImpl {
                     try await withEBUSYRetry(url: source.path) {
                         try moveItem(source.path, destination)
                     }
-                    // A same-volume rename is atomic and instant regardless of directory
-                    // size - there's nothing to report progress *during*. Still walk the
-                    // now-relocated tree to account for each file it contained, so
-                    // `filesProcessed`/`totalFiles` land on the same total the tracker was
-                    // built with instead of stalling at "File 1 of N".
                     if source.type == .directory {
                         reportCompletedDirectory(at: destination, progress: progress, onProgress: onProgress)
                     } else {
@@ -338,15 +273,12 @@ public final class FileSystemServiceImpl {
         )
     }
 
-    // MARK: - copy/move helpers
 
     private enum ExistingDestinationResolution {
         case proceed
         case skip
     }
 
-    /// If `destination` already exists, decides whether to remove it (so the caller can
-    /// proceed) or skip this source, per `options.updateOnly`.
     private func resolveExistingDestination(
         source: FileEntry,
         destination: URL,
@@ -386,19 +318,8 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    /// Directory-walk resource keys: just enough to tell files from directories and get
-    /// their size - `buildEntry`'s full listing entry additionally does a separate
-    /// `attributesOfItem` stat (for `permissions`) and, for symlinks, a
-    /// `destinationOfSymbolicLink` call, neither of which `copySingleFile`/
-    /// `OperationProgressTracker` ever actually reads (`copySingleFile` re-stats itself
-    /// when it needs attributes). Skipping them here roughly halves the syscalls per file
-    /// during a directory walk - the difference between a barely-noticeable pre-scan and
-    /// one that visibly stalls the dialog on an 11GB source tree.
     private static let directoryWalkKeys: [URLResourceKey] = [.isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey]
 
-    /// A minimal `FileEntry` for internal directory-walk bookkeeping only (progress
-    /// totals, per-file copy dispatch) - never returned to callers of `listDirectory`,
-    /// so the unused fields (dates/permissions/hidden/symlinkTarget) are safe filler.
     private func lightEntry(for url: URL, keys: Set<URLResourceKey> = Set(directoryWalkKeys)) -> FileEntry {
         let values = try? url.resourceValues(forKeys: keys)
         let isDirectory = values?.isDirectory ?? false
@@ -419,11 +340,6 @@ public final class FileSystemServiceImpl {
         )
     }
 
-    /// Recursively lists the real leaf files under `sources`' directories (files and
-    /// symlinks only, never the directory entries themselves) so `OperationProgressTracker`
-    /// can be built from the actual total file count/bytes instead of "1 unit per
-    /// top-level source" - which made copying a single folder report "File 1 of 1" with
-    /// no visible progress until the whole thing finished.
     private func expandedFiles(for sources: [FileEntry]) -> [FileEntry] {
         var result: [FileEntry] = []
         for source in sources {
@@ -441,11 +357,6 @@ public final class FileSystemServiceImpl {
         return result
     }
 
-    /// Copies a directory source file-by-file (mirrors `expandedFiles`' walk) instead of
-    /// one opaque `FileManager.copyItem` call for the whole subtree - that single call
-    /// reported no progress and ignored cancellation until the entire folder finished
-    /// copying. Each nested file goes through `copySingleFile` (so symlink/attribute
-    /// handling stays identical to the single-file path) and reports its own progress.
     private func copyDirectoryContents(
         _ source: FileEntry,
         to destination: URL,
@@ -474,10 +385,6 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    /// Accounts for a directory that a same-volume rename already relocated wholesale
-    /// (see `move(_:onProgress:)`) - no I/O here, just walks the now-relocated tree so
-    /// `filesProcessed` reaches the same total the tracker was built with, instead of
-    /// stalling at "File 1 of N" for an operation that in fact already finished.
     private func reportCompletedDirectory(
         at destination: URL,
         progress: OperationProgressTracker,
@@ -491,9 +398,6 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    /// Retries `operation` a few times, with a short backoff, when it fails with
-    /// `POSIXError.EBUSY` (file in use by another process), per design.md's Error
-    /// Handling Strategy. Throws a typed `.fileInUse` error once attempts are exhausted.
     private func withEBUSYRetry(url: URL, maxAttempts: Int = 3, _ operation: () throws -> Void) async throws {
         var attempt = 0
         while true {
@@ -518,8 +422,6 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    /// Edge Case 7: throws `.pathTooLong` before starting the operation if any planned
-    /// destination path would exceed the filesystem's `PATH_MAX`.
     private func ensureValidPathLengths(for plan: CopyMovePlan) throws {
         for source in plan.sources {
             let destination = plan.destinationDirectory.appendingPathComponent(plan.renames[source.id] ?? source.name)
@@ -529,10 +431,6 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    /// Edge Case 6: a disconnected volume mid-operation (`POSIXError.ENOTCONN`) aborts
-    /// the whole batch rather than being recorded as one more per-file failure - there's
-    /// no point continuing to copy/move to or from a volume that just vanished. Any other
-    /// error becomes a normal `FailedItem`, same as before.
     private func failedItemOrRethrowIfDisconnected(_ error: Error, source: FileEntry) throws -> FailedItem {
         if let posixError = error as? POSIXError, posixError.code == .ENOTCONN {
             throw FileSystemServiceError.volumeDisconnected(source.path)
@@ -547,7 +445,6 @@ public final class FileSystemServiceImpl {
         return error.localizedDescription
     }
 
-    // MARK: - getVolumes
 
     public func getVolumes() -> [VolumeInfo] {
         let keys: [URLResourceKey] = [.volumeNameKey, .volumeAvailableCapacityKey]
@@ -561,15 +458,6 @@ public final class FileSystemServiceImpl {
         }
     }
 
-    // SPEC_DEVIATION: `trash(_:)` is part of the `FileSystemService` protocol (Phase 1,
-    // frozen) and design.md lists it as a Key Method of FileSystemServiceImpl, but no
-    // task in T12-T14 owns it explicitly (the canonical, more thoroughly-tested
-    // implementation is T15's `TrashServiceImpl`, conforming to the separate
-    // `TrashService` protocol). Implemented here - minimally, using the same real
-    // `FileManager.trashItem` API, not a stub - because `FileSystemServiceImpl` cannot
-    // conform to `FileSystemService` (required for the type to be usable via the
-    // protocol, e.g. by future ViewModels) without it.
-    /// Moves `urls` to the system Trash.
     public func trash(_ urls: [URL]) async throws -> OperationResult {
         var failedItems: [FailedItem] = []
         var processedCount = 0
@@ -594,10 +482,6 @@ public final class FileSystemServiceImpl {
 
 extension FileSystemServiceImpl: FileSystemService {}
 
-/// Accumulates copy/move progress across sources for the `onProgress` callback (FO-14):
-/// running byte total, elapsed-time-based transfer speed, and a simple remaining-bytes /
-/// speed ETA. A small reference type (not a struct) so `recordProcessed` can update
-/// running totals without `copy`/`move` needing a mutable local var passed around.
 final class OperationProgressTracker {
     private let totalFiles: Int
     private let totalBytes: Int64
@@ -606,8 +490,6 @@ final class OperationProgressTracker {
     private var bytesTransferred: Int64 = 0
     private var filesProcessed: Int = 0
 
-    /// - Parameter now: injectable clock (defaults to the real `Date()`) so tests can
-    ///   control elapsed time deterministically instead of racing a wall clock.
     init(sources: [FileEntry], now: @escaping () -> Date = Date.init) {
         totalFiles = sources.count
         totalBytes = sources.reduce(Int64(0)) { $0 + ($1.type == .directory ? 0 : $1.size) }
@@ -615,8 +497,6 @@ final class OperationProgressTracker {
         startTime = now()
     }
 
-    /// Records `source` as processed and returns the resulting `OperationProgress`
-    /// snapshot. `speed`/`eta` are `0` until any time has elapsed since construction.
     func recordProcessed(_ source: FileEntry) -> OperationProgress {
         bytesTransferred += source.type == .directory ? 0 : source.size
         filesProcessed += 1

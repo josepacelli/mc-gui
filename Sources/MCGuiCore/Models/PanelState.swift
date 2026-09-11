@@ -1,11 +1,9 @@
 import Foundation
 
-/// The column a panel's file list is currently sorted by.
 public enum PanelSortColumn: String, Codable, CaseIterable {
     case name, size, date, type
 }
 
-/// Back/forward navigation history for a single panel.
 public struct PanelPathHistory: Codable, Hashable {
     public var past: [URL]
     public var future: [URL]
@@ -16,7 +14,6 @@ public struct PanelPathHistory: Codable, Hashable {
     }
 }
 
-/// The full navigable state of one file panel.
 public struct PanelState: Codable {
     public var currentPath: URL
     public var entries: [FileEntry]

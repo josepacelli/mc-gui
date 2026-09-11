@@ -1,9 +1,6 @@
 import Testing
 @testable import MCGuiUI
 
-/// Unit tests for `ButtonBar`'s pure static helpers (classic-layout-parity CL-03..CL-07).
-/// `ButtonBar.body` is thin declarative glue over these, consistent with the project's
-/// existing view-testing pattern (`PanelViewFileOperationsTests`).
 @Suite("ButtonBar")
 struct ButtonBarTests {
 

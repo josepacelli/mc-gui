@@ -2,73 +2,29 @@ import SwiftUI
 import AppKit
 import MCGuiCore
 
-/// A single file panel: renders `PanelViewModel.entries`, shows loading/error overlays,
-/// and tracks focus so the active panel can be visually distinguished.
-///
-/// This is a focus-state skeleton only - full keyboard navigation (arrows, Tab, Space,
-/// Insert) is wired in Phase 9 (`PanelCommands`/`KeyboardShortcuts`). The context menu
-/// below is a stub; its actions are wired in a future task. F5/F6/F7/F8 file operations
-/// (copy, move, mkdir, delete) are wired here (T33).
 @MainActor
 public struct PanelView: View {
     public let viewModel: PanelViewModel
     public let isActive: Bool
     public var onActivate: () -> Void
-    // WindowManager gap closure (T50): F3/F4 need to construct and present a real
-    // ViewerWindow/EditorWindow backed by a concrete ViewerServiceImpl/EditorServiceImpl
-    // (MCGuiMacOS), which PanelView (MCGuiUI) cannot reach directly - MCGuiUI does not
-    // depend on MCGuiMacOS. These closures let the caller (MainWindow -> WindowManager,
-    // MCGuiApp) supply that behavior, mirroring `onActivate`'s existing pattern.
     public var onViewFile: (FileEntry) -> Void
     public var onEditFile: (FileEntry) -> Void
-    // FO-14: copy/move progress used to be a `.sheet` (modal - blocked interacting with
-    // this panel, effectively the whole window, until the operation finished). Per user
-    // request ("faça a cópia async"), it's now presented as an independent, non-modal
-    // window via this closure (mirrors `onViewFile`/`onEditFile` - `WindowManager`,
-    // which can create a real standalone `NSWindow`, lives in `MCGuiApp`, unreachable
-    // from here).
     public var onShowProgress: (ProgressDialogViewModel) -> Void
-    // F1: opens the (context-free, singleton) Help window - mirrors `onViewFile`/
-    // `onEditFile`/`onShowProgress`. Not a `PanelAction` since it needs no panel context.
     public var onHelp: () -> Void
-    // F2: opens the User Menu with this panel's current context (%f/%d/%D) - routed
-    // through `PanelAction.userMenu`/`perform` like F3-F8, see `beginUserMenu`.
     public var onUserMenu: (UserMenuContext) -> Void
-    // classic-layout-parity CL-05: lets an outside caller (`MainWindow`, routing
-    // `ButtonBar`/`TopBar` clicks for whichever panel is active) trigger the same F3-F8
-    // handling physical key presses already run below - see `PanelAction`.
     public var pendingAction: Binding<PanelAction?>
-    // FO-01, FO-02: the classic dual-pane copy/move default - F5/F6 offers the *other*
-    // panel's current directory as the destination, not this panel's own. `MainWindow`
-    // passes its sibling `PanelViewModel.currentPath` here, re-evaluated on every
-    // `MainWindow.body` render so it always reflects the other panel's live location
-    // (never this struct's own - `PanelView` has no reference to its sibling otherwise).
-    // `nil` (the default) falls back to this panel's own path, matching the prior
-    // behavior for callers/tests that don't wire a sibling.
     public var otherPanelPath: URL?
-    // FO-14 bugfix: a copy/move's destination is often the *sibling* panel
-    // (`otherPanelPath`), whose `PanelViewModel` this `PanelView` never holds a reference
-    // to - `performCopyMove`'s own `viewModel.load()` only refreshes this panel's own
-    // (source) listing. `MainWindow` wires this to reload the sibling `PanelViewModel`
-    // directly, so its entries pick up whatever just landed in it.
     public var onOperationCompleted: () -> Void
 
     @FocusState private var isFocused: Bool
     @State private var selection: Set<UUID> = []
-    // KN-05/KN-06: the row Space/Insert last acted on - see `currentRowID`.
     @State private var cursorID: FileEntry.ID?
 
     @State private var copyMoveViewModel: CopyMoveDialogViewModel?
-    // FO-05..FO-09: the conflict dialog shown for each destination-name collision found
-    // while resolving a copy/move, one at a time, before the operation actually runs.
     @State private var conflictDialogViewModel: ConflictDialogViewModel?
     @State private var mkdirViewModel: MkdirDialogViewModel?
     @State private var deleteViewModel: DeleteConfirmDialogViewModel?
     @State private var operationErrorMessage: String?
-    // FO-14, FO-16: the actual running copy/move batch (post-conflict-resolution), so a
-    // second F5/F6 press can't start a concurrent operation on the same panel, and so its
-    // dialog's Cancel button (via `ProgressDialogViewModel.onCancel`) has something to
-    // cancel.
     @State private var operationTask: Task<OperationResult, Error>?
 
     public init(
@@ -97,11 +53,7 @@ public struct PanelView: View {
         self.onOperationCompleted = onOperationCompleted
     }
 
-    // MARK: - F-key handling (FV-01, ED-01, FO-01, FO-02, FO-10, FO-12)
 
-    // NSF3FunctionKey..NSF8FunctionKey are AppKit's Unicode private-use-area scalars for
-    // the physical F3-F8 keys; SwiftUI's `KeyEquivalent` has no dedicated function-key
-    // constants, so this is the standard technique for binding to them via `.onKeyPress`.
     private static let f1Key = KeyEquivalent(Character(UnicodeScalar(NSF1FunctionKey)!))
     private static let f2Key = KeyEquivalent(Character(UnicodeScalar(NSF2FunctionKey)!))
     private static let f3Key = KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!))
@@ -110,9 +62,6 @@ public struct PanelView: View {
     private static let f6Key = KeyEquivalent(Character(UnicodeScalar(NSF6FunctionKey)!))
     private static let f7Key = KeyEquivalent(Character(UnicodeScalar(NSF7FunctionKey)!))
     private static let f8Key = KeyEquivalent(Character(UnicodeScalar(NSF8FunctionKey)!))
-    // KN-06: NSInsertFunctionKey is the same kind of AppKit private-use-area scalar as the
-    // F-keys above - most Mac keyboards have no physical Insert key, but external/Windows
-    // keyboards that do send this.
     private static let insertKey = KeyEquivalent(Character(UnicodeScalar(NSInsertFunctionKey)!))
 
     private var fileSystemService: FileSystemService { viewModel.fileSystemService }
@@ -129,11 +78,6 @@ public struct PanelView: View {
         operationErrorMessage ?? viewModel.errorMessage
     }
 
-    /// The rows the `List` actually shows (FS-04, FS-05, KN-11): a synthetic ".." entry
-    /// first (`nil` at the filesystem root, where there is no parent to go up to),
-    /// followed by `viewModel.entries`. Kept separate from `viewModel.entries` itself so
-    /// counts/selection/file-operation logic elsewhere (footer count, F5-F8) stay exactly
-    /// as before - ".." is a display/navigation-only concept.
     private var displayEntries: [FileEntry] {
         if let parentEntry = Self.parentEntry(for: viewModel.currentPath) {
             return [parentEntry] + viewModel.entries
@@ -206,26 +150,12 @@ public struct PanelView: View {
         }
     }
 
-    // Split out of `body` (and its keyboard handling split across two `ViewModifier`s
-    // below) because chaining every `.onKeyPress` directly in one expression made the
-    // compiler give up with "unable to type-check this expression in reasonable time".
     private var entryList: some View {
         List(displayEntries, selection: $selection) { entry in
             FileRow(entry: entry)
                 .contextMenu {
                     Text(entry.name)
                 }
-                // FS-04, KN-11: real `NSTableView.doubleAction`, not a SwiftUI gesture.
-                // Two prior attempts both broke single-click selection to some degree:
-                // `.onTapGesture(count: 2)`/`.simultaneousGesture(TapGesture(count: 2))`
-                // made AppKit hold every click to see whether a second one follows before
-                // committing the List's native selection (single-click became unreliable,
-                // user-reported); detecting a double-click purely from `selection` changes
-                // never fired at all, because clicking an *already*-selected row a second
-                // time doesn't change `selection` (no `onChange` to observe). Installing
-                // the table's own `doubleAction` runs independently of - and never delays -
-                // its native single-click selection, because it's the same mechanism
-                // AppKit itself uses to distinguish click counts.
                 .background(TableDoubleClickInstaller(entries: displayEntries, onDoubleClick: activate))
         }
         .focusable()
@@ -252,9 +182,6 @@ public struct PanelView: View {
         ))
     }
 
-    // MARK: - Classic chrome (classic-layout-parity CL-09..CL-12): header shows the
-    // current path, footer shows the entry count or, once something is selected, the
-    // selected count - mirrors the original terminal panel's title/status-line border.
 
     private var header: some View {
         Text(viewModel.currentPath.path)
@@ -305,7 +232,6 @@ public struct PanelView: View {
     }
 
     private func handleFunctionKey(_ key: KeyEquivalent) {
-        // F1 is not a PanelAction (it needs no panel context - see onHelp's doc comment).
         if key.character == Self.f1Key.character {
             onHelp()
             return
@@ -314,18 +240,12 @@ public struct PanelView: View {
         perform(action)
     }
 
-    /// FS-04, KN-11: Enter navigates into the selected directory (or the ".." entry) /
-    /// opens the selected file. Mirrors F3/F4's existing "first selected entry, no-op
-    /// when empty" precedent. Returns whether there was a target to act on, so the caller
-    /// can report the key press as `.ignored` rather than `.handled` when there wasn't.
     private func activateSelected() -> Bool {
         guard let entry = Self.targetEntry(selection: selectedDisplayEntries) else { return false }
         activate(entry)
         return true
     }
 
-    /// Maps a physical F2-F8 key press to the `PanelAction` it triggers (F1 is handled
-    /// separately in `handleFunctionKey` - it isn't a `PanelAction`).
     static func action(forKey key: KeyEquivalent) -> PanelAction? {
         switch key.character {
         case Self.f2Key.character: return .userMenu
@@ -339,8 +259,6 @@ public struct PanelView: View {
         }
     }
 
-    /// Runs `action` through the same handlers physical F2-F8 already use (CL-05) -
-    /// shared by `handleFunctionKey` and the `pendingAction` binding.
     private func perform(_ action: PanelAction) {
         switch action {
         case .view: beginView()
@@ -353,10 +271,6 @@ public struct PanelView: View {
         }
     }
 
-    /// F2: opens the User Menu with this panel's current context - the first selected
-    /// entry's path (`%f`, `nil` when nothing is selected - the command author decides
-    /// whether that's fine), this panel's current directory (`%d`), and the other
-    /// panel's (`%D`).
     private func beginUserMenu() {
         onUserMenu(UserMenuContext(
             currentFile: selectedEntries.first?.path,
@@ -365,30 +279,19 @@ public struct PanelView: View {
         ))
     }
 
-    /// F3: opens the viewer on the first selected entry (FV-01). A no-op with nothing
-    /// selected.
     private func beginView() {
         guard let entry = Self.targetEntry(selection: selectedEntries) else { return }
         onViewFile(entry)
     }
 
-    /// F4: opens the editor on the first selected entry (ED-01). A no-op with nothing
-    /// selected.
     private func beginEdit() {
         guard let entry = Self.targetEntry(selection: selectedEntries) else { return }
         onEditFile(entry)
     }
 
     private func beginCopyOrMove(_ mode: OperationMode) {
-        // Progress is a non-modal window now, so - unlike before - the user really can
-        // press F5/F6 again while one is still running on this panel; refuse rather than
-        // race a second `operationTask` into the same @State slot.
         guard operationTask == nil else { return }
         operationErrorMessage = nil
-        // FO-01, FO-02: defaults to the *other* panel's current directory (the classic
-        // dual-pane default) via `otherPanelPath`, falling back to this panel's own path
-        // when there is no sibling (e.g. a caller/test that doesn't wire one). Always
-        // editable in CopyMoveDialog's text field before confirming either way.
         copyMoveViewModel = Self.makeCopyMoveDialog(
             selection: selectedEntries,
             mode: mode,
@@ -409,10 +312,6 @@ public struct PanelView: View {
         )
     }
 
-    /// Runs `entry`'s double-click/Enter activation (FS-04, KN-11): navigates into a
-    /// directory (the ".." entry included - it's just a `FileEntry` whose `path` is the
-    /// parent), or opens a file in the viewer (F3's default, the safer of view/edit for
-    /// an implicit "open" trigger the spec doesn't disambiguate further).
     private func activate(_ entry: FileEntry) {
         switch Self.activationResult(for: entry) {
         case .navigate(let target):
@@ -422,36 +321,21 @@ public struct PanelView: View {
         }
     }
 
-    /// FS-05: Backspace navigates to the parent directory unconditionally (no selection
-    /// precondition), mirroring `AppCommandActions.navigateToParent`.
     private func navigateToParent() {
         Task { await viewModel.load(viewModel.currentPath.deletingLastPathComponent()) }
     }
 
-    /// KN-04: jumps the selection to the first/last row via `PanelCommands.jump`. A no-op
-    /// on an empty panel.
     private func jumpToEdge(first: Bool) {
         guard let target = PanelCommands.jump(toFirst: first, entries: displayEntries) else { return }
         selection = [target]
     }
 
-    /// KN-05: Space toggles the current row (`cursorID` when set, else the sole member of
-    /// `selection`, else the first row) via `PanelCommands.toggleSelection`, and does not
-    /// move afterward - `cursorID` is recorded so a following Insert (KN-06) resumes from
-    /// the same row rather than losing track of it once `selection` holds several marks.
-    /// A no-op on an empty panel.
     private func toggleCurrentSelection() {
         guard let currentID = currentRowID else { return }
         selection = PanelCommands.toggleSelection(selection, id: currentID, entries: displayEntries)
         cursorID = currentID
     }
 
-    /// KN-06: Insert toggles the current row exactly like Space, then additionally
-    /// advances `cursorID` to `PanelCommands.toggleAndAdvance`'s `nextCursor` - unlike
-    /// KN-04/05's shared-handler predecessor, this actually calls the distinct
-    /// `toggleAndAdvance` API so repeated Insert presses mark descending rows without an
-    /// arrow key in between, independent of how many rows `selection` has already
-    /// accumulated (which `selection.first` alone can't track once it's more than one).
     private func toggleAndAdvanceSelection() {
         guard let currentID = currentRowID else { return }
         let result = PanelCommands.toggleAndAdvance(selection, id: currentID, entries: displayEntries)
@@ -459,35 +343,22 @@ public struct PanelView: View {
         cursorID = result.nextCursor ?? currentID
     }
 
-    /// The row Space/Insert act on: `cursorID` (set by the last Space/Insert) when
-    /// present, else whichever single row is currently selected (arrow-key/click
-    /// navigation), else the first row.
     private var currentRowID: FileEntry.ID? {
         cursorID ?? selection.first ?? displayEntries.first?.id
     }
 
-    /// "*": selects every entry via `PanelCommands.selectAll`. Deliberately scoped to
-    /// `viewModel.entries` (not `displayEntries`) so the synthetic ".." row is never
-    /// selected by this - a batch operation over ".." would be meaningless.
     private func selectAllEntries() {
         selection = PanelCommands.selectAll(entries: viewModel.entries)
     }
 
-    /// "-": clears the whole selection - a secondary key for keyboards with no working
-    /// physical Delete key (per user report), and the natural opposite of "*"/select-all.
     private func deselectAllEntries() {
         selection = PanelCommands.deselectAll()
     }
 
-    /// Cmd+I: inverts the whole selection - the classic mc "*" behavior, moved to its own
-    /// key once "*" itself became select-all (per user request).
     private func invertSelection() {
         selection = PanelCommands.invertSelection(selection, entries: viewModel.entries)
     }
 
-    /// KN-12, SF-04: runs whichever `escapeAction` applies to the current state. Progress
-    /// is no longer part of this - it's a non-modal window now (`onShowProgress`), with
-    /// its own Cancel button; Escape on the panel has nothing to dismiss for it anymore.
     private func handleEscape() {
         switch Self.escapeAction(hasOpenSheet: hasOpenSheet, filterText: viewModel.filterText, hasSelection: !selection.isEmpty) {
         case .dismissSheet:
@@ -508,8 +379,6 @@ public struct PanelView: View {
         conflictDialogViewModel != nil || copyMoveViewModel != nil || mkdirViewModel != nil || deleteViewModel != nil
     }
 
-    /// FO-05..FO-09: resolves every destination-name conflict (one dialog at a time) before
-    /// running the copy/move, then applies the batch with whatever the user chose per file.
     private func performCopyMove(_ dialogViewModel: CopyMoveDialogViewModel, background: Bool) async {
         copyMoveViewModel = nil
         operationErrorMessage = nil
@@ -552,17 +421,6 @@ public struct PanelView: View {
         }
     }
 
-    /// FO-14, FO-16: runs `plan` through `fileSystemService`'s progress-reporting
-    /// copy/move. Per user request, progress is presented as an independent, non-modal
-    /// window (`onShowProgress`) instead of a blocking sheet, so the rest of the app stays
-    /// usable while it runs - its Cancel button wires to `operationTask.cancel()`, and
-    /// `fileSystemService.copy`/`move` check for cancellation between sources
-    /// (`FileSystemServiceImpl`) - already-processed files stay in place.
-    ///
-    /// Classic mc parity: the progress dialog is shown by default (`background == false`,
-    /// the normal OK button) - `background == true` is the explicit "Segundo plano" opt-in
-    /// from `CopyMoveDialog`, which runs the exact same operation but never opens a
-    /// window for it.
     private func runWithProgress(_ plan: CopyMovePlan, mode: OperationMode, background: Bool) async {
         var continuation: AsyncStream<OperationProgress>.Continuation!
         let stream = AsyncStream<OperationProgress> { continuation = $0 }
@@ -585,7 +443,6 @@ public struct PanelView: View {
             let result = try await task.value
             operationErrorMessage = Self.fo15Message(from: result)
         } catch is CancellationError {
-            // FO-16: cancelled by the user - not a failure to surface as an error.
         } catch {
             operationErrorMessage = error.localizedDescription
         }
@@ -594,8 +451,6 @@ public struct PanelView: View {
         operationTask = nil
     }
 
-    /// Presents `ConflictDialog` for `destinationPath` and suspends until the user picks
-    /// Overwrite/Skip/Rename/Cancel.
     private func resolveConflict(destinationPath: URL) async -> FileConflictResolution {
         await withCheckedContinuation { continuation in
             conflictDialogViewModel = ConflictDialogViewModel(destinationPath: destinationPath) { resolution in
@@ -605,11 +460,7 @@ public struct PanelView: View {
         }
     }
 
-    // MARK: - Pure helpers (unit-tested; the body above is thin declarative glue)
 
-    /// What double-click/Enter (`activate`) does with `entry` (FS-04, KN-11): a directory
-    /// (the ".." entry included, since it's just a directory whose path is the parent)
-    /// navigates there; anything else opens in the viewer.
     enum ActivationResult: Equatable {
         case navigate(URL)
         case view(FileEntry)
@@ -619,17 +470,8 @@ public struct PanelView: View {
         entry.type == .directory ? .navigate(entry.path) : .view(entry)
     }
 
-    /// A fixed identity for the synthetic ".." row so `List`'s diffing treats it as the
-    /// same row across every re-render (a fresh `UUID()` per computed-property evaluation
-    /// would make `List`/`selection` treat it as a new row each time).
     static let parentEntryID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
 
-    /// Builds the synthetic ".." row for `currentPath` (FS-05, KN-11), or `nil` at the
-    /// filesystem root, where there is nothing to go up to. Checks `currentPath.path`
-    /// against "/" directly rather than comparing to `deletingLastPathComponent()`'s
-    /// result - that comparison broke on newer Foundation/URL versions, which resolve
-    /// "/".deletingLastPathComponent() to "/../" instead of "/" (bugfix, CI-only failure
-    /// on a newer Xcode than this was originally written against).
     static func parentEntry(for currentPath: URL) -> FileEntry? {
         guard currentPath.path != "/" else { return nil }
         let parent = currentPath.deletingLastPathComponent()
@@ -648,23 +490,11 @@ public struct PanelView: View {
         )
     }
 
-    /// The result of resolving every destination-name conflict for a copy/move batch
-    /// (FO-05..FO-09): either the (possibly narrowed/renamed) sources to actually run, or
-    /// `cancelled` when the user chose Cancel on any one of them - which aborts the whole
-    /// batch, not just that file.
     enum ConflictResolutionOutcome: Equatable {
         case proceed(sources: [FileEntry], renames: [UUID: String])
         case cancelled
     }
 
-    /// Applies `resolutions` (one per conflicting source, in the order they were resolved)
-    /// to `sources`: Overwrite leaves the source untouched (destination already gets
-    /// overwritten unconditionally downstream, FO-06); Skip removes it (FO-07); Rename
-    /// claims the next available `CopyMovePlanner.resolvedName` against `existingNames`
-    /// plus every name already claimed earlier in this same batch, so two renamed
-    /// conflicts in one operation can't collide with each other (FO-08); Cancel stops
-    /// processing further resolutions and aborts the entire batch (FO-09), matching the
-    /// spec's "Cancel aborts entire operation" - not just the one file being resolved.
     static func applyResolutions(
         sources: [FileEntry],
         resolutions: [(FileEntry, FileConflictResolution)],
@@ -693,8 +523,6 @@ public struct PanelView: View {
         return .proceed(sources: remainingSources, renames: renames)
     }
 
-    /// What Escape does (KN-12, SF-04), in priority order: dismiss an open dialog, else
-    /// clear an active filename filter, else clear the selection, else nothing.
     enum EscapeAction: Equatable {
         case dismissSheet
         case clearFilter
@@ -709,15 +537,10 @@ public struct PanelView: View {
         return .none
     }
 
-    /// The entry F3/F4 should act on (FV-01, ED-01): the first selected entry, or `nil`
-    /// when nothing is selected - F3/F4 with an empty selection is a no-op, mirroring
-    /// F5/F6/F8's existing empty-selection precedent above.
     static func targetEntry(selection: [FileEntry]) -> FileEntry? {
         selection.first
     }
 
-    /// Builds the F5/F6 copy/move dialog's ViewModel for `selection` (FO-01, FO-02).
-    /// `nil` when there is nothing selected - F5/F6 with an empty selection is a no-op.
     static func makeCopyMoveDialog(
         selection: [FileEntry],
         mode: OperationMode,
@@ -732,21 +555,15 @@ public struct PanelView: View {
         )
     }
 
-    /// Builds the F7 new-folder dialog's ViewModel (FO-10). Unlike copy/move/delete,
-    /// mkdir has no selection precondition.
     static func makeMkdirDialog(fileSystemService: FileSystemService, parentDirectory: URL) -> MkdirDialogViewModel {
         MkdirDialogViewModel(fileSystemService: fileSystemService, parentDirectory: parentDirectory)
     }
 
-    /// Builds the F8 delete-confirmation dialog's ViewModel for `selection` (FO-12).
-    /// `nil` when there is nothing selected - F8 with an empty selection is a no-op.
     static func makeDeleteDialog(selection: [FileEntry], trashService: TrashService) -> DeleteConfirmDialogViewModel? {
         guard !selection.isEmpty else { return nil }
         return DeleteConfirmDialogViewModel(trashService: trashService, entries: selection)
     }
 
-    /// Formats a failed copy/move `OperationResult` into the specific-file-and-reason
-    /// message FO-15 requires. `nil` when the operation succeeded.
     static func fo15Message(from result: OperationResult) -> String? {
         guard !result.success, let firstFailure = result.failedItems.first else { return nil }
         if result.failedItems.count == 1 {
@@ -770,9 +587,6 @@ public struct PanelView: View {
     }
 }
 
-/// Adapts `FileSystemService`'s own `trash(_:)` (already part of that protocol) to the
-/// separate `TrashService` protocol `DeleteConfirmDialogViewModel` expects, so `PanelView`
-/// doesn't need a second injected service to wire F8 (FO-12).
 private struct FileSystemTrashAdapter: TrashService {
     let fileSystemService: FileSystemService
 
@@ -781,9 +595,6 @@ private struct FileSystemTrashAdapter: TrashService {
     }
 }
 
-/// F3-F8 (function keys), FS-04/KN-11 (Enter), FS-05 (Backspace) - split out of
-/// `PanelView.entryList` (alongside `PanelSelectionKeys` below) so the compiler doesn't
-/// have to type-check every `.onKeyPress` in one giant chained expression.
 private struct PanelPrimaryKeys: ViewModifier {
     let functionKeys: Set<KeyEquivalent>
     let onFunctionKey: (KeyEquivalent) -> Void
@@ -806,22 +617,6 @@ private struct PanelPrimaryKeys: ViewModifier {
     }
 }
 
-/// KN-04 (Cmd+Left/Right jump), KN-05/KN-06 (Space/Insert toggle), "*" (select all, see
-/// `PanelView.selectAllEntries`), KN-12/SF-04 (Escape) - the other half of
-/// `PanelView.entryList`'s keyboard handling, split for the same reason as
-/// `PanelPrimaryKeys` above.
-///
-/// "+"/"-" are secondary keys for Insert/deselect-all (per user report: Mac keyboards
-/// often have no dedicated Insert key at all, and this user's keyboard doesn't reliably
-/// send it) - "+" mirrors Insert (toggle current row and advance), "-" clears the whole
-/// selection, the natural opposite of "*"/select-all. Cmd+I inverts the selection - the
-/// classic mc "*" behavior, given its own key since "*" itself became select-all.
-///
-/// Ctrl+A/Ctrl+U/Ctrl+T/Ctrl+I are a third, fully keyboard-navigable set of aliases for
-/// the same four selection commands (per user request) - select-all/deselect-all/toggle/
-/// invert, mnemonic on the letter (Select/Unselect/Toggle/Invert). Scoped to this list's
-/// key handling only, so they never shadow a text field's own Ctrl+A "move to start of
-/// line" (a focused `TextField` owns its key events before this modifier ever sees them).
 private struct PanelSelectionKeys: ViewModifier {
     let insertKey: KeyEquivalent
     let onJumpFirst: () -> Void
@@ -882,12 +677,6 @@ private struct PanelSelectionKeys: ViewModifier {
     }
 }
 
-/// Installs a real `NSTableView.doubleAction` for double-click-to-activate (FS-04,
-/// KN-11) by walking up from an invisible helper view placed inside each row's content -
-/// a genuine descendant of the `List`'s backing `NSTableView`, unlike a `.background()`/
-/// `.overlay()` attached to the `List` itself, which SwiftUI may render as a sibling
-/// rather than a descendant. Harmless to attach per-row: `List` only ever instantiates
-/// the handful of currently-visible rows regardless of how many entries there are.
 private struct TableDoubleClickInstaller: NSViewRepresentable {
     let entries: [FileEntry]
     let onDoubleClick: (FileEntry) -> Void

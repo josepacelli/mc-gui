@@ -4,7 +4,6 @@ import Testing
 @Suite("SelectionService")
 struct SelectionServiceTests {
 
-    // MARK: - toggle (KN-05: Space to toggle selection)
 
     @Test("toggle selects an unselected index")
     func toggleSelectsUnselectedIndex() {
@@ -34,7 +33,6 @@ struct SelectionServiceTests {
         #expect(result == [])
     }
 
-    // MARK: - range (KN-03: Shift+Arrow for range selection)
 
     @Test("range selects a contiguous forward span from anchor to index")
     func rangeSelectsForwardSpan() {
@@ -64,7 +62,6 @@ struct SelectionServiceTests {
         #expect(result == [])
     }
 
-    // MARK: - firstIndex / lastIndex (KN-04: Cmd+Arrow jump to first/last)
 
     @Test("firstIndex returns 0 for a non-empty list")
     func firstIndexOnNonEmptyList() {
@@ -86,7 +83,6 @@ struct SelectionServiceTests {
         #expect(SelectionService.lastIndex(count: 0) == nil)
     }
 
-    // MARK: - invert
 
     @Test("invert flips selected and unselected indices")
     func invertFlipsSelection() {
@@ -116,7 +112,6 @@ struct SelectionServiceTests {
         #expect(result == [])
     }
 
-    // MARK: - toggleAndAdvance (KN-06: Insert to toggle selection and move down)
 
     @Test("toggleAndAdvance selects the index and advances the cursor by one")
     func toggleAndAdvanceSelectsAndMovesDown() {

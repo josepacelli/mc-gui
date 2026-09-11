@@ -30,7 +30,6 @@ struct FileSystemServiceImplCopyMoveTests {
         CopyMovePlan(sources: sources, destinationDirectory: destination, mode: mode, options: options, renames: renames)
     }
 
-    // MARK: - preserveAttributes (FO-03)
 
     @Test("copy preserves permissions and modification date when preserveAttributes is true")
     func copyPreservesAttributes() async throws {
@@ -64,7 +63,6 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(abs((destModDate?.timeIntervalSince1970 ?? 0) - oldDate.timeIntervalSince1970) < 1.0)
     }
 
-    // MARK: - same-volume / cross-volume move (FO-04)
 
     @Test("move on the same volume renames via moveItem rather than copying")
     func moveSameVolumeRenames() async throws {
@@ -128,7 +126,6 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(try String(contentsOf: destURL, encoding: .utf8) == "hi")
     }
 
-    // MARK: - overwrite / skip conflict resolution (FO-06/FO-07)
 
     @Test("copy overwrites an existing destination file by default")
     func copyOverwritesExistingDestinationByDefault() async throws {
@@ -182,7 +179,6 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(try String(contentsOf: destURL, encoding: .utf8) == "old-content")
     }
 
-    // MARK: - rename conflict resolution (FO-08)
 
     @Test("copy writes to the renamed destination name when plan.renames has an entry for the source")
     func copyUsesRenameWhenPresent() async throws {
@@ -204,14 +200,11 @@ struct FileSystemServiceImplCopyMoveTests {
 
         #expect(result.success)
         #expect(result.processedCount == 1)
-        // the original destination file is untouched - the rename avoided the conflict
-        // entirely rather than overwriting it
         #expect(try String(contentsOf: existingDestURL, encoding: .utf8) == "old-content")
         let renamedDestURL = dstDir.appendingPathComponent("a (1).txt")
         #expect(try String(contentsOf: renamedDestURL, encoding: .utf8) == "new-content")
     }
 
-    // MARK: - progress reporting and cancellation (FO-14, FO-16)
 
     @Test("copy(_:onProgress:) reports one snapshot per source, in order, with the running byte total")
     func copyWithProgressReportsOneSnapshotPerSource() async throws {
@@ -228,8 +221,6 @@ struct FileSystemServiceImplCopyMoveTests {
         let service = FileSystemServiceImpl()
         let sources = try await service.listDirectory(srcDir).sorted { $0.name < $1.name }
 
-        // `onProgress` is called synchronously, in order, from within `copy`'s own loop -
-        // no concurrency to guard against, so a plain class is enough to record calls.
         let recorder = ProgressRecorder()
         let result = try await service.copy(
             plan(sources: sources, destination: dstDir, mode: .copy),
@@ -303,9 +294,6 @@ struct FileSystemServiceImplCopyMoveTests {
         let task = Task<OperationResult, Error> {
             try await service.copy(
                 plan(sources: sources, destination: dstDir, mode: .copy),
-                // cancels as soon as the first nested file is reported - proves
-                // cancellation is now checked *between* nested files, not only before
-                // the (single, top-level) directory source.
                 onProgress: { _ in box.task?.cancel() }
             )
         }
@@ -315,7 +303,6 @@ struct FileSystemServiceImplCopyMoveTests {
             _ = try await task.value
             Issue.record("Expected CancellationError to be thrown")
         } catch is CancellationError {
-            // expected
         } catch {
             Issue.record("Unexpected error type: \(error)")
         }
@@ -351,7 +338,6 @@ struct FileSystemServiceImplCopyMoveTests {
             _ = try await task.value
             Issue.record("Expected CancellationError to be thrown")
         } catch is CancellationError {
-            // expected - checkCancellation() fires before the first source is processed
         } catch {
             Issue.record("Unexpected error type: \(error)")
         }
@@ -360,7 +346,6 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("b.txt").path) == false)
     }
 
-    // MARK: - path length / volume disconnection (Edge Cases 7, 6)
 
     @Test("copy throws a typed pathTooLong error when the destination path exceeds PATH_MAX")
     func copyFailsWithPathTooLong() async throws {
@@ -375,8 +360,6 @@ struct FileSystemServiceImplCopyMoveTests {
 
         let service = FileSystemServiceImpl()
         let sourceEntry = try #require(try await service.listDirectory(srcDir).first)
-        // a rename long enough to push the destination path past PATH_MAX regardless of
-        // where the temp directory happens to live
         let hugeName = String(repeating: "a", count: 5_000) + ".txt"
 
         do {
@@ -427,11 +410,9 @@ struct FileSystemServiceImplCopyMoveTests {
             Issue.record("Unexpected error type: \(error)")
         }
 
-        // aborted after the first source - the second was never attempted
         #expect(recorder.copyCalls == 1)
     }
 
-    // MARK: - EBUSY-simulated retry
 
     @Test("copy retries a transient EBUSY failure and succeeds once the file is free")
     func copyRetriesEBUSYThenSucceeds() async throws {
@@ -487,15 +468,10 @@ struct FileSystemServiceImplCopyMoveTests {
         #expect(result.processedCount == 0)
         #expect(recorder.copyCalls == 3)
         #expect(result.failedItems.count == 1)
-        // FileSystemServiceError.fileInUse now has a localized errorDescription (T5)
-        // instead of a raw `String(describing:)` dump of the enum case - assert the
-        // failure reason matches that typed error's own message for this exact source
-        // path, not the old case-name substring.
         #expect(result.failedItems.first?.reason == FileSystemServiceError.fileInUse(sourceEntry.path).errorDescription)
         #expect(FileManager.default.fileExists(atPath: dstDir.appendingPathComponent("a.txt").path) == false)
     }
 
-    // MARK: - ENOSPC-simulated failure
 
     @Test("copy throws a typed insufficientDiskSpace error when available space is less than required")
     func copyFailsWithInsufficientDiskSpace() async throws {
@@ -524,14 +500,11 @@ struct FileSystemServiceImplCopyMoveTests {
     }
 }
 
-/// Records injected-closure invocation counts. A plain reference type is enough here:
-/// each test drives its `FileSystemServiceImpl` sequentially within a single async task.
 private final class CallRecorder {
     var copyCalls = 0
     var moveCalls = 0
 }
 
-/// Records `onProgress` snapshots in call order - see the "progress reporting" tests.
 private final class ProgressRecorder {
     var snapshots: [OperationProgress] = []
 }

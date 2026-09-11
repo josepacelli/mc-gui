@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// A minimal, heuristic syntax highlighter for the text viewer (FV-02): single-line-scoped
-/// (no multi-line block-comment tracking) and language-agnostic (one shared keyword set
-/// spanning common C-like/Python/shell/SQL-ish languages, not a real per-language grammar).
-/// Colors line comments, string literals, keywords, and numeric literals - enough to make
-/// source more scannable at a glance, not a real tokenizer/parser.
 enum SyntaxHighlighter {
     private static let keywords: Set<String> = [
         "func", "function", "def", "fn", "class", "struct", "enum", "protocol", "interface",
@@ -22,7 +17,6 @@ enum SyntaxHighlighter {
 
     private static let lineCommentPrefixes = ["//", "#", "--", ";;"]
 
-    /// Highlights one line of source text. `line` should not contain a newline.
     static func highlight(_ line: Substring) -> AttributedString {
         let chars = Array(line)
         guard !chars.isEmpty else { return AttributedString("") }

@@ -1,9 +1,5 @@
 import Foundation
 
-/// A user-defined menu item (F2): a label and a shell command template using `%f`/`%d`/
-/// `%D` macros (see `UserMenuRunner`). Scoped down from the original mc's 9-macro,
-/// submenu-capable `.mnu`-format menu to a flat list of shell commands - real utility,
-/// contained scope, mirroring `Bookmark`'s own simplification.
 public struct UserMenuItem: Identifiable, Hashable, Codable {
     public let id: UUID
     public let label: String
@@ -16,9 +12,6 @@ public struct UserMenuItem: Identifiable, Hashable, Codable {
     }
 }
 
-/// JSON-persisted user-menu store (add/remove/list), mirroring `BookmarkStore`'s own
-/// persistence pattern: items live at `~/Library/Application Support/MCGui/
-/// user-menu.json`, with corrupt-file recovery to an empty list.
 public final class UserMenuStore {
     private let fileURL: URL
     private let fileManager: FileManager
@@ -35,8 +28,6 @@ public final class UserMenuStore {
         return appSupport.appendingPathComponent("MCGui", isDirectory: true)
     }
 
-    /// Lists all items. An empty list when no file exists yet, or when the file is
-    /// corrupted.
     public func list() async throws -> [UserMenuItem] {
         guard fileManager.fileExists(atPath: fileURL.path) else { return [] }
 
@@ -48,14 +39,12 @@ public final class UserMenuStore {
         }
     }
 
-    /// Adds `item` and persists the updated list.
     public func add(_ item: UserMenuItem) async throws {
         var items = try await list()
         items.append(item)
         try await save(items)
     }
 
-    /// Removes the item with `id`, if present, and persists the updated list.
     public func remove(id: UUID) async throws {
         var items = try await list()
         items.removeAll { $0.id == id }

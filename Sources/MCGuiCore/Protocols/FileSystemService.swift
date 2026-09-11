@@ -1,11 +1,5 @@
 import Foundation
 
-// SPEC_DEVIATION: `VolumeInfo` is not among the 13 domain models spec.md's SWIFT-02
-// enumerates, but design.md's FileSystemServiceImpl Key Methods require a return type
-// for `getVolumes()`. Defined here as the minimal supporting type needed for the
-// protocol signature to compile; fields (name, mountPoint, freeSpace) match what T14
-// (getVolumes implementation) needs.
-/// A mounted filesystem volume.
 public struct VolumeInfo: Identifiable, Hashable, Codable {
     public let id: UUID
     public let name: String
@@ -20,7 +14,6 @@ public struct VolumeInfo: Identifiable, Hashable, Codable {
     }
 }
 
-/// Filesystem access: directory listing, directory creation, copy/move, trash, volumes.
 public protocol FileSystemService {
     func listDirectory(_ url: URL) async throws -> [FileEntry]
 
@@ -30,11 +23,6 @@ public protocol FileSystemService {
 
     func move(_ plan: CopyMovePlan) async throws -> OperationResult
 
-    // FO-14, FO-16: progress-reporting variants `PanelView`'s `ProgressDialog` consumes -
-    // `onProgress` is called once per source processed, and cancelling the enclosing
-    // `Task` (checked between sources) aborts the operation. Default implementations
-    // below fall back to a single before/after snapshot for conformers that don't
-    // override them; `FileSystemServiceImpl` overrides both with real per-file progress.
     func copy(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult
 
     func move(_ plan: CopyMovePlan, onProgress: @escaping (OperationProgress) -> Void) async throws -> OperationResult

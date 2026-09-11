@@ -3,15 +3,10 @@ import SwiftUI
 import Testing
 @testable import MCGuiUI
 
-/// Unit tests for `ThemePreference` (T46): the default value, persistence round-trip
-/// through `@AppStorage` (via an injected `UserDefaults` suite, per the batch's own
-/// guidance to avoid touching real system prefs), and the pure `colorScheme` mapping.
 @Suite("ThemePreference")
 @MainActor
 struct ThemePreferenceTests {
 
-    /// A fresh, empty `UserDefaults` suite isolated per test, so persistence tests never
-    /// read/write real system preferences and never interfere with each other.
     private func makeTestDefaults() -> UserDefaults {
         let suiteName = "ThemePreferenceTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
@@ -19,7 +14,6 @@ struct ThemePreferenceTests {
         return defaults
     }
 
-    // MARK: - default value (TH-01)
 
     @Test("defaults to .system when nothing has been stored yet")
     func defaultsToSystem() {
@@ -29,7 +23,6 @@ struct ThemePreferenceTests {
         #expect(storage.wrappedValue == .system)
     }
 
-    // MARK: - persistence round-trip (TH-06)
 
     @Test("a chosen preference persists across a new AppStorage instance reading the same store")
     func persistsAcrossRelaunch() {
@@ -55,7 +48,6 @@ struct ThemePreferenceTests {
         }
     }
 
-    // MARK: - colorScheme mapping (TH-02, TH-03, TH-04)
 
     @Test("colorScheme maps .system to nil (follow system appearance)")
     func systemMapsToNil() {
@@ -72,7 +64,6 @@ struct ThemePreferenceTests {
         #expect(ThemePreference.dark.colorScheme == .dark)
     }
 
-    // MARK: - rawValue round-trip (Codable/RawRepresentable for @AppStorage eligibility)
 
     @Test("every case round-trips through its rawValue")
     func rawValueRoundTrips() {

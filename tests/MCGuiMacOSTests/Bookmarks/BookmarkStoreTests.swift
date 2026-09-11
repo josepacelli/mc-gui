@@ -10,7 +10,6 @@ struct BookmarkStoreTests {
             .appendingPathComponent("bookmarkstore-\(UUID().uuidString)", isDirectory: true)
     }
 
-    // MARK: - add + persist + reload (BM-01, BM-03)
 
     @Test("add persists a bookmark that a fresh store instance can reload")
     func addPersistsAndReloads() async throws {
@@ -42,7 +41,6 @@ struct BookmarkStoreTests {
         #expect(list == [first, second])
     }
 
-    // MARK: - remove (BM-04)
 
     @Test("remove deletes the bookmark with the given id and persists the change")
     func removeDeletesBookmarkAndPersists() async throws {
@@ -75,7 +73,6 @@ struct BookmarkStoreTests {
         #expect(try await store.list() == [bookmark])
     }
 
-    // MARK: - corrupt-file recovery (BM-03 persistence contract, mirrors PH-04)
 
     @Test("list recovers to an empty array when the JSON file is corrupted")
     func listRecoversFromCorruptedJSON() async throws {

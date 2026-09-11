@@ -2,9 +2,6 @@ import Foundation
 import Observation
 import MCGuiCore
 
-/// The in-progress operation dialog's state: consumes an `AsyncStream<OperationProgress>`,
-/// updating published stats as each snapshot arrives, and propagates Cancel to the running
-/// operation via the injected `onCancel` (FO-14, FO-16).
 @MainActor
 @Observable
 public final class ProgressDialogViewModel {
@@ -24,8 +21,6 @@ public final class ProgressDialogViewModel {
         self.onCancel = onCancel
     }
 
-    /// Consumes `stream` to completion, applying each progress snapshot as it arrives, then
-    /// marks the operation completed (FO-14).
     public func consume(_ stream: AsyncStream<OperationProgress>) async {
         for await progress in stream {
             apply(progress)
@@ -43,8 +38,6 @@ public final class ProgressDialogViewModel {
         eta = progress.eta
     }
 
-    /// Cancels the in-progress operation (FO-16): marks `isCancelled` and invokes the
-    /// injected `onCancel`, which the caller wires to the running operation's cancellation.
     public func cancel() {
         isCancelled = true
         onCancel()

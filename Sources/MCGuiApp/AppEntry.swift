@@ -4,16 +4,6 @@ import MCGuiCore
 import MCGuiUI
 import MCGuiMacOS
 
-/// The app's entry point (SWIFT-05, MB-01): wires `MainWindowViewModel`, `WindowManager`,
-/// and `AppCommands` together so `swift run` launches a visible dual-pane window with a
-/// full native menu bar. Replaces the placeholder `main.swift`.
-///
-/// Uses `Settings {}` as the app's only `Scene` - the main/viewer/editor windows are
-/// created and shown imperatively by `WindowManager` (T49), not by SwiftUI's scene-based
-/// window system, so no `WindowGroup` is needed. `.commandsRemoved()` strips SwiftUI's own
-/// default File/Edit/View/Window/Help menu contributions before `AppCommands` (T48) adds
-/// its own - without it, those defaults and `AppCommands`' identically-named menus would
-/// appear side by side as duplicates.
 @main
 @MainActor
 struct AppEntry: App {
@@ -25,19 +15,11 @@ struct AppEntry: App {
         }
         .commandsRemoved()
         .commands {
-            // VL-01: reading `appDelegate.volumes` here (not just inside
-            // `commandActions`/a nested closure) is what makes this `Scene` rebuild the
-            // Go menu when `AppDelegate` (an `@Observable` class) posts a change -
-            // SwiftUI's Observation tracking only sees property reads that happen
-            // directly inside a tracked `body`.
             AppCommands(actions: appDelegate.commandActions, volumes: appDelegate.volumes)
         }
     }
 }
 
-/// Owns the `WindowManager` and `MainWindowViewModel` for the app's lifetime, shows the
-/// main window on launch, and builds the `AppCommandActions` closures `AppCommands`
-/// routes menu selections through.
 @MainActor
 @Observable
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -45,16 +27,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let mainViewModel: MainWindowViewModel
     private let bookmarksViewModel: BookmarksViewModel
     private let userMenuViewModel: UserMenuViewModel
-    // VL-01, VL-04: the native Go menu's volume list, refreshed on mount/unmount -
-    // mirrors `MainWindow`'s own `VolumesListViewModel`, duplicated here because this
-    // class (not a View) has no access to that one's `@State` instance.
     private(set) var volumes: [VolumeInfo] = []
 
     override init() {
         let fileSystemService = FileSystemServiceImpl()
-        // Restores the last-used directories, per-panel sort/hidden preference, and
-        // active panel (window geometry itself is restored separately, natively, by
-        // `NSWindow.setFrameAutosaveName` in `WindowManager.showMainWindow`).
         let settings = AppSettingsStore.load()
         mainViewModel = MainWindowViewModel(
             fileSystemService: fileSystemService,
@@ -68,17 +44,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if settings.activePanel == .right {
             mainViewModel.activate(.right)
         }
-        // BM-01..04: bridges MCGuiUI's BookmarksView/BookmarksViewModel (which cannot
-        // depend on MCGuiMacOS) to the real, disk-persisted BookmarkStore - mirrors
-        // onViewFile/onEditFile's ViewerService/EditorService bridge below.
         let bookmarkStore = BookmarkStore()
         bookmarksViewModel = BookmarksViewModel(actions: BookmarksActions(
             list: { try await bookmarkStore.list().map { BookmarkEntry(id: $0.id, name: $0.name, path: $0.path) } },
             add: { entry in try await bookmarkStore.add(Bookmark(id: entry.id, name: entry.name, path: entry.path)) },
             remove: { id in try await bookmarkStore.remove(id: id) }
         ))
-        // F2: same bridging pattern as Bookmarks above, plus `run` shelling out via
-        // UserMenuRunner (MCGuiMacOS) - MCGuiUI never touches Process directly.
         let userMenuStore = UserMenuStore()
         userMenuViewModel = UserMenuViewModel(actions: UserMenuActions(
             list: { try await userMenuStore.list().map { UserMenuEntry(id: $0.id, label: $0.label, command: $0.command) } },
@@ -110,13 +81,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         volumes = mainViewModel.leftPanel.fileSystemService.getVolumes()
     }
 
-    /// Every action here operates on whichever panel is active. Sort/hidden-toggle/
-    /// refresh/navigation act directly on `MainWindowViewModel.activePanelViewModel`;
-    /// `view`/`edit`/`copy`/`move`/`mkdir`/`delete` route through
-    /// `MainWindowViewModel.triggerActivePanel` (`PanelAction`/`pendingAction`, the same
-    /// mechanism classic-layout-parity's `TopBar`/`ButtonBar` already use) since those
-    /// need the active panel's current selection, which lives in `PanelView`'s private
-    /// `@State` - `triggerActivePanel` is the one path that reaches it from outside.
     var commandActions: AppCommandActions {
         AppCommandActions(
             view: { [mainViewModel] in mainViewModel.triggerActivePanel(.view) },

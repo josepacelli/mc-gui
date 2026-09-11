@@ -7,7 +7,6 @@ import MCGuiCore
 @MainActor
 struct PanelViewModelTests {
 
-    // MARK: - load success / failure (FS-03, FS-08)
 
     @Test("load success populates entries, clears error, and stops loading")
     func loadSuccessPopulatesEntries() async {
@@ -61,7 +60,6 @@ struct PanelViewModelTests {
         #expect(viewModel.isLoading == false)
     }
 
-    // MARK: - sort (FS-09)
 
     @Test("sort by name ascending and descending")
     func sortByNameBothDirections() async {
@@ -130,7 +128,6 @@ struct PanelViewModelTests {
         #expect(viewModel.entries.map(\.name) == ["s", "f", "d"])
     }
 
-    // MARK: - hidden-files toggle (FS-10)
 
     @Test("showHidden false filters out hidden entries")
     func showHiddenFalseFiltersHiddenEntries() async {
@@ -156,7 +153,6 @@ struct PanelViewModelTests {
         #expect(Set(viewModel.entries.map(\.name)) == Set(["visible", ".hidden"]))
     }
 
-    // MARK: - live filename filter (SF-01, SF-02, SF-03, SF-04)
 
     @Test("filterText with a substring match filters entries to matching names anywhere in the name (SF-01, SF-03)")
     func filterTextMatchesSubstringAnywhere() async {
@@ -209,7 +205,6 @@ struct PanelViewModelTests {
         #expect(viewModel.entries.map(\.name) == ["report.txt", "summary.doc"])
     }
 
-    // MARK: - back/forward history (FS-11, FS-12, FS-13)
 
     private let pathA = URL(fileURLWithPath: "/tmp/a")
     private let pathB = URL(fileURLWithPath: "/tmp/b")
@@ -232,8 +227,8 @@ struct PanelViewModelTests {
         let service = MockFileSystemService { _ in [] }
         let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
 
-        await viewModel.load() // refresh, path == currentPath
-        await viewModel.load(pathA) // explicit but still == currentPath
+        await viewModel.load()
+        await viewModel.load(pathA)
 
         #expect(viewModel.canGoBack == false)
     }
@@ -268,8 +263,8 @@ struct PanelViewModelTests {
         await viewModel.goBack()
 
         #expect(viewModel.currentPath == pathB)
-        #expect(viewModel.canGoBack == true) // pathA still in past
-        #expect(viewModel.canGoForward == true) // pathC now in future
+        #expect(viewModel.canGoBack == true)
+        #expect(viewModel.canGoForward == true)
     }
 
     @Test("goForward after goBack returns to the path that was current before going back")
@@ -292,13 +287,13 @@ struct PanelViewModelTests {
         let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
         await viewModel.load(pathB)
         await viewModel.load(pathC)
-        await viewModel.goBack() // currentPath = pathB, future = [pathC]
+        await viewModel.goBack()
 
         let pathD = URL(fileURLWithPath: "/tmp/d")
         await viewModel.load(pathD)
 
         #expect(viewModel.currentPath == pathD)
-        #expect(viewModel.canGoForward == false) // pathC no longer reachable
+        #expect(viewModel.canGoForward == false)
     }
 
     @Test("a failed goBack leaves currentPath and history unchanged")
@@ -308,12 +303,12 @@ struct PanelViewModelTests {
             return []
         }
         let viewModel = PanelViewModel(fileSystemService: service, initialPath: pathA)
-        await viewModel.load(pathB) // succeeds, history.past = [pathA]
+        await viewModel.load(pathB)
 
-        await viewModel.goBack() // would navigate to pathA, which fails
+        await viewModel.goBack()
 
         #expect(viewModel.currentPath == pathB)
-        #expect(viewModel.canGoBack == true) // history untouched by the failed attempt
+        #expect(viewModel.canGoBack == true)
         #expect(viewModel.errorMessage == "boom")
     }
 }

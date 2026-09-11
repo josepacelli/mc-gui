@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// The active panel's context when F2 (User Menu) opens: which file/directories `%f`/
-/// `%d`/`%D` expand to (`UserMenuRunner`, `MCGuiMacOS`).
 public struct UserMenuContext: Equatable {
     public var currentFile: URL?
     public var currentDir: URL
@@ -14,9 +12,6 @@ public struct UserMenuContext: Equatable {
     }
 }
 
-/// One user-defined menu item as `UserMenuView` renders it - a lightweight, `MCGuiUI`-
-/// local model decoupled from `MCGuiMacOS`'s concrete `UserMenuItem`, mirroring
-/// `BookmarkEntry`/`Bookmark`.
 public struct UserMenuEntry: Identifiable, Hashable {
     public let id: UUID
     public let label: String
@@ -29,7 +24,6 @@ public struct UserMenuEntry: Identifiable, Hashable {
     }
 }
 
-/// The result of running one User Menu command.
 public struct UserMenuRunResult: Equatable {
     public var output: String
     public var exitCode: Int32
@@ -40,9 +34,6 @@ public struct UserMenuRunResult: Equatable {
     }
 }
 
-/// Persistence + execution actions `UserMenuViewModel` delegates to - injected by the
-/// caller so this module never needs to import `MCGuiMacOS`'s concrete `UserMenuStore`/
-/// `UserMenuRunner` (mirrors `BookmarksActions`).
 public struct UserMenuActions {
     public var list: () async throws -> [UserMenuEntry]
     public var add: (UserMenuEntry) async throws -> Void
@@ -64,8 +55,6 @@ public struct UserMenuActions {
     }
 }
 
-/// User Menu list state (F2): loads from the injected `UserMenuActions`, keeps `items` in
-/// sync after adding/removing, and tracks the last run's output.
 @MainActor
 @Observable
 public final class UserMenuViewModel {
@@ -79,7 +68,6 @@ public final class UserMenuViewModel {
         self.actions = actions
     }
 
-    /// Reloads `items` from the injected `list` action.
     public func refresh() async {
         do {
             items = try await actions.list()
@@ -89,7 +77,6 @@ public final class UserMenuViewModel {
         }
     }
 
-    /// Adds a new item with `label`/`command` (both required), then refreshes `items`.
     public func addItem(label: String, command: String) async {
         guard !label.isEmpty, !command.isEmpty else { return }
         do {
@@ -100,7 +87,6 @@ public final class UserMenuViewModel {
         }
     }
 
-    /// Removes the item with `id`, then refreshes `items`.
     public func remove(id: UUID) async {
         do {
             try await actions.remove(id)
@@ -110,7 +96,6 @@ public final class UserMenuViewModel {
         }
     }
 
-    /// Runs `item` against `context`, recording the result in `lastResult`.
     public func run(_ item: UserMenuEntry, context: UserMenuContext) async {
         isRunning = true
         lastResult = nil
@@ -119,10 +104,6 @@ public final class UserMenuViewModel {
     }
 }
 
-/// The F2 User Menu window: an editable list of commands (add/run/remove) plus the last
-/// run's output. Scoped down from the original mc's tree-structured, drag-and-drop menu
-/// editor with submenus/conditions to a flat, always-visible list - real utility,
-/// contained scope, mirroring `BookmarksView`'s own simplification.
 @MainActor
 public struct UserMenuView: View {
     public let viewModel: UserMenuViewModel
@@ -203,7 +184,6 @@ public struct UserMenuView: View {
 
     private func itemRow(_ item: UserMenuEntry) -> some View {
         HStack {
-            // I18N-12: item.label/item.command are the user's own content, never translated.
             VStack(alignment: .leading) {
                 Text(item.label)
                 Text(item.command)

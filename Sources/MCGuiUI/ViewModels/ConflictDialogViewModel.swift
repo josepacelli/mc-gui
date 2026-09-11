@@ -2,10 +2,6 @@ import Foundation
 import Observation
 import MCGuiCore
 
-/// The file-conflict resolution dialog's state (FO-05..FO-09): the user picks one of
-/// Overwrite/Skip/Rename/Cancel for the file already present at `destinationPath`, and the
-/// choice is both recorded on `resolution` and reported via `onResolve` (so a caller such
-/// as `CopyMoveDialogViewModel` can await it).
 @MainActor
 @Observable
 public final class ConflictDialogViewModel {

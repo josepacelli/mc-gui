@@ -9,7 +9,6 @@ struct UserMenuRunnerTests {
     private let currentDir = URL(fileURLWithPath: "/tmp/left")
     private let otherDir = URL(fileURLWithPath: "/tmp/right")
 
-    // MARK: - expand (macro substitution)
 
     @Test("%f expands to the quoted current file path")
     func expandsCurrentFile() {
@@ -48,8 +47,6 @@ struct UserMenuRunnerTests {
 
     @Test("a substituted path containing a literal %d is not re-substituted")
     func substitutedPathIsNotRescanned() {
-        // if %f were naively substituted then the whole string re-scanned for %d, this
-        // path's own literal "%d" would incorrectly get replaced too
         let trickyFile = URL(fileURLWithPath: "/tmp/100%done.txt")
         let result = UserMenuRunner.expand("cat %f", currentFile: trickyFile, currentDir: currentDir, otherDir: otherDir)
 
@@ -77,7 +74,6 @@ struct UserMenuRunnerTests {
         #expect(result == "echo hello")
     }
 
-    // MARK: - run (real process execution)
 
     @Test("run captures stdout and a zero exit code on success")
     func runCapturesSuccessfulOutput() async throws {

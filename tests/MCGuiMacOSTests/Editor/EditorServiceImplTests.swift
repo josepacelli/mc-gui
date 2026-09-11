@@ -13,7 +13,6 @@ struct EditorServiceImplTests {
         return url
     }
 
-    // MARK: - load + save round-trip (ED-01, ED-04)
 
     @Test("open then save round-trips edited content back to disk as UTF-8")
     func loadAndSaveRoundTrip() async throws {
@@ -34,15 +33,12 @@ struct EditorServiceImplTests {
         #expect(String(data: savedBytes, encoding: .utf8) == "edited content")
     }
 
-    // MARK: - non-UTF8 encoding detection (ED-01)
 
     @Test("open on a non-UTF8 file falls back to Latin-1 and reports that encoding")
     func openNonUtf8FileDetectsLatin1() async throws {
         let dir = try makeTempDirectory()
         defer { try? FileManager.default.removeItem(at: dir) }
         let fileURL = dir.appendingPathComponent("latin1.txt")
-        // 0xE9 alone is not a valid UTF-8 lead byte for any continuation here, so this is
-        // not valid UTF-8; in Latin-1 it decodes as "caf\u{e9}" ("café").
         let bytes = Data([0x63, 0x61, 0x66, 0xE9])
         try bytes.write(to: fileURL)
 
@@ -69,7 +65,6 @@ struct EditorServiceImplTests {
         #expect(state.content == "hello")
     }
 
-    // MARK: - save-to-read-only-path error
 
     @Test("save to a read-only file throws EditorServiceError.cannotWrite")
     func saveToReadOnlyFileThrowsCannotWrite() async throws {
@@ -93,7 +88,6 @@ struct EditorServiceImplTests {
         }
     }
 
-    // MARK: - open on a missing file
 
     @Test("open on a nonexistent file throws EditorServiceError.cannotRead")
     func openNonexistentFileThrowsCannotRead() async throws {
@@ -113,7 +107,6 @@ struct EditorServiceImplTests {
         }
     }
 
-    // MARK: - empty file
 
     @Test("open on an empty file returns empty content with UTF-8 encoding")
     func openEmptyFileReturnsEmptyContent() async throws {

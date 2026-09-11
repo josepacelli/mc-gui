@@ -27,7 +27,6 @@ struct ProgressDialogViewModelTests {
         )
     }
 
-    // MARK: - progress updates (FO-14)
 
     @Test("consume applies each progress snapshot as it arrives, ending on the last one")
     func consumeAppliesEachSnapshot() async {
@@ -55,7 +54,6 @@ struct ProgressDialogViewModelTests {
         #expect(viewModel.eta == 25)
     }
 
-    // MARK: - completion (FO-14)
 
     @Test("consume marks isCompleted once the stream finishes")
     func consumeMarksCompletedOnFinish() async {
@@ -70,7 +68,6 @@ struct ProgressDialogViewModelTests {
         #expect(viewModel.isCompleted)
     }
 
-    // MARK: - cancellation (FO-16)
 
     @Test("cancel marks isCancelled and propagates to the running operation via onCancel")
     func cancelPropagatesToRunningOperation() {

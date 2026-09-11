@@ -3,14 +3,9 @@ import Testing
 @testable import MCGuiUI
 import MCGuiCore
 
-/// Unit tests for the pure find/replace helper functions `EditorWindow` uses to wire
-/// Cmd+F / Cmd+Option+F (ED-10, T43). `EditorWindow.body` itself is thin declarative glue
-/// over these and the `NSTextView` wrapper - consistent with the Phase 5/7 view precedent,
-/// it has no XCUITest coverage yet (no Xcode project/scheme exists in this pure-SPM setup).
 @Suite("EditorWindow find/replace")
 struct EditorWindowTests {
 
-    // MARK: - nextMatch (ED-10, Cmd+F)
 
     @Test("nextMatch finds the first case-insensitive occurrence at or after the given offset")
     func nextMatchFindsOccurrenceAtOrAfterOffset() {
@@ -37,7 +32,6 @@ struct EditorWindowTests {
         #expect(EditorWindow.nextMatch(in: "hello World", query: "xyz", after: 0) == nil)
     }
 
-    // MARK: - replaceAll (ED-10, Cmd+Option+F)
 
     @Test("replaceAll replaces every case-insensitive occurrence and returns the count")
     func replaceAllReplacesEveryOccurrence() {

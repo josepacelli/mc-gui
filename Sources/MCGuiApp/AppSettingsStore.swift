@@ -2,12 +2,6 @@ import Foundation
 import MCGuiCore
 import MCGuiUI
 
-/// Persists last-used panel directories, per-panel sort/hidden-files preference, and
-/// which panel was active, across launches - via plain `UserDefaults` (small scalar
-/// values, no need for the `BookmarkStore`/`UserMenuStore` JSON-file pattern used
-/// elsewhere for arrays of user-authored records). Window geometry itself is handled
-/// separately by `NSWindow.setFrameAutosaveName` (`WindowManager.showMainWindow`), which
-/// already persists position/size natively - no custom code needed for that part.
 enum AppSettingsStore {
     private static let defaults = UserDefaults.standard
 
@@ -31,8 +25,6 @@ enum AppSettingsStore {
         var activePanel: PanelSide
     }
 
-    /// Loads the last-saved snapshot, falling back to the home directory / defaults for
-    /// anything missing or no longer valid (e.g. a saved path on an unmounted volume).
     static func load() -> Snapshot {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return Snapshot(
@@ -46,7 +38,6 @@ enum AppSettingsStore {
         )
     }
 
-    /// Saves the current state - called on quit (`applicationWillTerminate`).
     @MainActor
     static func save(_ viewModel: MainWindowViewModel) {
         defaults.set(viewModel.leftPanel.currentPath.path, forKey: Key.leftPath.rawValue)

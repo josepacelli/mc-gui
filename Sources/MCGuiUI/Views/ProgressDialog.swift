@@ -1,8 +1,6 @@
 import SwiftUI
 import MCGuiCore
 
-/// The in-progress copy/move/delete dialog: a progress bar, current file, transfer speed,
-/// ETA, and a Cancel button bound to `ProgressDialogViewModel` (FO-14, FO-16).
 @MainActor
 public struct ProgressDialog: View {
     public let viewModel: ProgressDialogViewModel
@@ -16,20 +14,12 @@ public struct ProgressDialog: View {
         return Double(viewModel.bytesTransferred) / Double(viewModel.totalBytes)
     }
 
-    // Before the first source file/byte lands, `totalFiles == 0` means the operation is
-    // still walking the source tree to compute real totals (`FileSystemServiceImpl.
-    // expandedFiles`) - for a large folder that scan itself can take a few seconds, and
-    // with nothing else on screen changing yet it looked like the dialog had frozen.
     private var isScanning: Bool {
         !viewModel.isCompleted && viewModel.totalFiles == 0
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // SPEC_DEVIATION: ProgressDialogViewModel has no copy-vs-move mode of its own
-            // (pre-existing, not part of this localization task) - the header always reads
-            // "Copying…" even during a move. Localizing the literal as-is; adding a mode
-            // flag would be a behavior change outside T12's string-extraction scope.
             Text(String(localized: "progress.title.copying", bundle: .module, comment: "Progress dialog title (always shown, even for move - pre-existing limitation)"))
                 .font(.headline)
 

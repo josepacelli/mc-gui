@@ -3,10 +3,6 @@ import Testing
 @testable import MCGuiUI
 import MCGuiCore
 
-/// Wiring-level tests for `PanelCommands` (T45): confirms each key action calls through to
-/// the right `SelectionService` semantics (already unit-tested in isolation at T9) after
-/// translating `PanelView`'s `Set<FileEntry.ID>` selection into `SelectionService`'s
-/// `Set<Int>` index space and back.
 @Suite("PanelCommands")
 struct PanelCommandsTests {
 
@@ -16,7 +12,6 @@ struct PanelCommandsTests {
         makeTestEntry(name: "c.txt")
     ]
 
-    // MARK: - moveCursor (KN-02: arrow keys)
 
     @Test("moveCursor with no current cursor and a downward delta starts at the first entry")
     func moveCursorWithNoCursorStartsAtFirst() {
@@ -44,7 +39,6 @@ struct PanelCommandsTests {
         #expect(PanelCommands.moveCursor(nil, delta: 1, entries: []) == nil)
     }
 
-    // MARK: - extendSelection (KN-03: Shift+Arrow), via SelectionService.range
 
     @Test("extendSelection from the first entry downward selects the range through the new cursor")
     func extendSelectionDownwardSelectsRange() {
@@ -63,7 +57,6 @@ struct PanelCommandsTests {
         #expect(shrunk.cursor == entries[0].id)
     }
 
-    // MARK: - jump (KN-04: Cmd+Arrow), via SelectionService.firstIndex/lastIndex
 
     @Test("jump toFirst returns the first entry's id")
     func jumpToFirstReturnsFirstEntry() {
@@ -80,7 +73,6 @@ struct PanelCommandsTests {
         #expect(PanelCommands.jump(toFirst: true, entries: []) == nil)
     }
 
-    // MARK: - toggleSelection (KN-05: Space), via SelectionService.toggle
 
     @Test("toggleSelection selects an unselected entry")
     func toggleSelectionSelectsUnselectedEntry() {
@@ -105,7 +97,6 @@ struct PanelCommandsTests {
         #expect(result == current)
     }
 
-    // MARK: - toggleAndAdvance (KN-06: Insert), via SelectionService.toggleAndAdvance
 
     @Test("toggleAndAdvance selects the entry and advances the cursor to the next one")
     func toggleAndAdvanceSelectsAndAdvances() {
@@ -123,7 +114,6 @@ struct PanelCommandsTests {
         #expect(result.nextCursor == entries[2].id)
     }
 
-    // MARK: - selectAll ("*") / deselectAll ("-")
 
     @Test("selectAll from an empty selection selects everything")
     func selectAllFromEmptySelectsAll() {
@@ -134,8 +124,6 @@ struct PanelCommandsTests {
 
     @Test("selectAll from a partial selection still selects everything, not just the unselected ones")
     func selectAllFromPartialSelectsAll() {
-        // bugfix: "*" used to invert (deselecting whatever was already marked) - it must
-        // always select everything, regardless of what was already selected.
         let result = PanelCommands.selectAll(entries: entries)
 
         #expect(result == Set(entries.map(\.id)))
@@ -148,7 +136,6 @@ struct PanelCommandsTests {
         #expect(result.isEmpty)
     }
 
-    // MARK: - invertSelection (Cmd+I), via SelectionService.invert
 
     @Test("invertSelection from an empty selection selects everything")
     func invertSelectionFromEmptySelectsAll() {

@@ -2,12 +2,6 @@ import SwiftUI
 import AppKit
 import MCGuiCore
 
-/// The classic in-window top menu row (`classic-layout-parity` CL-01..CL-02, STATE.md
-/// AD-004): `Left | File | Command | Options | Right`, reproducing the original
-/// terminal mc's five top-level menus (`src/filemanager/filemanager.c`'s
-/// `menubar_add_menu` calls) alongside - not instead of - the native macOS menu bar
-/// (`AppCommands.swift`). Left/Right list that specific panel's mounted volumes and
-/// navigate it directly (CL-02), replacing the removed `VolumesSidebar` (CL-13/CL-14).
 @MainActor
 public struct TopBar: View {
     public var leftVolumes: [VolumeInfo]
@@ -21,8 +15,6 @@ public struct TopBar: View {
     public var onGoBackActive: () -> Void
     public var onGoForwardActive: () -> Void
     public var onToggleHiddenFiles: () -> Void
-    // BM-01..04: opens the Bookmarks popover (`MainWindow`) - mirrors real mc's Command
-    // menu "Directory hotlist" entry (Ctrl+\).
     public var onOpenBookmarks: () -> Void
 
     public init(
@@ -53,7 +45,6 @@ public struct TopBar: View {
         self.onOpenBookmarks = onOpenBookmarks
     }
 
-    // MARK: - localized labels (I18N-01..04)
 
     private var leftMenuTitle: String { String(localized: "topBar.menu.left", bundle: .module, comment: "Left menu title (lists the left panel's mounted volumes)") }
     private var fileMenuTitle: String { String(localized: "topBar.menu.file", bundle: .module, comment: "File menu title") }
@@ -101,9 +92,6 @@ public struct TopBar: View {
             Menu(commandMenuTitle) {
                 Button(refreshLabel) { onRefreshActive() }
                 Divider()
-                // No .keyboardShortcut here - Cmd+[/Cmd+] are already registered by the
-                // native macOS menu bar's Go menu (AppCommands.swift); a second
-                // registration for the same combo risks an ambiguous/duplicate firing.
                 Button(backLabel) { onGoBackActive() }
                 Button(forwardLabel) { onGoForwardActive() }
                 Divider()

@@ -1,9 +1,5 @@
 import SwiftUI
 
-/// F1's help window: a static reference page (app name + a shortcuts table). Scoped down
-/// from the original mc's sidebar-topic-tree/full-text-search/contextual-per-widget help
-/// system (help-system-f1/spec.md) to a single scrollable page - real, useful reference
-/// info without that much larger undertaking.
 @MainActor
 public struct HelpWindow: View {
     private struct Shortcut {
@@ -11,9 +7,6 @@ public struct HelpWindow: View {
         let action: String
     }
 
-    // MARK: - localized labels (I18N-01..04). Keyboard glyphs (F2, ⌘D, *, ...) are never
-    // translated - only the action description text. "Midnight Commander" (the app name,
-    // below) is likewise never translated per spec.md's confirmed assumption.
 
     private static var subtitle: String { String(localized: "help.subtitle", bundle: .module, comment: "Help window subtitle under the app name") }
     private static var panelShortcutsTitle: String { String(localized: "help.section.panelShortcuts", bundle: .module, comment: "Help window: Panel Shortcuts section title") }

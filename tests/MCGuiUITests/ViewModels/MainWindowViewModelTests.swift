@@ -45,7 +45,6 @@ struct MainWindowViewModelTests {
         #expect(viewModel.activePanel == .left)
     }
 
-    // MARK: - triggerActivePanel (native menu bar wiring, classic-layout-parity CL-05)
 
     @Test("triggerActivePanel sets leftPendingAction when the left panel is active")
     func triggerActivePanelSetsLeftPendingAction() {

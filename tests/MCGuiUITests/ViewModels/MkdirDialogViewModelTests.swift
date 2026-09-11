@@ -7,7 +7,6 @@ import MCGuiCore
 @MainActor
 struct MkdirDialogViewModelTests {
 
-    // MARK: - valid name (FO-11)
 
     @Test("valid name creates the directory at parentDirectory/name and completes")
     func validNameCreatesDirectory() async {
@@ -24,7 +23,6 @@ struct MkdirDialogViewModelTests {
         #expect(viewModel.errorMessage == nil)
     }
 
-    // MARK: - empty name (FO-10)
 
     @Test("empty name is rejected with an error message and no directory is created")
     func emptyNameIsRejected() async {
@@ -41,7 +39,6 @@ struct MkdirDialogViewModelTests {
         #expect(recorder.callCount == 0)
     }
 
-    // MARK: - name containing "/" (FO-10)
 
     @Test("name containing a path separator is rejected with an error message and no directory is created")
     func nameWithSlashIsRejected() async {
@@ -58,7 +55,6 @@ struct MkdirDialogViewModelTests {
         #expect(recorder.callCount == 0)
     }
 
-    // MARK: - filesystem failure surfaces as errorMessage
 
     @Test("a filesystem failure on a valid name surfaces its reason and does not complete")
     func filesystemFailureSurfacesErrorMessage() async {

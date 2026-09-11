@@ -13,7 +13,6 @@ struct FileSystemServiceImplTests {
         return url
     }
 
-    // MARK: - listDirectory
 
     @Test("listDirectory returns entries with name, size, dates, permissions, hidden, and symlink populated")
     func listDirectoryReturnsPopulatedEntries() async throws {
@@ -83,7 +82,6 @@ struct FileSystemServiceImplTests {
         }
     }
 
-    // MARK: - createDirectory
 
     @Test("createDirectory creates a new directory")
     func createDirectorySucceeds() async throws {

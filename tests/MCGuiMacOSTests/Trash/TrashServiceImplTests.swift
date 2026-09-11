@@ -20,11 +20,6 @@ struct TrashServiceImplTests {
         return url
     }
 
-    /// Builds a `TrashServiceImpl` whose injected `trashItem` seam records every
-    /// resulting Trash URL (via `FileManager.trashItem`'s own `resultingItemURL`) into
-    /// `trashedURLs`, so tests can confirm items via `fileExists` on a known path
-    /// instead of enumerating `~/.Trash` (TCC can deny listing that directory
-    /// independently of the privileged `trashItem` call itself).
     private func makeService(recordingInto trashedURLs: Recorder) -> TrashServiceImpl {
         TrashServiceImpl { url in
             var resultingItemURL: NSURL?
@@ -114,8 +109,6 @@ struct TrashServiceImplTests {
         #expect(FileManager.default.fileExists(atPath: firstURL.path) == false)
         #expect(FileManager.default.fileExists(atPath: secondURL.path) == false)
 
-        // The system resolved the name collision (rather than one call failing or one
-        // trashed item overwriting the other): both land at distinct, existing paths.
         #expect(recorder.urls.count == 2)
         #expect(recorder.urls[0] != recorder.urls[1])
         for trashedURL in recorder.urls {
@@ -124,9 +117,6 @@ struct TrashServiceImplTests {
     }
 }
 
-/// Collects the Trash destination URLs the injected seam observes, for cleanup and
-/// assertions. A plain reference type is enough: each test drives its service
-/// sequentially within a single async task.
 private final class Recorder {
     var urls: [URL] = []
 }

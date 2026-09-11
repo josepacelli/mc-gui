@@ -21,7 +21,6 @@ struct FileSystemServiceImplVolumesTests {
         #expect(bootVolume != nil)
     }
 
-    // MARK: - trash (protocol-conformance completion, see SPEC_DEVIATION in FileSystemServiceImpl.swift)
 
     @Test("trash moves a file to the macOS Trash instead of deleting it")
     func trashMovesFileToTrash() async throws {

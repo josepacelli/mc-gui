@@ -10,7 +10,6 @@ struct PathHistoryManagerTests {
     private let c = URL(fileURLWithPath: "/tmp/c")
     private let d = URL(fileURLWithPath: "/tmp/d")
 
-    // MARK: - navigate
 
     @Test("navigate pushes the current path onto past and clears future")
     func navigatePushesPastAndClearsFuture() {
@@ -30,7 +29,6 @@ struct PathHistoryManagerTests {
         #expect(result.future == [])
     }
 
-    // MARK: - back
 
     @Test("back on empty history returns nil")
     func backOnEmptyHistoryReturnsNil() {
@@ -61,7 +59,6 @@ struct PathHistoryManagerTests {
         #expect(result.history.future == [c])
     }
 
-    // MARK: - forward
 
     @Test("forward on empty future returns nil")
     func forwardOnEmptyFutureReturnsNil() {
@@ -81,7 +78,6 @@ struct PathHistoryManagerTests {
         #expect(result.history.future == [])
     }
 
-    // MARK: - back-then-navigate clears the stale forward stack
 
     @Test("navigating to a new path after going back clears the stale forward stack")
     func navigateAfterBackClearsForward() throws {

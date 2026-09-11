@@ -13,14 +13,11 @@ struct ViewerServiceImplNavigationSearchTests {
         return url
     }
 
-    /// A minimal, valid 1x1 transparent PNG - small enough to embed inline, real enough
-    /// for `NSImage(data:)` to decode successfully.
     private var onePixelPNGData: Data {
         let base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
         return Data(base64Encoded: base64)!
     }
 
-    // MARK: - image loading (FV-03)
 
     @Test("load on an image file returns .image with the exact, NSImage-decodable bytes")
     func loadImageFileReturnsImageContent() async throws {
@@ -36,7 +33,6 @@ struct ViewerServiceImplNavigationSearchTests {
         #expect(content == .image(pngData))
     }
 
-    // MARK: - navigation (FV-05)
 
     @Test("nextFile loads the following file in the list set via setFileList")
     func nextFileLoadsFollowingFile() async throws {
@@ -144,7 +140,6 @@ struct ViewerServiceImplNavigationSearchTests {
         }
     }
 
-    // MARK: - search (FV-06)
 
     @Test("search with zero matches returns an empty array")
     func searchZeroMatchesReturnsEmpty() async throws {

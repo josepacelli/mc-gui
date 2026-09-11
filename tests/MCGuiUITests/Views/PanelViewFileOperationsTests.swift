@@ -5,17 +5,12 @@ import Testing
 @testable import MCGuiUI
 import MCGuiCore
 
-/// Unit tests for the pure helper functions `PanelView` uses to wire F5/F6/F7/F8 file
-/// operations (T33). `PanelView.body` itself is thin declarative glue over these -
-/// consistent with the Phase 5 dialog views, it has no XCUITest coverage yet (no Xcode
-/// project/scheme exists in this pure-SPM setup); these functions carry the actual logic.
 @Suite("PanelView file operations")
 @MainActor
 struct PanelViewFileOperationsTests {
 
     private let directory = URL(fileURLWithPath: "/tmp/dest")
 
-    // MARK: - targetEntry (FV-01, ED-01 - F3/F4 target selection)
 
     @Test("targetEntry returns the first selected entry when the selection is non-empty")
     func targetEntryReturnsFirstSelectedEntry() {
@@ -42,7 +37,6 @@ struct PanelViewFileOperationsTests {
         #expect(target == nil)
     }
 
-    // MARK: - makeCopyMoveDialog (FO-01, FO-02)
 
     @Test("makeCopyMoveDialog with a non-empty selection builds a dialog in copy mode")
     func makeCopyMoveDialogCopyMode() {
@@ -72,7 +66,6 @@ struct PanelViewFileOperationsTests {
         #expect(dialog == nil)
     }
 
-    // MARK: - makeMkdirDialog (FO-10)
 
     @Test("makeMkdirDialog builds a dialog for the given parent directory regardless of selection")
     func makeMkdirDialogBuildsDialog() {
@@ -83,7 +76,6 @@ struct PanelViewFileOperationsTests {
         #expect(dialog.parentDirectory == directory)
     }
 
-    // MARK: - makeDeleteDialog (FO-12)
 
     @Test("makeDeleteDialog with a non-empty selection builds a dialog with those entries")
     func makeDeleteDialogBuildsDialog() {
@@ -103,7 +95,6 @@ struct PanelViewFileOperationsTests {
         #expect(dialog == nil)
     }
 
-    // MARK: - fo15Message (FO-15)
 
     @Test("fo15Message returns nil for a successful operation")
     func fo15MessageNilOnSuccess() {
@@ -145,8 +136,6 @@ struct PanelViewFileOperationsTests {
         #expect(message?.contains("insufficientDiskSpace") == true)
     }
 
-    // MARK: - action(forKey:) (classic-layout-parity CL-05 - unifies physical F3-F8 with
-    // ButtonBar/TopBar's PanelAction dispatch)
 
     private static func key(_ scalar: Int) -> KeyEquivalent {
         KeyEquivalent(Character(UnicodeScalar(scalar)!))
@@ -168,7 +157,6 @@ struct PanelViewFileOperationsTests {
         #expect(PanelView.action(forKey: "a") == nil)
     }
 
-    // MARK: - parentEntry(for:) (FS-05, KN-11 - the synthetic ".." row)
 
     @Test("parentEntry returns a '..' entry pointing at the parent directory")
     func parentEntryPointsAtParent() {
@@ -177,9 +165,6 @@ struct PanelViewFileOperationsTests {
         let entry = PanelView.parentEntry(for: current)
 
         #expect(entry?.name == "..")
-        // .path (not the URL itself) - newer Foundation/URL versions represent a
-        // directory's deletingLastPathComponent() result with a trailing slash, which
-        // makes URL == fail here even though it points at the same directory.
         #expect(entry?.path.path == URL(fileURLWithPath: "/Users/pacelli").path)
         #expect(entry?.type == .directory)
         #expect(entry?.id == PanelView.parentEntryID)
@@ -192,7 +177,6 @@ struct PanelViewFileOperationsTests {
         #expect(PanelView.parentEntry(for: root) == nil)
     }
 
-    // MARK: - activationResult(for:) (FS-04, KN-11 - double-click/Enter)
 
     @Test("activationResult for a directory navigates to its path")
     func activationResultDirectoryNavigates() {
@@ -215,8 +199,6 @@ struct PanelViewFileOperationsTests {
         #expect(PanelView.activationResult(for: file) == .view(file))
     }
 
-    // MARK: - applyResolutions(sources:resolutions:existingNames:) (FO-05..FO-09 - the
-    // conflict dialog's Overwrite/Skip/Rename/Cancel choices)
 
     @Test("overwrite leaves the source untouched (downstream copy/move overwrites unconditionally)")
     func applyResolutionsOverwriteLeavesSourceUnchanged() {
@@ -290,7 +272,6 @@ struct PanelViewFileOperationsTests {
         #expect(outcome == .cancelled)
     }
 
-    // MARK: - escapeAction(hasOpenSheet:filterText:hasSelection:) (KN-12, SF-04)
 
     @Test("escapeAction dismisses an open sheet first, regardless of filter/selection")
     func escapeActionDismissesSheetFirst() {

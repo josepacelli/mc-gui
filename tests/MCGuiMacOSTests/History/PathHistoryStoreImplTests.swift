@@ -12,7 +12,6 @@ struct PathHistoryStoreImplTests {
         return url
     }
 
-    // MARK: - save/load round-trip (PH-01/PH-02)
 
     @Test("save then load round-trips a PanelPathHistory through JSON on disk")
     func saveLoadRoundTrip() async throws {
@@ -47,7 +46,6 @@ struct PathHistoryStoreImplTests {
         #expect(try await store.load(for: .right) == rightHistory)
     }
 
-    // MARK: - corrupted / missing file recovery (PH-04)
 
     @Test("load recovers to an empty history when the JSON file is corrupted")
     func loadRecoversFromCorruptedJSON() async throws {
@@ -75,7 +73,6 @@ struct PathHistoryStoreImplTests {
         #expect(loaded == PanelPathHistory())
     }
 
-    // MARK: - 100-entry cap (PH-03)
 
     @Test("save truncates history to at most 100 total entries, keeping the most recent")
     func saveTruncatesTo100Entries() async throws {

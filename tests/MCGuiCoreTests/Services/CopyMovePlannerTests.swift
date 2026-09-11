@@ -20,7 +20,6 @@ struct CopyMovePlannerTests {
         )
     }
 
-    // MARK: - conflicts (FO-05: destination file exists)
 
     @Test("conflicts returns an empty array when no source name exists at the destination")
     func noConflictDetected() {
@@ -55,7 +54,6 @@ struct CopyMovePlannerTests {
         #expect(result == [first, second])
     }
 
-    // MARK: - resolvedName (FO-08: auto-rename with numeric suffix)
 
     @Test("resolvedName suggests ' (1)' before the extension when there is no existing name")
     func resolvedNameFirstSuffix() {

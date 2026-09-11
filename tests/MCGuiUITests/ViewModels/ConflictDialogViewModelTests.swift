@@ -9,7 +9,6 @@ struct ConflictDialogViewModelTests {
 
     private let destination = URL(fileURLWithPath: "/tmp/dest/a.txt")
 
-    // MARK: - the 4 resolution paths (FO-06..FO-09)
 
     @Test("chooseOverwrite records .overwrite and reports it via onResolve")
     func chooseOverwriteResolvesOverwrite() {
@@ -55,7 +54,6 @@ struct ConflictDialogViewModelTests {
         #expect(reported == .cancel)
     }
 
-    // MARK: - destinationPath (FO-05)
 
     @Test("destinationPath exposes the conflicting file's URL")
     func destinationPathIsExposed() {

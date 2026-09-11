@@ -6,7 +6,6 @@ import Testing
 @MainActor
 struct SaveChangesDialogViewModelTests {
 
-    // MARK: - the 3 outcomes (ED-05..ED-08)
 
     @Test("chooseSave records .save and reports it via onResolve")
     func chooseSaveResolvesSave() {
@@ -41,7 +40,6 @@ struct SaveChangesDialogViewModelTests {
         #expect(reported == .cancel)
     }
 
-    // MARK: - fileName / message
 
     @Test("message includes the file name being prompted about")
     func messageIncludesFileName() {

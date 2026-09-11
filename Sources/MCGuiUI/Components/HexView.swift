@@ -1,24 +1,14 @@
 import SwiftUI
 
-/// One formatted row of a hex/ASCII dump: an offset label, space-separated hex byte
-/// pairs, and the ASCII rendering of those same bytes.
 public struct HexRow: Equatable {
     public let offset: String
     public let hex: String
     public let ascii: String
 }
 
-/// Pure byte-chunk -> `HexRow` formatting, kept separate from `HexView` so it's
-/// unit-testable without going through SwiftUI (FV-04).
 public enum HexFormatter {
-    /// Bytes shown per row - the conventional hex-dump width.
     public static let bytesPerRow = 16
 
-    /// Formats `bytes` (a chunk of at most `bytesPerRow` bytes, e.g. a full or partial
-    /// row from `HexView`) into an offset/hex/ASCII row. `offset` is the byte offset of
-    /// `bytes.first` within the full file, shown as an 8-digit uppercase hex address.
-    /// Non-printable bytes (outside the printable ASCII range 0x20-0x7E) render as `.`
-    /// in the ASCII column.
     public static func formatRow(bytes: [UInt8], offset: Int) -> HexRow {
         let offsetString = String(format: "%08X", offset)
         let hexString = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
@@ -29,10 +19,6 @@ public enum HexFormatter {
     }
 }
 
-/// A virtualized hex/ASCII dump of `data` (FV-04): offset, hex, and ASCII columns, one
-/// row per `HexFormatter.bytesPerRow` bytes. Rows are produced lazily by `LazyVStack`
-/// inside a `ScrollView` - only visible rows are formatted/rendered, so a 100MB file
-/// (FV-07) doesn't allocate every row up front.
 @MainActor
 public struct HexView: View {
     public let data: Data
