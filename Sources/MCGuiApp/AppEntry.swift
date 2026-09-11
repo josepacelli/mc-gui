@@ -15,6 +15,7 @@ import MCGuiMacOS
 /// its own - without it, those defaults and `AppCommands`' identically-named menus would
 /// appear side by side as duplicates.
 @main
+@MainActor
 struct AppEntry: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 

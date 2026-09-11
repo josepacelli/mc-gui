@@ -91,6 +91,7 @@ public struct AppCommandActions {
 /// (`MCGuiApp`, Phase 11) alongside `.commandsRemoved()`, which strips SwiftUI's own
 /// default File/Edit/View/Window/Help contributions first - without it, those defaults and
 /// this type's identically-named menus would appear side by side as duplicates.
+@MainActor
 public struct AppCommands: Commands {
     private let actions: AppCommandActions
     // VL-01: the Go menu's dynamic volume list - a plain array (not itself observed
