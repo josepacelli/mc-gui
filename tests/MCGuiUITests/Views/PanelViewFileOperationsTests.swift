@@ -177,7 +177,10 @@ struct PanelViewFileOperationsTests {
         let entry = PanelView.parentEntry(for: current)
 
         #expect(entry?.name == "..")
-        #expect(entry?.path == URL(fileURLWithPath: "/Users/pacelli"))
+        // .path (not the URL itself) - newer Foundation/URL versions represent a
+        // directory's deletingLastPathComponent() result with a trailing slash, which
+        // makes URL == fail here even though it points at the same directory.
+        #expect(entry?.path.path == URL(fileURLWithPath: "/Users/pacelli").path)
         #expect(entry?.type == .directory)
         #expect(entry?.id == PanelView.parentEntryID)
     }

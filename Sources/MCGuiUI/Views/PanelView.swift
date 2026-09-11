@@ -625,11 +625,14 @@ public struct PanelView: View {
     static let parentEntryID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
 
     /// Builds the synthetic ".." row for `currentPath` (FS-05, KN-11), or `nil` at the
-    /// filesystem root, where `deletingLastPathComponent()` returns the same path and
-    /// there is nothing to go up to.
+    /// filesystem root, where there is nothing to go up to. Checks `currentPath.path`
+    /// against "/" directly rather than comparing to `deletingLastPathComponent()`'s
+    /// result - that comparison broke on newer Foundation/URL versions, which resolve
+    /// "/".deletingLastPathComponent() to "/../" instead of "/" (bugfix, CI-only failure
+    /// on a newer Xcode than this was originally written against).
     static func parentEntry(for currentPath: URL) -> FileEntry? {
+        guard currentPath.path != "/" else { return nil }
         let parent = currentPath.deletingLastPathComponent()
-        guard parent.path != currentPath.path else { return nil }
         return FileEntry(
             id: parentEntryID,
             name: "..",
