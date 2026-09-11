@@ -2,6 +2,10 @@ import Foundation
 
 public enum UserMenuRunner {
 
+    static func shellQuote(_ path: String) -> String {
+        "'" + path.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+
     static func expand(_ command: String, currentFile: URL?, currentDir: URL, otherDir: URL) -> String {
         var result = ""
         var rest = Substring(command)
@@ -17,11 +21,11 @@ public enum UserMenuRunner {
 
             switch rest[markerIndex] {
             case "f":
-                result += currentFile.map { "\"\($0.path)\"" } ?? ""
+                result += currentFile.map { shellQuote($0.path) } ?? ""
             case "d":
-                result += "\"\(currentDir.path)\""
+                result += shellQuote(currentDir.path)
             case "D":
-                result += "\"\(otherDir.path)\""
+                result += shellQuote(otherDir.path)
             default:
                 result += "%\(rest[markerIndex])"
             }

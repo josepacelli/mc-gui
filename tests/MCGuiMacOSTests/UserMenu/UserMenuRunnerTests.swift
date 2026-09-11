@@ -10,11 +10,11 @@ struct UserMenuRunnerTests {
     private let otherDir = URL(fileURLWithPath: "/tmp/right")
 
 
-    @Test("%f expands to the quoted current file path")
+    @Test("%f expands to the shell-quoted current file path")
     func expandsCurrentFile() {
         let result = UserMenuRunner.expand("cat %f", currentFile: currentFile, currentDir: currentDir, otherDir: otherDir)
 
-        #expect(result == "cat \"/tmp/a.txt\"")
+        #expect(result == "cat '/tmp/a.txt'")
     }
 
     @Test("%f expands to empty when there is no current file")
@@ -24,25 +24,25 @@ struct UserMenuRunnerTests {
         #expect(result == "cat ")
     }
 
-    @Test("%d expands to the quoted active panel directory")
+    @Test("%d expands to the shell-quoted active panel directory")
     func expandsCurrentDir() {
         let result = UserMenuRunner.expand("ls %d", currentFile: currentFile, currentDir: currentDir, otherDir: otherDir)
 
-        #expect(result == "ls \"/tmp/left\"")
+        #expect(result == "ls '/tmp/left'")
     }
 
-    @Test("%D expands to the quoted other panel directory")
+    @Test("%D expands to the shell-quoted other panel directory")
     func expandsOtherDir() {
         let result = UserMenuRunner.expand("cp %f %D/", currentFile: currentFile, currentDir: currentDir, otherDir: otherDir)
 
-        #expect(result == "cp \"/tmp/a.txt\" \"/tmp/right\"/")
+        #expect(result == "cp '/tmp/a.txt' '/tmp/right'/")
     }
 
     @Test("multiple macros in one command all expand correctly, left to right")
     func expandsMultipleMacros() {
         let result = UserMenuRunner.expand("cp %f %D/ && ls %d", currentFile: currentFile, currentDir: currentDir, otherDir: otherDir)
 
-        #expect(result == "cp \"/tmp/a.txt\" \"/tmp/right\"/ && ls \"/tmp/left\"")
+        #expect(result == "cp '/tmp/a.txt' '/tmp/right'/ && ls '/tmp/left'")
     }
 
     @Test("a substituted path containing a literal %d is not re-substituted")
@@ -50,7 +50,23 @@ struct UserMenuRunnerTests {
         let trickyFile = URL(fileURLWithPath: "/tmp/100%done.txt")
         let result = UserMenuRunner.expand("cat %f", currentFile: trickyFile, currentDir: currentDir, otherDir: otherDir)
 
-        #expect(result == "cat \"/tmp/100%done.txt\"")
+        #expect(result == "cat '/tmp/100%done.txt'")
+    }
+
+    @Test("a file name containing shell metacharacters is neutralized by single-quoting")
+    func shellMetacharactersAreNeutralized() {
+        let maliciousFile = URL(fileURLWithPath: "/tmp/$(touch /tmp/pwned).txt")
+        let result = UserMenuRunner.expand("cat %f", currentFile: maliciousFile, currentDir: currentDir, otherDir: otherDir)
+
+        #expect(result == "cat '/tmp/$(touch /tmp/pwned).txt'")
+    }
+
+    @Test("a file name containing a single quote is escaped correctly")
+    func embeddedSingleQuoteIsEscaped() {
+        let trickyFile = URL(fileURLWithPath: "/tmp/it's a file.txt")
+        let result = UserMenuRunner.expand("cat %f", currentFile: trickyFile, currentDir: currentDir, otherDir: otherDir)
+
+        #expect(result == "cat '/tmp/it'\\''s a file.txt'")
     }
 
     @Test("an unrecognized %-marker passes through unchanged")
@@ -103,5 +119,18 @@ struct UserMenuRunnerTests {
 
         #expect(result.output == "marker-content")
         #expect(result.exitCode == 0)
+    }
+
+    @Test("run does not execute shell command substitution embedded in a file name")
+    func runNeutralizesCommandSubstitutionInFileName() async throws {
+        let tempDir = FileManager.default.temporaryDirectory
+        let canaryFile = tempDir.appendingPathComponent("usermenu-runner-canary-\(UUID().uuidString)")
+        let maliciousFile = tempDir.appendingPathComponent("$(touch \(canaryFile.path)).txt")
+        defer { try? FileManager.default.removeItem(at: canaryFile) }
+
+        let result = await UserMenuRunner.run(command: "echo %f", currentFile: maliciousFile, currentDir: tempDir, otherDir: tempDir)
+
+        #expect(!FileManager.default.fileExists(atPath: canaryFile.path))
+        #expect(result.output.trimmingCharacters(in: .whitespacesAndNewlines) == maliciousFile.path)
     }
 }
