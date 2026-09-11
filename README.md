@@ -87,8 +87,30 @@ missing translation fails `swift test` instead of shipping silently.
 
 ## Contributing
 
-Issues and pull requests welcome. `swift build && swift test` must pass before a change is
-proposed.
+Issues and pull requests welcome.
+
+- **Bug reports / feature requests**: use the issue templates — they ask for exactly what's
+  needed to act on a report (expected vs. actual behavior, macOS version, suspect file for
+  bugs; problem/proposal for feature requests). Usage questions and open-ended ideas go to
+  [Discussions](https://github.com/josepacelli/mc-gui/discussions) instead of an issue.
+- **Pull requests**: follow the PR template's test plan — `swift build`/`swift test` must
+  pass, and a changed packaging script needs a real `./packaging/build-macos.sh` run.
+  Every push and PR against `main` also runs automatically in CI
+  ([`tests.yml`](.github/workflows/tests.yml): build + full test suite).
+  [`codeql.yml`](.github/workflows/codeql.yml) (static analysis) exists but is currently
+  disabled (`workflow_dispatch` only).
+
+## Releases
+
+Tagging a commit `vX.Y.Z` and pushing the tag triggers
+[`build-macos.yml`](.github/workflows/build-macos.yml): it builds the release DMG and
+attaches it to a new GitHub Release for that tag automatically. The same workflow also
+runs on every push to `main` (without creating a release) as a build-health check.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 ## License
 

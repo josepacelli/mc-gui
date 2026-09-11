@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question / discuss an idea
+    url: https://github.com/josepacelli/mc-gui/discussions
+    about: For usage questions or ideas that aren't a concrete bug/feature yet.
+  - name: Website & download
+    url: https://mc.jpmo.dev.br
+    about: Features, install instructions, and the FAQ.
