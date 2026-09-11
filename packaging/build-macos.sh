@@ -3,13 +3,21 @@
 # release, assemble the .app bundle, and create a drag-to-Applications DMG.
 # Unsigned (development build).
 #
-# Usage: ./packaging/build-macos.sh [VERSION]
+# Usage: ./packaging/build-macos.sh [VERSION] [--open]
 #   VERSION defaults to 0.1.0; used for CFBundle* and the DMG filename.
+#   --open reveals the built DMG in Finder once done (optional).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR/.."
-VERSION="${1:-0.1.0}"
+VERSION="0.1.0"
+OPEN_AFTER_BUILD=0
+for arg in "$@"; do
+    case "$arg" in
+        --open) OPEN_AFTER_BUILD=1 ;;
+        *) VERSION="$arg" ;;
+    esac
+done
 
 ARTIFACTS="$REPO_ROOT/artifacts"
 APP_BUNDLE_NAME="Midnight Commander GUI.app"
@@ -79,4 +87,6 @@ hdiutil create -volname "$APP_EXECUTABLE_NAME" -srcfolder "$STAGE_DIR" -ov -form
 
 echo "Done: $DMG_PATH"
 
-open $DMG_PATH
+if [ "$OPEN_AFTER_BUILD" -eq 1 ]; then
+    open "$DMG_PATH"
+fi
