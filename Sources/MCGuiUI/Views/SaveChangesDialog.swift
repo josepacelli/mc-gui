@@ -2,6 +2,7 @@ import SwiftUI
 
 /// The close-with-unsaved-changes prompt: Save/Don't Save/Cancel buttons bound to
 /// `SaveChangesDialogViewModel` (ED-05..ED-08).
+@MainActor
 public struct SaveChangesDialog: View {
     public let viewModel: SaveChangesDialogViewModel
 

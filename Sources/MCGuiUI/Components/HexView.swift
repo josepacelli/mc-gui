@@ -33,6 +33,7 @@ public enum HexFormatter {
 /// row per `HexFormatter.bytesPerRow` bytes. Rows are produced lazily by `LazyVStack`
 /// inside a `ScrollView` - only visible rows are formatted/rendered, so a 100MB file
 /// (FV-07) doesn't allocate every row up front.
+@MainActor
 public struct HexView: View {
     public let data: Data
 

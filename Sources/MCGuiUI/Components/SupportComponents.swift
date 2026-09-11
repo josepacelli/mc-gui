@@ -3,6 +3,7 @@ import MCGuiCore
 
 /// A system icon representing a file entry's type. Broken symlinks (target could not be
 /// resolved) render in a distinct color, per Edge Case 3.
+@MainActor
 public struct FileIcon: View {
     public let type: FileType
     public let isSymlinkBroken: Bool
@@ -28,6 +29,7 @@ public struct FileIcon: View {
 }
 
 /// A compact `rwx` display of a `FileEntry`'s owner permission triad.
+@MainActor
 public struct PermissionBadge: View {
     public let permissions: FilePermissions
 
@@ -50,6 +52,7 @@ public struct PermissionBadge: View {
 
 /// A panel column header showing its title and, when it's the active sort column, a
 /// direction chevron (FS-09).
+@MainActor
 public struct SortIndicator: View {
     public let title: String
     public let column: PanelSortColumn
@@ -75,6 +78,7 @@ public struct SortIndicator: View {
 }
 
 /// A spinner with a message, shown over a panel while its directory listing loads (FS-07).
+@MainActor
 public struct LoadingOverlay: View {
     public let message: String
 
@@ -94,6 +98,7 @@ public struct LoadingOverlay: View {
 }
 
 /// Standardized presentation for a failed operation's error message (FS-08).
+@MainActor
 public struct ErrorAlert: View {
     public let message: String
 

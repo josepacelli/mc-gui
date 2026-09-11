@@ -9,6 +9,7 @@ import MCGuiCore
 /// Insert) is wired in Phase 9 (`PanelCommands`/`KeyboardShortcuts`). The context menu
 /// below is a stub; its actions are wired in a future task. F5/F6/F7/F8 file operations
 /// (copy, move, mkdir, delete) are wired here (T33).
+@MainActor
 public struct PanelView: View {
     public let viewModel: PanelViewModel
     public let isActive: Bool

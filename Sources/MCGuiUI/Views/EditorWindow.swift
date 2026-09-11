@@ -20,6 +20,7 @@ import MCGuiCore
 // attempt-to-close (same self-consistent choice `ViewerWindow` made for F3). Constructing
 // and presenting this window when F4 is pressed on a panel selection is cross-target
 // wiring that belongs to a future task (MCGuiApp, Phase 11) - out of scope here.
+@MainActor
 public struct EditorWindow: View {
     public let viewModel: EditorWindowViewModel
     public var onClosed: () -> Void
@@ -218,7 +219,7 @@ public struct EditorWindow: View {
     /// Finds the next case-insensitive occurrence of `query` in `text` at or after
     /// `location`, wrapping to the first occurrence when none remain after that point.
     /// `nil` when `query` is empty or not present anywhere in `text`.
-    static func nextMatch(in text: String, query: String, after location: Int) -> SearchMatch? {
+    nonisolated static func nextMatch(in text: String, query: String, after location: Int) -> SearchMatch? {
         let matches = findMatches(in: text, query: query)
         guard !matches.isEmpty else { return nil }
         return matches.first(where: { $0.location >= location }) ?? matches.first
@@ -227,7 +228,7 @@ public struct EditorWindow: View {
     /// Replaces every case-insensitive occurrence of `query` with `replacement` in `text`.
     /// Returns the new text and the number of replacements made (0 for an empty query or
     /// no matches).
-    static func replaceAll(in text: String, query: String, replacement: String) -> (text: String, count: Int) {
+    nonisolated static func replaceAll(in text: String, query: String, replacement: String) -> (text: String, count: Int) {
         let matches = findMatches(in: text, query: query)
         guard !matches.isEmpty else { return (text, 0) }
 
@@ -245,7 +246,7 @@ public struct EditorWindow: View {
 
     /// All case-insensitive, non-overlapping occurrences of `query` in `text`, in order.
     /// Mirrors `ViewerServiceImpl.search`'s scanning loop.
-    private static func findMatches(in text: String, query: String) -> [SearchMatch] {
+    private nonisolated static func findMatches(in text: String, query: String) -> [SearchMatch] {
         guard !query.isEmpty else { return [] }
 
         let haystack = text as NSString

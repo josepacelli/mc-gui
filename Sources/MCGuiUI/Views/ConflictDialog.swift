@@ -3,6 +3,7 @@ import MCGuiCore
 
 /// The file-conflict dialog: Overwrite/Skip/Rename/Cancel buttons for a destination file
 /// that already exists, bound to `ConflictDialogViewModel` (FO-05..FO-09).
+@MainActor
 public struct ConflictDialog: View {
     public let viewModel: ConflictDialogViewModel
 

@@ -3,6 +3,7 @@ import MCGuiCore
 
 /// The F5 (copy) / F6 (move) dialog: destination field, copy/move option checkboxes, and
 /// confirm/cancel actions bound to `CopyMoveDialogViewModel` (FO-01, FO-02).
+@MainActor
 public struct CopyMoveDialog: View {
     @Bindable public var viewModel: CopyMoveDialogViewModel
     public var onConfirm: () -> Void

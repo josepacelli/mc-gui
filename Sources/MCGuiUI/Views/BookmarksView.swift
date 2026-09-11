@@ -87,6 +87,7 @@ public final class BookmarksViewModel {
 /// (BM-01), selecting a row navigates there via `onNavigate`, and each row's remove
 /// control deletes it (BM-04). Persistence across launches (BM-03) is the injected
 /// `BookmarksActions`' responsibility (backed by `MCGuiMacOS`'s `BookmarkStore`, T53).
+@MainActor
 public struct BookmarksView: View {
     public let viewModel: BookmarksViewModel
     public var activeDirectory: URL

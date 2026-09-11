@@ -18,6 +18,7 @@ import MCGuiCore
 // its concrete-type-only `setFileList(_:)` - `ViewerViewModel` only holds the
 // `ViewerService` protocol, and MCGuiUI cannot depend on MCGuiMacOS to reach the concrete
 // type) is out of scope for this task, which only builds the window itself.
+@MainActor
 public struct ViewerWindow: View {
     public let viewModel: ViewerViewModel
     public let initialURL: URL

@@ -8,6 +8,7 @@ import MCGuiCore
 /// `menubar_add_menu` calls) alongside - not instead of - the native macOS menu bar
 /// (`AppCommands.swift`). Left/Right list that specific panel's mounted volumes and
 /// navigate it directly (CL-02), replacing the removed `VolumesSidebar` (CL-13/CL-14).
+@MainActor
 public struct TopBar: View {
     public var leftVolumes: [VolumeInfo]
     public var rightVolumes: [VolumeInfo]

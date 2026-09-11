@@ -25,6 +25,7 @@ public final class VolumesListViewModel {
 
 /// The root window: a volumes sidebar plus two `PanelView`s side by side in an
 /// `HSplitView`, coordinated by a `MainWindowViewModel`.
+@MainActor
 public struct MainWindow: View {
     public let viewModel: MainWindowViewModel
     // WindowManager gap closure (T50): forwarded from PanelView's own onViewFile/

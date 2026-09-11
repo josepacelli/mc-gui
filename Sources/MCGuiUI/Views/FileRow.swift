@@ -3,6 +3,7 @@ import MCGuiCore
 
 /// A single row in a panel's file list: icon, name, size, modification date, and
 /// permissions for one `FileEntry`.
+@MainActor
 public struct FileRow: View {
     public let entry: FileEntry
 

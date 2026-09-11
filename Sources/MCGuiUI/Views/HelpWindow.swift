@@ -4,6 +4,7 @@ import SwiftUI
 /// from the original mc's sidebar-topic-tree/full-text-search/contextual-per-widget help
 /// system (help-system-f1/spec.md) to a single scrollable page - real, useful reference
 /// info without that much larger undertaking.
+@MainActor
 public struct HelpWindow: View {
     private struct Shortcut {
         let keys: String

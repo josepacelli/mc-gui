@@ -5,6 +5,7 @@ import SwiftUI
 /// other theme-aware view reads. Selecting an option here updates immediately everywhere
 /// (TH-05) - no message-passing needed, since `@AppStorage` on the same key is a shared,
 /// observed value across every view that declares it (here and in `MainWindow`).
+@MainActor
 public struct ThemeMenu: View {
     @AppStorage(ThemePreference.storageKey) private var preference: ThemePreference = .system
 

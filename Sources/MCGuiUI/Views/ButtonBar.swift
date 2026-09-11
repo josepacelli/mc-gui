@@ -11,6 +11,7 @@ import SwiftUI
 /// directly. Button 9 still has no backing implementation (SPEC_DEVIATION: no
 /// programmatic way to open a SwiftUI `Menu` to pull down the `TopBar` - matches
 /// STATE.md's accepted Known Limitation for this one key), so it renders disabled.
+@MainActor
 public struct ButtonBar: View {
     public var onAction: (PanelAction) -> Void
     public var onHelp: () -> Void
@@ -69,7 +70,7 @@ public struct ButtonBar: View {
     /// Maps a button number to the `PanelAction` it triggers (CL-05). `nil` for 1 (Help
     /// routes through `onHelp`, not a `PanelAction`, since it isn't panel-scoped), 9 (no
     /// implementation, CL-07), and 10 (Quit routes through `onQuit`).
-    static func action(for number: Int) -> PanelAction? {
+    nonisolated static func action(for number: Int) -> PanelAction? {
         switch number {
         case 2: return .userMenu
         case 3: return .view
@@ -83,7 +84,7 @@ public struct ButtonBar: View {
     }
 
     /// Buttons with no backing implementation (CL-07).
-    static func isDisabled(_ number: Int) -> Bool {
+    nonisolated static func isDisabled(_ number: Int) -> Bool {
         [9].contains(number)
     }
 }

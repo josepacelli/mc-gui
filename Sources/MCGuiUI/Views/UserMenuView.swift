@@ -123,6 +123,7 @@ public final class UserMenuViewModel {
 /// run's output. Scoped down from the original mc's tree-structured, drag-and-drop menu
 /// editor with submenus/conditions to a flat, always-visible list - real utility,
 /// contained scope, mirroring `BookmarksView`'s own simplification.
+@MainActor
 public struct UserMenuView: View {
     public let viewModel: UserMenuViewModel
     public var context: UserMenuContext

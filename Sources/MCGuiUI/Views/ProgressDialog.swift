@@ -3,6 +3,7 @@ import MCGuiCore
 
 /// The in-progress copy/move/delete dialog: a progress bar, current file, transfer speed,
 /// ETA, and a Cancel button bound to `ProgressDialogViewModel` (FO-14, FO-16).
+@MainActor
 public struct ProgressDialog: View {
     public let viewModel: ProgressDialogViewModel
 
