@@ -36,6 +36,15 @@ Landing page: **[mc.jpmo.dev.br](https://mc.jpmo.dev.br)**
   Spanish, following the Mac's System Language. No in-app picker.
 - **No account, no telemetry** — nothing phoned home.
 
+## Screenshots
+
+| | |
+| --- | --- |
+| ![Dual-pane window](docs/screenshots/dual-pane.png) | ![Copy dialog](docs/screenshots/copy-dialog.png) |
+| Two panels, classic menu row, F1-F10 button row | F5 copy dialog — destination, attributes, Background |
+| ![Context menu](docs/screenshots/context-menu.png) | ![Go to Folder](docs/screenshots/go-to-folder.png) |
+| Right-click: open, select, zip, edit, delete, info | Go to Folder — path field + live directory tree |
+
 ## Requirements
 
 - macOS 14.0+

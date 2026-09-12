@@ -169,6 +169,19 @@ section p.section-sub { color: var(--text-dim); margin: 0 0 32px; max-width: 62c
 .diagram pre { margin: 0; padding: 18px 20px; white-space: pre; overflow-x: auto; }
 .diagram .hl { color: var(--accent); }
 .diagram .dim { color: var(--text-faint); }
+.diagram.screenshot { overflow: hidden; }
+.diagram.screenshot img { display: block; width: 100%; }
+
+/* ---------- Screenshots gallery ---------- */
+
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 640px) { .gallery { grid-template-columns: 1fr; } }
+.gallery figure {
+  margin: 0; background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.gallery img { display: block; width: 100%; }
+.gallery figcaption { padding: 10px 14px; font-size: 0.85rem; color: var(--text-dim); border-top: 1px solid var(--border); }
 
 /* ---------- Install steps ---------- */
 
