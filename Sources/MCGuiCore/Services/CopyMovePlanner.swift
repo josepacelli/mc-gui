@@ -20,6 +20,12 @@ public enum CopyMovePlanner {
         return nil
     }
 
+    public static func zipArchiveName(for sources: [FileEntry], existingNames: Set<String>) -> String? {
+        let base = sources.count == 1 ? "\(sources[0].name).zip" : "Archive.zip"
+        guard existingNames.contains(base) else { return base }
+        return resolvedName(for: base, existingNames: existingNames)
+    }
+
     private static func splitStemAndExtension(_ name: String) -> (stem: String, ext: String) {
         guard let dotIndex = name.lastIndex(of: "."), dotIndex != name.startIndex else {
             return (name, "")

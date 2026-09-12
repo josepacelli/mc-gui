@@ -87,4 +87,51 @@ struct CopyMovePlannerTests {
 
         #expect(result == nil)
     }
+
+
+    @Test("zipArchiveName for a single file source appends .zip to its name when there is no conflict")
+    func zipArchiveNameSingleFileSource() {
+        let result = CopyMovePlanner.zipArchiveName(for: [entry(named: "notes.txt")], existingNames: [])
+
+        #expect(result == "notes.txt.zip")
+    }
+
+    @Test("zipArchiveName for a single folder source appends .zip to the folder's name")
+    func zipArchiveNameSingleFolderSource() {
+        let folder = FileEntry(
+            name: "Photos",
+            path: URL(fileURLWithPath: "/tmp/Photos"),
+            size: 0,
+            creationDate: Date(timeIntervalSince1970: 0),
+            modificationDate: Date(timeIntervalSince1970: 0),
+            permissions: [.ownerRead],
+            type: .directory,
+            isHidden: false,
+            isSymlink: false,
+            symlinkTarget: nil
+        )
+
+        let result = CopyMovePlanner.zipArchiveName(for: [folder], existingNames: [])
+
+        #expect(result == "Photos.zip")
+    }
+
+    @Test("zipArchiveName for two or more sources yields Archive.zip when there is no conflict")
+    func zipArchiveNameMultipleSources() {
+        let sources = [entry(named: "a.txt"), entry(named: "b.txt")]
+
+        let result = CopyMovePlanner.zipArchiveName(for: sources, existingNames: [])
+
+        #expect(result == "Archive.zip")
+    }
+
+    @Test("zipArchiveName resolves the next available numeric suffix when the computed name already exists")
+    func zipArchiveNameResolvesConflict() {
+        let result = CopyMovePlanner.zipArchiveName(
+            for: [entry(named: "notes.txt")],
+            existingNames: ["notes.txt.zip"]
+        )
+
+        #expect(result == "notes.txt (1).zip")
+    }
 }

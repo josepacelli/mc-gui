@@ -161,7 +161,7 @@ T9 -> T10
 
 ---
 
-### T5: Add `CopyMovePlanner.zipArchiveName(for:existingNames:)`
+### T5: Add `CopyMovePlanner.zipArchiveName(for:existingNames:)` ✅ Done
 
 **What**: A pure function in `MCGuiCore`: single source → `<name>.zip`; multiple sources → `Archive.zip`; either way, resolved against `existingNames` via the existing `resolvedName` numeric-suffix helper so it never collides.
 **Where**: `Sources/MCGuiCore/Services/CopyMovePlanner.swift`
