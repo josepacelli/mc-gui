@@ -76,12 +76,20 @@ case "$BIN_FILE" in
     *) echo "ERROR: executable is not a Mach-O arm64 executable." >&2; exit 1 ;;
 esac
 
-echo "==> Sign app bundle (ad-hoc)"
+SIGN_IDENTITY="-"
+if security find-identity -v -p codesigning 2>/dev/null | grep -q "mc-gui Local Developer"; then
+    SIGN_IDENTITY="mc-gui Local Developer"
+fi
+
+echo "==> Sign app bundle ($SIGN_IDENTITY)"
 # swift build only ad-hoc-signs the raw binary; re-signing the whole assembled
 # bundle here seals Info.plist + Resources too. Without this, Gatekeeper sees a
 # signed binary inside an unsealed bundle and reports the app as "damaged"
 # instead of showing the normal (bypassable) unidentified-developer prompt.
-codesign --force --deep --sign - "$APP_DIR"
+# Prefers the local self-signed "mc-gui Local Developer" identity when present
+# (stable identity across rebuilds - avoids the keychain/TCC permission resets
+# ad-hoc signing causes) and falls back to ad-hoc ("-") on any other machine.
+codesign --force --deep --sign "$SIGN_IDENTITY" "$APP_DIR"
 codesign --verify --deep --strict "$APP_DIR"
 
 echo "==> Create DMG"
