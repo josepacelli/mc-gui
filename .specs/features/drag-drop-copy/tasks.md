@@ -106,7 +106,7 @@ T5 -> T6
 
 ---
 
-### T3: Add `PanelView.dragPayload(for:)` and wire `.draggable`
+### T3: Add `PanelView.dragPayload(for:)` and wire `.draggable` ✅ Done
 
 **What**: A static, testable function `PanelView.dragPayload(for entry: FileEntry, markedIDs: Set<UUID>, markedEntries: [FileEntry], sourcePanelID: UUID) -> DraggedFileURLs` returning the marked set's paths if `entry.id` is marked, else `[entry.path]` alone; wired onto each row via `.draggable(dragPayload(for: entry))` in `entryList`.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`

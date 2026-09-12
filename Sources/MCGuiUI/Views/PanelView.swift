@@ -176,6 +176,7 @@ public struct PanelView: View {
                     Text(entry.name)
                 }
                 .background(TableDoubleClickInstaller(entries: displayEntries, onDoubleClick: activate))
+                .draggable(Self.dragPayload(for: entry, markedIDs: markedIDs, markedEntries: markedEntries, sourcePanelID: viewModel.instanceID))
         }
         .focusable()
         .focused($isFocused)
@@ -574,6 +575,16 @@ public struct PanelView: View {
 
     static func targetEntry(selection: [FileEntry]) -> FileEntry? {
         selection.first
+    }
+
+    static func dragPayload(
+        for entry: FileEntry,
+        markedIDs: Set<UUID>,
+        markedEntries: [FileEntry],
+        sourcePanelID: UUID
+    ) -> DraggedFileURLs {
+        let paths = markedIDs.contains(entry.id) ? markedEntries.map(\.path) : [entry.path]
+        return DraggedFileURLs(sourcePanelID: sourcePanelID, paths: paths)
     }
 
     static func makeCopyMoveDialog(
