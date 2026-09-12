@@ -234,7 +234,7 @@ T9 -> T10
 
 ---
 
-### T8: Add `PanelView.beginZip(for:)` and `isZipping` state
+### T8: Add `PanelView.beginZip(for:)` and `isZipping` state ✅ Done (uses the existing `LoadingOverlay()` default message rather than a new "Zipando…" locale key, since T8's Where scope is `PanelView.swift` only - no locale files)
 
 **What**: Guarded async function computing the destination via `CopyMovePlanner.zipArchiveName` (T5) and `operationTargets` (T4), calling `fileSystemService.zip` (T3), showing `LoadingOverlay` while `isZipping` is `true`, reloading the panel on success, surfacing failures via the existing `operationErrorMessage`/`ErrorAlert` mechanism.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`

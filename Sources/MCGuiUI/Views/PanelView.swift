@@ -27,6 +27,7 @@ public struct PanelView: View {
     @State private var goToFolderViewModel: GoToFolderDialogViewModel?
     @State private var operationErrorMessage: String?
     @State private var operationTask: Task<OperationResult, Error>?
+    @State private var isZipping = false
 
     public init(
         viewModel: PanelViewModel,
@@ -102,6 +103,10 @@ public struct PanelView: View {
                 entryList
 
                 if viewModel.isLoading {
+                    LoadingOverlay()
+                }
+
+                if isZipping {
                     LoadingOverlay()
                 }
 
@@ -367,6 +372,28 @@ public struct PanelView: View {
             selection: operationEntries,
             trashService: FileSystemTrashAdapter(fileSystemService: fileSystemService)
         )
+    }
+
+    private func beginZip(for entry: FileEntry) {
+        guard operationTask == nil, !isZipping else { return }
+        operationErrorMessage = nil
+
+        let targets = Self.operationTargets(for: entry, markedIDs: markedIDs, markedEntries: markedEntries)
+        guard !targets.isEmpty,
+            let archiveName = CopyMovePlanner.zipArchiveName(for: targets, existingNames: Set(viewModel.entries.map(\.name)))
+        else { return }
+        let destination = viewModel.currentPath.appendingPathComponent(archiveName)
+
+        isZipping = true
+        Task {
+            defer { isZipping = false }
+            do {
+                try await fileSystemService.zip(targets, to: destination)
+                await viewModel.load()
+            } catch {
+                operationErrorMessage = error.localizedDescription
+            }
+        }
     }
 
     private func activate(_ entry: FileEntry) {
