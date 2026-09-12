@@ -577,6 +577,11 @@ public struct PanelView: View {
         selection.first
     }
 
+    static func resolveDroppedEntries(paths: [URL], in entries: [FileEntry]) -> [FileEntry] {
+        let pathSet = Set(paths)
+        return entries.filter { pathSet.contains($0.path) }
+    }
+
     static func dragPayload(
         for entry: FileEntry,
         markedIDs: Set<UUID>,

@@ -130,7 +130,7 @@ T5 -> T6
 
 ---
 
-### T4: Add `PanelView.resolveDroppedEntries(paths:in:)`
+### T4: Add `PanelView.resolveDroppedEntries(paths:in:)` ✅ Done
 
 **What**: A static, testable function `PanelView.resolveDroppedEntries(paths: [URL], in entries: [FileEntry]) -> [FileEntry]` filtering a directory listing down to the entries whose `path` is in the dropped set (preserves `entries`' order, ignores any path with no match - e.g. a source deleted mid-drag).
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`
