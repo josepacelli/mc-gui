@@ -14,6 +14,7 @@ public struct TopBar: View {
     public var onRefreshActive: () -> Void
     public var onGoBackActive: () -> Void
     public var onGoForwardActive: () -> Void
+    public var isShowingHiddenFiles: Bool
     public var onToggleHiddenFiles: () -> Void
     public var onOpenBookmarks: () -> Void
 
@@ -28,6 +29,7 @@ public struct TopBar: View {
         onRefreshActive: @escaping () -> Void,
         onGoBackActive: @escaping () -> Void = {},
         onGoForwardActive: @escaping () -> Void = {},
+        isShowingHiddenFiles: Bool = false,
         onToggleHiddenFiles: @escaping () -> Void,
         onOpenBookmarks: @escaping () -> Void = {}
     ) {
@@ -41,6 +43,7 @@ public struct TopBar: View {
         self.onRefreshActive = onRefreshActive
         self.onGoBackActive = onGoBackActive
         self.onGoForwardActive = onGoForwardActive
+        self.isShowingHiddenFiles = isShowingHiddenFiles
         self.onToggleHiddenFiles = onToggleHiddenFiles
         self.onOpenBookmarks = onOpenBookmarks
     }
@@ -64,7 +67,11 @@ public struct TopBar: View {
     private var forwardLabel: String { String(localized: "topBar.command.forward", bundle: .module, comment: "Command menu: navigate forward") }
     private var bookmarksLabel: String { String(localized: "topBar.command.bookmarks", bundle: .module, comment: "Command menu: open the Bookmarks popover") }
     private var userMenuLabel: String { String(localized: "topBar.command.userMenu", bundle: .module, comment: "Command menu: open the User Menu window") }
-    private var showHiddenFilesLabel: String { String(localized: "topBar.options.showHiddenFiles", bundle: .module, comment: "Options menu: toggle hidden files in the active panel") }
+    private var showHiddenFilesLabel: String {
+        isShowingHiddenFiles
+            ? String(localized: "topBar.options.hideHiddenFiles", bundle: .module, comment: "Options menu: toggle hidden files in the active panel, shown while hidden files ARE visible")
+            : String(localized: "topBar.options.showHiddenFiles", bundle: .module, comment: "Options menu: toggle hidden files in the active panel, shown while hidden files are NOT visible")
+    }
     private var themeLabel: String { String(localized: "topBar.options.theme", bundle: .module, comment: "Options menu: Theme submenu title") }
 
     public var body: some View {

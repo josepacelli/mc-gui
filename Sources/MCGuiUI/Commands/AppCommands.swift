@@ -76,6 +76,7 @@ public struct AppCommandActions {
 public struct AppCommands: Commands {
     private let actions: AppCommandActions
     private let volumes: [VolumeInfo]
+    private let isShowingHiddenFiles: Bool
 
     private static let f3Key = KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!))
     private static let f4Key = KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!))
@@ -84,9 +85,10 @@ public struct AppCommands: Commands {
     private static let f7Key = KeyEquivalent(Character(UnicodeScalar(NSF7FunctionKey)!))
     private static let f8Key = KeyEquivalent(Character(UnicodeScalar(NSF8FunctionKey)!))
 
-    public init(actions: AppCommandActions, volumes: [VolumeInfo] = []) {
+    public init(actions: AppCommandActions, volumes: [VolumeInfo] = [], isShowingHiddenFiles: Bool = false) {
         self.actions = actions
         self.volumes = volumes
+        self.isShowingHiddenFiles = isShowingHiddenFiles
     }
 
 
@@ -118,7 +120,11 @@ public struct AppCommands: Commands {
     private var sortBySizeLabel: String { String(localized: "appCommands.view.sortBySize", bundle: .module, comment: "View menu: sort the active panel by size") }
     private var sortByDateLabel: String { String(localized: "appCommands.view.sortByDate", bundle: .module, comment: "View menu: sort the active panel by date") }
     private var sortByTypeLabel: String { String(localized: "appCommands.view.sortByType", bundle: .module, comment: "View menu: sort the active panel by type") }
-    private var showHiddenFilesLabel: String { String(localized: "appCommands.view.showHiddenFiles", bundle: .module, comment: "View menu: toggle hidden files") }
+    private var showHiddenFilesLabel: String {
+        isShowingHiddenFiles
+            ? String(localized: "appCommands.view.hideHiddenFiles", bundle: .module, comment: "View menu: toggle hidden files, shown while hidden files ARE visible")
+            : String(localized: "appCommands.view.showHiddenFiles", bundle: .module, comment: "View menu: toggle hidden files, shown while hidden files are NOT visible")
+    }
     private var refreshLabel: String { String(localized: "appCommands.view.refresh", bundle: .module, comment: "View menu: reload the active panel") }
 
     private var backLabel: String { String(localized: "appCommands.go.back", bundle: .module, comment: "Go menu: navigate back") }

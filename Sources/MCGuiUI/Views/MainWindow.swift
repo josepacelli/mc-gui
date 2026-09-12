@@ -66,6 +66,7 @@ public struct MainWindow: View {
                 onRefreshActive: { Task { await viewModel.activePanelViewModel.load() } },
                 onGoBackActive: { Task { await viewModel.activePanelViewModel.goBack() } },
                 onGoForwardActive: { Task { await viewModel.activePanelViewModel.goForward() } },
+                isShowingHiddenFiles: viewModel.activePanelViewModel.showHidden,
                 onToggleHiddenFiles: { viewModel.activePanelViewModel.showHidden.toggle() },
                 onOpenBookmarks: { showBookmarks = true }
             )

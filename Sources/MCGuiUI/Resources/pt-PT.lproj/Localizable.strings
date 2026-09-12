@@ -68,6 +68,7 @@
 "topBar.command.bookmarks" = "Marcadores…";
 "topBar.command.userMenu" = "Menu do Utilizador…";
 "topBar.options.showHiddenFiles" = "Mostrar Ficheiros Ocultos";
+"topBar.options.hideHiddenFiles" = "Ocultar Ficheiros Ocultos";
 "topBar.options.theme" = "Tema";
 
 /* ButtonBar.swift (T14) */
@@ -152,6 +153,7 @@
 "appCommands.view.sortByDate" = "Ordenar por Data";
 "appCommands.view.sortByType" = "Ordenar por Tipo";
 "appCommands.view.showHiddenFiles" = "Mostrar Ficheiros Ocultos";
+"appCommands.view.hideHiddenFiles" = "Ocultar Ficheiros Ocultos";
 "appCommands.view.refresh" = "Atualizar";
 "appCommands.go.back" = "Retroceder";
 "appCommands.go.forward" = "Avançar";

@@ -15,7 +15,11 @@ struct AppEntry: App {
         }
         .commandsRemoved()
         .commands {
-            AppCommands(actions: appDelegate.commandActions, volumes: appDelegate.volumes)
+            AppCommands(
+                actions: appDelegate.commandActions,
+                volumes: appDelegate.volumes,
+                isShowingHiddenFiles: appDelegate.isShowingHiddenFiles
+            )
         }
     }
 }
@@ -28,6 +32,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let bookmarksViewModel: BookmarksViewModel
     private let userMenuViewModel: UserMenuViewModel
     private(set) var volumes: [VolumeInfo] = []
+
+    var isShowingHiddenFiles: Bool { mainViewModel.activePanelViewModel.showHidden }
 
     override init() {
         let fileSystemService = FileSystemServiceImpl()
