@@ -84,7 +84,7 @@ T5 -> T6
 
 ---
 
-### T2: Add `DraggedFileURLs` Transferable type
+### T2: Add `DraggedFileURLs` Transferable type ✅ Done (file at `Sources/MCGuiUI/Views/DraggedFileURLs.swift`, matching this module's existing folder convention — no `Models/` folder exists in `MCGuiUI`)
 
 **What**: New `Codable`, `Transferable` struct wrapping `sourcePanelID: UUID` and `paths: [URL]`, using `CodableRepresentation(contentType: .json)` per the design's confirmed SDK usage.
 **Where**: `Sources/MCGuiUI/Models/DraggedFileURLs.swift` (new file)
