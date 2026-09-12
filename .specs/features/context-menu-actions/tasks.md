@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/context-menu-actions/design.md`
-**Status**: Batch 1 (Phase 1 + Phase 2, T1-T7) done - `swift test` 359/359 green. Batch 2 (Phase 3, T8-T10) not started.
+**Status**: All 10 tasks done (T1-T10, Phase 1 + Phase 2 + Phase 3) - `swift test` 359/359 green. Feature-level Verifier validation pending.
 
 ---
 
