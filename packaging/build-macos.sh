@@ -85,7 +85,7 @@ codesign --force --deep --sign - "$APP_DIR"
 codesign --verify --deep --strict "$APP_DIR"
 
 echo "==> Create DMG"
-VOLNAME="Midnight Commander GUI"
+VOLNAME="Midnight Commander"
 rm -rf "$STAGE_DIR"
 mkdir -p "$STAGE_DIR"
 cp -R "$APP_DIR" "$STAGE_DIR/"
