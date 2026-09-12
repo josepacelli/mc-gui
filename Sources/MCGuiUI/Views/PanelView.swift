@@ -184,7 +184,32 @@ public struct PanelView: View {
         List(displayEntries, selection: $selection) { entry in
             FileRow(entry: entry, isMarked: markedIDs.contains(entry.id))
                 .contextMenu {
-                    Text(entry.name)
+                    Button(String(localized: "contextMenu.open", bundle: .module, comment: "Context menu: open a file in the viewer or navigate into a directory")) {
+                        activate(entry)
+                    }
+                    Button(
+                        markedIDs.contains(entry.id)
+                            ? String(localized: "contextMenu.deselect", bundle: .module, comment: "Context menu: unmark a currently marked row")
+                            : String(localized: "contextMenu.select", bundle: .module, comment: "Context menu: mark a currently unmarked row")
+                    ) {
+                        markedIDs = PanelCommands.toggleSelection(markedIDs, id: entry.id, entries: displayEntries)
+                    }
+                    Button(String(localized: "contextMenu.zip", bundle: .module, comment: "Context menu: create a zip archive")) {
+                        beginZip(for: entry)
+                    }
+                    Button(String(localized: "contextMenu.edit", bundle: .module, comment: "Context menu: open a file in the editor")) {
+                        onEditFile(entry)
+                    }
+                    Button(String(localized: "contextMenu.delete", bundle: .module, comment: "Context menu: move a file or folder to the Trash")) {
+                        operationErrorMessage = nil
+                        deleteViewModel = Self.makeDeleteDialog(
+                            selection: Self.operationTargets(for: entry, markedIDs: markedIDs, markedEntries: markedEntries),
+                            trashService: FileSystemTrashAdapter(fileSystemService: fileSystemService)
+                        )
+                    }
+                    Button(String(localized: "contextMenu.showInfo", bundle: .module, comment: "Context menu: show the file/folder info dialog")) {
+                        beginInfo(for: entry)
+                    }
                 }
                 .background(TableDoubleClickInstaller(entries: displayEntries, onDoubleClick: activate))
                 .draggable(Self.dragPayload(for: entry, markedIDs: markedIDs, markedEntries: markedEntries, sourcePanelID: viewModel.instanceID))

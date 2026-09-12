@@ -280,7 +280,7 @@ T9 -> T10
 
 ---
 
-### T10: Replace the placeholder context menu with the full 6-item menu
+### T10: Replace the placeholder context menu with the full 6-item menu ✅ Done
 
 **What**: Replace `.contextMenu { Text(entry.name) }` with a real `Menu`/`contextMenu` builder offering Abrir (`activate(entry)`), Selecionar/Desselecionar (label from `markedIDs.contains(entry.id)`, action toggles via `PanelCommands.toggleSelection(markedIDs, id: entry.id, ...)`), Zipar (`beginZip(for: entry)`, T8), Editar (`onEditFile(entry)`), Apagar (`Self.makeDeleteDialog(selection: operationTargets(for: entry, ...))`, T4), Mostrar Informações (`beginInfo(for: entry)`, T9); add all 6 item labels to all 4 locale tables.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift` (`entryList`), `Sources/MCGuiUI/Resources/{en,es,pt-BR,pt-PT}.lproj/Localizable.strings`

@@ -225,3 +225,12 @@
 "info.kind.symlink" = "Link Simbólico";
 "info.size.calculating" = "Calculando…";
 "info.size.withItemCount" = "%1$@ (%2$d itens)";
+
+/* PanelView.swift context menu (T10) */
+"contextMenu.open" = "Abrir";
+"contextMenu.select" = "Selecionar";
+"contextMenu.deselect" = "Desselecionar";
+"contextMenu.zip" = "Zipar";
+"contextMenu.edit" = "Editar";
+"contextMenu.delete" = "Apagar";
+"contextMenu.showInfo" = "Mostrar Informações";
