@@ -139,7 +139,7 @@ T9 -> T10
 
 ---
 
-### T4: Add `PanelView.operationTargets(for:markedIDs:markedEntries:)`
+### T4: Add `PanelView.operationTargets(for:markedIDs:markedEntries:)` ✅ Done
 
 **What**: A static, testable function generalizing the existing marked-set-or-cursor-fallback rule to an arbitrary entry: returns `markedEntries` if `entry.id` is in `markedIDs`, else `[entry]`.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`

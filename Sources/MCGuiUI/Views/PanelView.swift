@@ -628,6 +628,14 @@ public struct PanelView: View {
         return DraggedFileURLs(sourcePanelID: sourcePanelID, paths: paths)
     }
 
+    static func operationTargets(
+        for entry: FileEntry,
+        markedIDs: Set<UUID>,
+        markedEntries: [FileEntry]
+    ) -> [FileEntry] {
+        markedIDs.contains(entry.id) ? markedEntries : [entry]
+    }
+
     static func makeCopyMoveDialog(
         selection: [FileEntry],
         mode: OperationMode,

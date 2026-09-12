@@ -295,6 +295,35 @@ struct PanelViewFileOperationsTests {
     }
 
 
+    @Test("operationTargets returns the marked set unchanged when the given entry is marked")
+    func operationTargetsReturnsMarkedSetWhenEntryIsMarked() {
+        let entry = makeTestEntry(name: "a.txt")
+        let alsoMarked = makeTestEntry(name: "b.txt")
+
+        let targets = PanelView.operationTargets(
+            for: entry,
+            markedIDs: [entry.id, alsoMarked.id],
+            markedEntries: [entry, alsoMarked]
+        )
+
+        #expect(targets == [entry, alsoMarked])
+    }
+
+    @Test("operationTargets returns just the given entry when it is not marked, regardless of what else is marked")
+    func operationTargetsReturnsSingleEntryWhenNotMarked() {
+        let entry = makeTestEntry(name: "a.txt")
+        let unrelatedMarked = makeTestEntry(name: "b.txt")
+
+        let targets = PanelView.operationTargets(
+            for: entry,
+            markedIDs: [unrelatedMarked.id],
+            markedEntries: [unrelatedMarked]
+        )
+
+        #expect(targets == [entry])
+    }
+
+
     @Test("dragPayload carries only the dragged entry's path when that entry is not marked")
     func dragPayloadUnmarkedEntryDragsOnlyItself() {
         let dragged = makeTestEntry(name: "a.txt")
