@@ -333,6 +333,25 @@ public struct PanelView: View {
         )
     }
 
+    private func handleDrop(_ payload: DraggedFileURLs) async {
+        guard !Self.shouldIgnoreDrop(
+            sourcePanelID: payload.sourcePanelID,
+            destinationPanelID: viewModel.instanceID,
+            hasRunningOperation: operationTask != nil
+        ) else { return }
+
+        guard let parent = payload.paths.first?.deletingLastPathComponent() else { return }
+        let sourceEntries = (try? await fileSystemService.listDirectory(parent)) ?? []
+        let resolved = Self.resolveDroppedEntries(paths: payload.paths, in: sourceEntries)
+
+        operationErrorMessage = nil
+        copyMoveViewModel = Self.makeCopyMoveDialog(
+            selection: resolved,
+            mode: .copy,
+            destinationDirectory: viewModel.currentPath
+        )
+    }
+
     private func beginMkdir() {
         operationErrorMessage = nil
         mkdirViewModel = Self.makeMkdirDialog(fileSystemService: fileSystemService, parentDirectory: viewModel.currentPath)
@@ -580,6 +599,10 @@ public struct PanelView: View {
     static func resolveDroppedEntries(paths: [URL], in entries: [FileEntry]) -> [FileEntry] {
         let pathSet = Set(paths)
         return entries.filter { pathSet.contains($0.path) }
+    }
+
+    static func shouldIgnoreDrop(sourcePanelID: UUID, destinationPanelID: UUID, hasRunningOperation: Bool) -> Bool {
+        sourcePanelID == destinationPanelID || hasRunningOperation
     }
 
     static func dragPayload(

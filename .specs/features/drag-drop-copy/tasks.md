@@ -153,7 +153,7 @@ T5 -> T6
 
 ---
 
-### T5: Add `PanelView.shouldIgnoreDrop(...)` and `handleDrop(_:)`
+### T5: Add `PanelView.shouldIgnoreDrop(...)` and `handleDrop(_:)` ✅ Done
 
 **What**: A static, testable guard `PanelView.shouldIgnoreDrop(sourcePanelID: UUID, destinationPanelID: UUID, hasRunningOperation: Bool) -> Bool` (true when source == destination, or an operation is already running); an async `handleDrop(_ payload: DraggedFileURLs)` that applies this guard, resolves dropped paths via `fileSystemService.listDirectory(parent)` + `resolveDroppedEntries` (T4), and opens the copy dialog via the existing `Self.makeCopyMoveDialog(selection:mode:destinationDirectory:)` with `destinationDirectory: viewModel.currentPath`.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`
