@@ -178,6 +178,11 @@ public struct PanelView: View {
                 .background(TableDoubleClickInstaller(entries: displayEntries, onDoubleClick: activate))
                 .draggable(Self.dragPayload(for: entry, markedIDs: markedIDs, markedEntries: markedEntries, sourcePanelID: viewModel.instanceID))
         }
+        .dropDestination(for: DraggedFileURLs.self) { items, _ in
+            guard let payload = items.first else { return false }
+            Task { await handleDrop(payload) }
+            return true
+        }
         .focusable()
         .focused($isFocused)
         .onChange(of: isFocused) { _, focused in

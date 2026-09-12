@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/drag-drop-copy/design.md`
-**Status**: Draft
+**Status**: In Progress (all 6 tasks implemented; feature-level Verifier pending)
 
 ---
 
@@ -180,7 +180,7 @@ T5 -> T6
 
 ---
 
-### T6: Wire `.dropDestination` on `entryList`
+### T6: Wire `.dropDestination` on `entryList` ✅ Done (build gate + smoke launch verified; interactive drag/gesture checks need manual confirmation - see chat)
 
 **What**: Attach `.dropDestination(for: DraggedFileURLs.self) { items in ... }` to `entryList`, calling `handleDrop` (T5) for the first received item; manually verify (per the design's flagged Risk) that dragging, single-click, double-click, and right-click all still work correctly together on the same row after this change.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`
