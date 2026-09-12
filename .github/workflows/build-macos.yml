@@ -19,6 +19,9 @@ jobs:
       - name: Make packaging scripts executable
         run: chmod +x packaging/*.sh
 
+      - name: Install create-dmg
+        run: brew install create-dmg
+
       - name: Build DMG
         env:
           VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.1.0' }}
