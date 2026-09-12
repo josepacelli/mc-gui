@@ -210,7 +210,7 @@ T9 -> T10
 
 ---
 
-### T7: Create `InfoDialog` view
+### T7: Create `InfoDialog` view ✅ Done (manual/visual confirmation in the running app still pending - see report)
 
 **What**: SwiftUI view showing `InfoDialogViewModel`'s fields (name, full path, kind, size-or-"Calculando…", permissions via `PermissionBadge`, created/modified dates, symlink target when applicable); `.task` starts the size calculation, cancelled automatically on dismissal.
 **Where**: `Sources/MCGuiUI/Views/InfoDialog.swift` (new file), plus the dialog's labels added to all 4 `.lproj` tables under `Sources/MCGuiUI/Resources/`

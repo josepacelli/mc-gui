@@ -210,3 +210,18 @@
 "goToFolder.button.cancel" = "Cancelar";
 "goToFolder.button.go" = "Ir";
 "goToFolder.error.empty" = "Introduce una ruta.";
+
+/* InfoDialog.swift, InfoDialogViewModel.swift (T7) */
+"info.field.path" = "Ruta";
+"info.field.kind" = "Tipo";
+"info.field.size" = "Tamaño";
+"info.field.symlinkTarget" = "Apunta a";
+"info.field.permissions" = "Permisos";
+"info.field.created" = "Creado";
+"info.field.modified" = "Modificado";
+"info.button.close" = "Cerrar";
+"info.kind.file" = "Archivo";
+"info.kind.folder" = "Carpeta";
+"info.kind.symlink" = "Enlace Simbólico";
+"info.size.calculating" = "Calculando…";
+"info.size.withItemCount" = "%1$@ (%2$d elementos)";

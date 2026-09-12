@@ -210,3 +210,18 @@
 "goToFolder.button.cancel" = "Cancel";
 "goToFolder.button.go" = "Go";
 "goToFolder.error.empty" = "Enter a path.";
+
+/* InfoDialog.swift, InfoDialogViewModel.swift (T7) */
+"info.field.path" = "Path";
+"info.field.kind" = "Kind";
+"info.field.size" = "Size";
+"info.field.symlinkTarget" = "Points to";
+"info.field.permissions" = "Permissions";
+"info.field.created" = "Created";
+"info.field.modified" = "Modified";
+"info.button.close" = "Close";
+"info.kind.file" = "File";
+"info.kind.folder" = "Folder";
+"info.kind.symlink" = "Symbolic Link";
+"info.size.calculating" = "Calculating…";
+"info.size.withItemCount" = "%1$@ (%2$d items)";
