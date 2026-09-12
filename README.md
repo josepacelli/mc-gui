@@ -16,9 +16,18 @@ Landing page: **[mc.jpmo.dev.br](https://mc.jpmo.dev.br)**
   file panels, and the numbered `F1`-`F10` button row at the bottom.
 - **Built-in viewer & editor** (F3/F4) — native text/hex viewer, a real text editor with
   heuristic syntax highlighting, no external app needed.
-- **Real copy/move** (F5/F6) — per-file progress, byte counts, a working Cancel mid-copy,
-  and an explicit *Background* option that runs silently, like the original. Progress runs
-  in an independent, non-modal window — both panels stay usable during a transfer.
+- **Real copy/move** (F5/F6) — per-file progress with transfer speed (B/s, MB/s, GB/s) and
+  ETA, a working Cancel mid-copy, and an explicit *Background* option that runs silently,
+  like the original. Progress runs in an independent, non-modal window — both panels stay
+  usable during a transfer.
+- **Drag-and-drop copy between panels** — drag a file or folder (or the current marked
+  selection) from one panel and drop it on the other; the same copy confirmation dialog as
+  F5 always appears first, so nothing copies without you seeing source/destination.
+- **Right-click context menu** — Open, Select/Deselect, Zip, Edit, Delete, and Show Info
+  (size, permissions, dates; folder size computed recursively in the background) on any
+  file or folder, without leaving the mouse.
+- **Go to Folder** — double-click the path bar (or its button) to jump straight to a
+  directory: type a path or pick it from a live, lazy-loaded directory tree.
 - **Bookmarks & User Menu** (F2) — save frequent directories, and define your own shell
   commands with `%f`/`%d`/`%D` macros, run against the current file or panel.
 - **Back/forward history, sort, hidden files** — per-panel, all reachable from the
@@ -52,8 +61,9 @@ swift test              # run the test suite
 swift run MCGuiApp       # run the app directly
 ```
 
-To produce the same signed-DMG-free release build and installer the GitHub Actions
-workflow (`.github/workflows/build-macos.yml`) publishes:
+To produce the same release build and installer DMG published under
+[Releases](https://github.com/josepacelli/mc-gui/releases) (built locally, see
+[Releases](#releases) below):
 
 ```bash
 ./packaging/build-macos.sh 0.1.0
@@ -102,14 +112,19 @@ Issues and pull requests welcome.
 
 ## Releases
 
-Tagging a commit `vX.Y.Z` and pushing the tag triggers
-[`build-macos.yml`](.github/workflows/build-macos.yml): it builds the release DMG and
-attaches it to a new GitHub Release for that tag automatically. The same workflow also
-runs on every push to `main` (without creating a release) as a build-health check.
+Releases are built and published locally, not by CI (`build-macos.yml` is disabled — a bad
+build once slipped through it and produced a DMG Gatekeeper reported as "damaged"; building
+and checking the DMG by hand before publishing catches that first):
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+./packaging/build-macos.sh 1.0.4
+# sanity-check the DMG isn't going to show "damaged" before shipping it:
+xattr -w com.apple.quarantine "0081;00000000;Safari;" "artifacts/Midnight Commander GUI.app"
+spctl -a -vv "artifacts/Midnight Commander GUI.app"   # expect: rejected (unsigned), never a resources/corruption error
+
+git tag -a v1.0.4 -m "v1.0.4"
+git push origin v1.0.4
+gh release create v1.0.4 artifacts/mc-gui-1.0.4-arm64.dmg --title "mc-gui v1.0.4" --notes "…"
 ```
 
 ## License
