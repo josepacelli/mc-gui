@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/context-menu-actions/design.md`
-**Status**: All 10 tasks done (T1-T10, Phase 1 + Phase 2 + Phase 3) - `swift test` 359/359 green. Feature-level Verifier validation pending.
+**Status**: Done — Verifier PASS. See `.specs/features/context-menu-actions/validation.md`. Non-blocking gap: CTXM-17 (symlink target row) has no dedicated test (lesson L-021). GUI-interaction ACs need manual UAT - no automation tool available for this native app.
 
 ---
 

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 21,
+  "next_id": 22,
   "lessons": [
     {
       "id": "L-001",
@@ -364,6 +364,24 @@
       ],
       "created": "2026-09-12T01:55:15Z",
       "last_seen": "2026-09-12T01:55:15Z"
+    },
+    {
+      "id": "L-021",
+      "key": "ac_gap::when a spec requirement is conditional on a data field a view model already exposes e g issymlink symlinktarget add a view model level test for that branch even if the surrounding feature is otherwise ui only and untestable",
+      "text": "When a spec requirement is conditional on a data field a view model already exposes (e.g. isSymlink/symlinkTarget), add a view-model-level test for that branch even if the surrounding feature is otherwise UI-only and untestable.",
+      "signal": "ac_gap",
+      "scope": "MCGuiUI",
+      "status": "candidate",
+      "features": [
+        "context-menu-actions"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "CTXM-17 (MCGuiUI)"
+      ],
+      "created": "2026-09-12T02:30:20Z",
+      "last_seen": "2026-09-12T02:30:20Z"
     }
   ]
 }

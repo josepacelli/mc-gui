@@ -134,6 +134,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: DND-12 iteration 2 - dragPayload/PanelView.swift:621-628 (corrects L-018) (MCGuiUI/Views/PanelView)
 - last seen: 2026-09-12T01:55:15Z
 
+### L-021 - When a spec requirement is conditional on a data field a view model already exposes (e.g. isSymlink/symlinkTarget), add a view-model-level test for that branch even if the surrounding feature is otherwise UI-only and untestable.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `MCGuiUI` · harmful: 0
+- features: context-menu-actions
+- evidence: CTXM-17 (MCGuiUI)
+- last seen: 2026-09-12T02:30:20Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

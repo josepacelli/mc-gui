@@ -115,30 +115,30 @@ Right-clicking a row in either panel today shows a placeholder context menu with
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| CTXM-01 | P1: Reuse existing actions | Design | Pending |
-| CTXM-02 | P1: Reuse existing actions | Design | Pending |
-| CTXM-03 | P1: Reuse existing actions | Design | Pending |
-| CTXM-04 | P1: Reuse existing actions | Design | Pending |
-| CTXM-05 | P1: Reuse existing actions | Design | Pending |
-| CTXM-06 | P1: Reuse existing actions | Design | Pending |
-| CTXM-07 | P1: Reuse existing actions | Design | Pending |
-| CTXM-08 | P2: Zip | Design | Pending |
-| CTXM-09 | P2: Zip | Design | Pending |
-| CTXM-10 | P2: Zip | Design | Pending |
-| CTXM-11 | P2: Zip | Design | Pending |
-| CTXM-12 | P2: Zip | Design | Pending |
-| CTXM-13 | P2: Zip | Design | Pending |
-| CTXM-14 | P3: Show info | Design | Pending |
-| CTXM-15 | P3: Show info | Design | Pending |
-| CTXM-16 | P3: Show info | Design | Pending |
-| CTXM-17 | P3: Show info | Design | Pending |
-| CTXM-18 | P3: Show info | Design | Pending |
-| CTXM-19 | Edge case: no row under cursor | Design | Pending |
-| CTXM-20 | Edge case: operation already running (delete) | Design | Pending |
-| CTXM-21 | Edge case: operation already running (zip) | Design | Pending |
-| CTXM-22 | Edge case: empty folder info | Design | Pending |
+| CTXM-01 | P1: Reuse existing actions | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-02 | P1: Reuse existing actions | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-03 | P1: Reuse existing actions | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-04 | P1: Reuse existing actions | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-05 | P1: Reuse existing actions | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-06 | P1: Reuse existing actions | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-07 | P1: Reuse existing actions | Verified | ✅ Verified |
+| CTXM-08 | P2: Zip | Verified | ✅ Verified |
+| CTXM-09 | P2: Zip | Verified | ✅ Verified |
+| CTXM-10 | P2: Zip | Verified | ✅ Verified |
+| CTXM-11 | P2: Zip | Verified | ✅ Verified |
+| CTXM-12 | P2: Zip | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-13 | P2: Zip | Verified | ⏭️ UAT-required (code-verified) |
+| CTXM-14 | P3: Show info | Verified | ✅ Verified (view-model layer) |
+| CTXM-15 | P3: Show info | Verified | ✅ Verified (view-model layer) |
+| CTXM-16 | P3: Show info | Verified | ✅ Verified |
+| CTXM-17 | P3: Show info | Verified | ⚠️ Coverage gap - not blocking, see validation.md Recommendation |
+| CTXM-18 | P3: Show info | Verified | ✅ Verified (cancellation logic) |
+| CTXM-19 | Edge case: no row under cursor | Verified | ✅ Verified (structural) |
+| CTXM-20 | Edge case: operation already running (delete) | Verified | ✅ Verified |
+| CTXM-21 | Edge case: operation already running (zip) | Verified | ✅ Verified |
+| CTXM-22 | Edge case: empty folder info | Verified | ✅ Verified |
 
-**Coverage:** 22 total, 0 mapped to tasks, 22 unmapped ⚠️ (expected at Specify stage; Tasks phase maps these)
+**Coverage:** 22 total, 22 mapped to tasks (T1-T10), 0 unmapped. Verifier PASS - see `.specs/features/context-menu-actions/validation.md` for full evidence (10/22 directly test-covered, 11/22 flagged UAT-required for GUI-only behavior, 1/22 minor non-blocking coverage gap).
 
 ---
 
