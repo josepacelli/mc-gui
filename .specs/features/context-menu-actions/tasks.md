@@ -114,7 +114,7 @@ T9 -> T10
 
 ---
 
-### T3: Implement `FileSystemServiceImpl.zip(_:to:)`
+### T3: Implement `FileSystemServiceImpl.zip(_:to:)` ✅ Done
 
 **What**: Implement `zip` by invoking `/usr/bin/zip -r -X -y <temp-name> <relative source names>` via `Process` (argument array, `currentDirectoryURL` = sources' common parent directory per AD-006), then moving the temp file to `destination` only on a zero exit code; throws `.zipFailed(reason:)` on non-zero exit and removes the temp file.
 **Where**: `Sources/MCGuiMacOS/FileSystem/FileSystemServiceImpl.swift`

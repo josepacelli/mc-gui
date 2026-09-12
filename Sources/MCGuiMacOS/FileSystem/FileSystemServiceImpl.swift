@@ -468,6 +468,40 @@ public final class FileSystemServiceImpl {
         }
     }
 
+    public func zip(_ sources: [FileEntry], to destination: URL) async throws {
+        guard let parentDirectory = sources.first?.path.deletingLastPathComponent() else { return }
+
+        let tempURL = destination.deletingLastPathComponent()
+            .appendingPathComponent(".\(destination.lastPathComponent).partial")
+        try? fileManager.removeItem(at: tempURL)
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/zip")
+        process.currentDirectoryURL = parentDirectory
+        process.arguments = ["-r", "-X", "-y", tempURL.path] + sources.map(\.name)
+
+        let stderrPipe = Pipe()
+        process.standardError = stderrPipe
+
+        do {
+            try process.run()
+        } catch {
+            throw FileSystemServiceError.zipFailed(reason: error.localizedDescription)
+        }
+        process.waitUntilExit()
+
+        guard process.terminationStatus == 0 else {
+            let stderrText = String(data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            try? fileManager.removeItem(at: tempURL)
+            throw FileSystemServiceError.zipFailed(
+                reason: (stderrText?.isEmpty == false ? stderrText : nil) ?? "zip exited with status \(process.terminationStatus)"
+            )
+        }
+
+        try fileManager.moveItem(at: tempURL, to: destination)
+    }
+
     public func trash(_ urls: [URL]) async throws -> OperationResult {
         var failedItems: [FailedItem] = []
         var processedCount = 0
