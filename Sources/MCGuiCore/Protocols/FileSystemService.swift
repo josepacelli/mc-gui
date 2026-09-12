@@ -30,6 +30,8 @@ public protocol FileSystemService {
     func trash(_ urls: [URL]) async throws -> OperationResult
 
     func getVolumes() -> [VolumeInfo]
+
+    func zip(_ sources: [FileEntry], to destination: URL) async throws
 }
 
 public extension FileSystemService {
@@ -43,6 +45,12 @@ public extension FileSystemService {
         let result = try await move(plan)
         onProgress(Self.finalProgress(for: plan))
         return result
+    }
+
+    /// Default placeholder so existing conformers keep building until a concrete
+    /// implementation (`FileSystemServiceImpl`, MCGuiMacOS) is added.
+    func zip(_ sources: [FileEntry], to destination: URL) async throws {
+        throw CocoaError(.featureUnsupported)
     }
 
     private static func finalProgress(for plan: CopyMovePlan) -> OperationProgress {

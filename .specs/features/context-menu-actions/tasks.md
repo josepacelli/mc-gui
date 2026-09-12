@@ -71,7 +71,7 @@ T9 -> T10
 
 ## Task Breakdown
 
-### T1: Add `FileSystemService.zip(_:to:)` to the protocol
+### T1: Add `FileSystemService.zip(_:to:)` to the protocol ✅ Done (protocol requirement + a default throwing extension implementation, mirroring the existing `copy`/`move` `onProgress` pattern, so `FileSystemServiceImpl` and the test `MockFileSystemService` keep building until T3 supplies the real implementation)
 
 **What**: Add `func zip(_ sources: [FileEntry], to destination: URL) async throws` to the `FileSystemService` protocol.
 **Where**: `Sources/MCGuiCore/Protocols/FileSystemService.swift`
