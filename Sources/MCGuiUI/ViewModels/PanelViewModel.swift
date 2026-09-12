@@ -6,6 +6,7 @@ import MCGuiCore
 @Observable
 public final class PanelViewModel {
     public let fileSystemService: FileSystemService
+    public let instanceID = UUID()
     private var rawEntries: [FileEntry] = []
 
     public private(set) var currentPath: URL
