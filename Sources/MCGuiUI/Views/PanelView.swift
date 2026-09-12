@@ -28,6 +28,7 @@ public struct PanelView: View {
     @State private var operationErrorMessage: String?
     @State private var operationTask: Task<OperationResult, Error>?
     @State private var isZipping = false
+    @State private var infoViewModel: InfoDialogViewModel?
 
     public init(
         viewModel: PanelViewModel,
@@ -154,6 +155,11 @@ public struct PanelView: View {
         .sheet(isPresented: presented($goToFolderViewModel)) {
             if let goToFolderViewModel {
                 GoToFolderDialog(viewModel: goToFolderViewModel, onCancel: { self.goToFolderViewModel = nil })
+            }
+        }
+        .sheet(isPresented: presented($infoViewModel)) {
+            if let infoViewModel {
+                InfoDialog(viewModel: infoViewModel, onClose: { self.infoViewModel = nil })
             }
         }
         .onChange(of: mkdirViewModel?.isCompleted) { _, completed in
@@ -394,6 +400,10 @@ public struct PanelView: View {
                 operationErrorMessage = error.localizedDescription
             }
         }
+    }
+
+    private func beginInfo(for entry: FileEntry) {
+        infoViewModel = InfoDialogViewModel(entry: entry, fileSystemService: fileSystemService)
     }
 
     private func activate(_ entry: FileEntry) {

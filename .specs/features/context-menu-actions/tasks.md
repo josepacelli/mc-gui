@@ -258,7 +258,7 @@ T9 -> T10
 
 ---
 
-### T9: Add `PanelView.beginInfo(for:)` and `infoViewModel` state
+### T9: Add `PanelView.beginInfo(for:)` and `infoViewModel` state ✅ Done
 
 **What**: Constructs an `InfoDialogViewModel` (T6) for the given entry, stores it in `@State private var infoViewModel`, presents `InfoDialog` (T7) via `.sheet`.
 **Where**: `Sources/MCGuiUI/Views/PanelView.swift`
