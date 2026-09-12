@@ -293,4 +293,88 @@ struct PanelViewFileOperationsTests {
     func escapeActionNoneWhenNothingToDo() {
         #expect(PanelView.escapeAction(hasOpenSheet: false, filterText: "", hasSelection: false) == .none)
     }
+
+
+    @Test("dragPayload carries only the dragged entry's path when that entry is not marked")
+    func dragPayloadUnmarkedEntryDragsOnlyItself() {
+        let dragged = makeTestEntry(name: "a.txt")
+        let otherMarked = makeTestEntry(name: "b.txt")
+        let sourcePanelID = UUID()
+
+        let payload = PanelView.dragPayload(
+            for: dragged,
+            markedIDs: [otherMarked.id],
+            markedEntries: [otherMarked],
+            sourcePanelID: sourcePanelID
+        )
+
+        #expect(payload.paths == [dragged.path])
+        #expect(payload.sourcePanelID == sourcePanelID)
+    }
+
+    @Test("dragPayload carries every marked entry's path when the dragged entry is marked")
+    func dragPayloadMarkedEntryDragsWholeSet() {
+        let dragged = makeTestEntry(name: "a.txt")
+        let alsoMarked = makeTestEntry(name: "b.txt")
+        let sourcePanelID = UUID()
+
+        let payload = PanelView.dragPayload(
+            for: dragged,
+            markedIDs: [dragged.id, alsoMarked.id],
+            markedEntries: [dragged, alsoMarked],
+            sourcePanelID: sourcePanelID
+        )
+
+        #expect(Set(payload.paths) == Set([dragged.path, alsoMarked.path]))
+    }
+
+
+    @Test("resolveDroppedEntries returns only the entries whose path matches a dropped path")
+    func resolveDroppedEntriesFiltersToMatchingPaths() {
+        let a = makeTestEntry(name: "a.txt")
+        let b = makeTestEntry(name: "b.txt")
+        let c = makeTestEntry(name: "c.txt")
+
+        let resolved = PanelView.resolveDroppedEntries(paths: [a.path, c.path], in: [a, b, c])
+
+        #expect(Set(resolved.map(\.id)) == Set([a.id, c.id]))
+    }
+
+    @Test("resolveDroppedEntries silently skips a dropped path with no matching entry")
+    func resolveDroppedEntriesSkipsUnmatchedPath() {
+        let a = makeTestEntry(name: "a.txt")
+        let missing = URL(fileURLWithPath: "/tmp/deleted.txt")
+
+        let resolved = PanelView.resolveDroppedEntries(paths: [a.path, missing], in: [a])
+
+        #expect(resolved == [a])
+    }
+
+    @Test("resolveDroppedEntries returns an empty array for an empty paths list")
+    func resolveDroppedEntriesEmptyPathsReturnsEmpty() {
+        let a = makeTestEntry(name: "a.txt")
+
+        let resolved = PanelView.resolveDroppedEntries(paths: [], in: [a])
+
+        #expect(resolved.isEmpty)
+    }
+
+
+    @Test("shouldIgnoreDrop is true when the source and destination panel are the same, regardless of a running operation")
+    func shouldIgnoreDropTrueForSamePanel() {
+        let panelID = UUID()
+
+        #expect(PanelView.shouldIgnoreDrop(sourcePanelID: panelID, destinationPanelID: panelID, hasRunningOperation: false))
+        #expect(PanelView.shouldIgnoreDrop(sourcePanelID: panelID, destinationPanelID: panelID, hasRunningOperation: true))
+    }
+
+    @Test("shouldIgnoreDrop is true when an operation is already running, even for two different panels")
+    func shouldIgnoreDropTrueForRunningOperation() {
+        #expect(PanelView.shouldIgnoreDrop(sourcePanelID: UUID(), destinationPanelID: UUID(), hasRunningOperation: true))
+    }
+
+    @Test("shouldIgnoreDrop is false only for two different panels with no running operation")
+    func shouldIgnoreDropFalseWhenSafe() {
+        #expect(PanelView.shouldIgnoreDrop(sourcePanelID: UUID(), destinationPanelID: UUID(), hasRunningOperation: false) == false)
+    }
 }
