@@ -42,6 +42,14 @@
 - **Date**: 2026-09-10
 - **Status**: active
 
+### AD-006
+- **Decision**: Quando uma feature precisa invocar uma ferramenta de linha de comando externa (ex.: `zip`) e os argumentos são inteiramente conhecidos em tempo de design (não texto arbitrário fornecido pelo usuário), a invocação usa `Process` com `arguments: [String]` (array) direto no binário (ex.: `/usr/bin/zip`), nunca `/bin/sh -c` com string interpolada. Isso é mais estrito que o único precedente existente no repo (`UserMenuRunner.swift`, que usa `/bin/sh -c` porque executa comandos de shell arbitrários definidos pelo usuário no User Menu, e foi endurecido via shell-escaping do valor interpolado em `ee5e610` — escaping é necessário ali, mas continua passando por um shell).
+- **Reason**: Array de argumentos elimina estruturalmente a classe de bug de shell-injection, independente de caracteres em nomes de arquivo — não há shell pra escapar contra. Quando os argumentos são fixos/controlados (flags + paths), não há motivo pra pagar o custo de correção de escaping que o `UserMenuRunner` precisa pagar.
+- **Trade-off**: Não serve para o caso do `UserMenuRunner` (que precisa mesmo de um shell pra interpretar comandos arbitrários do usuário) — este AD cobre apenas invocações novas com argumentos conhecidos em design-time, não substitui o padrão existente lá.
+- **Scope**: Toda feature futura que invoque uma ferramenta CLI externa com argumentos conhecidos em tempo de design (não comandos de usuário arbitrários). Primeiro uso: `FileSystemServiceImpl.zip` (feature `context-menu-actions`).
+- **Date**: 2026-09-11
+- **Status**: active
+
 ## Handoff
 
 - **Feature `convert-to-swift-swiftui`**: **DONE — Verifier PASS ✅ (iteração 2/3 do fix→reverify).** Histórico: Execute completou as 54 tasks originais; 1º Verifier retornou FAIL (14 requirement IDs eram código morto nunca plugado no app real — conflict dialog, Enter/Backspace/".." navigation, progress dialog, KN-04/05/06/12, FV-02/03, 3 Edge Cases). Fix cycle iteração 1 (6 commits: `9657e1e` `1ea38fd` `0232d46` `60cd903` `b20eff4` `46ce1a6`) resolveu os 6 Fix Plans; 2º Verifier achou só 1 gap residual (KN-06/Insert usava o mesmo handler do Space, nunca chamava `PanelCommands.toggleAndAdvance`). Fix iteração 2 (`2223763`) resolveu isso com `cursorID` state separado de `selection`. 3º Verifier (mesma sessão, iteração 2 do loop): **PASS**, 22/22 ACs re-derivados batem, 254/254 testes, sem gaps. `validate_state.py`: 0 erros. Relatório final: `.specs/features/convert-to-swift-swiftui/validation.md`.
