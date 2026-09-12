@@ -76,6 +76,14 @@ case "$BIN_FILE" in
     *) echo "ERROR: executable is not a Mach-O arm64 executable." >&2; exit 1 ;;
 esac
 
+echo "==> Sign app bundle (ad-hoc)"
+# swift build only ad-hoc-signs the raw binary; re-signing the whole assembled
+# bundle here seals Info.plist + Resources too. Without this, Gatekeeper sees a
+# signed binary inside an unsealed bundle and reports the app as "damaged"
+# instead of showing the normal (bypassable) unidentified-developer prompt.
+codesign --force --deep --sign - "$APP_DIR"
+codesign --verify --deep --strict "$APP_DIR"
+
 echo "==> Create DMG"
 VOLNAME="Midnight Commander GUI"
 rm -rf "$STAGE_DIR"
