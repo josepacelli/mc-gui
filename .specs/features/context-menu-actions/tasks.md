@@ -92,7 +92,7 @@ T9 -> T10
 
 ---
 
-### T2: Add `FileSystemServiceError.zipFailed(reason:)`
+### T2: Add `FileSystemServiceError.zipFailed(reason:)` ✅ Done
 
 **What**: Add a new case to `FileSystemServiceError`, its `errorDescription` (via `NSLocalizedString`), and the corresponding key in all 4 `.lproj` tables under `Sources/MCGuiMacOS/Resources/`.
 **Where**: `Sources/MCGuiMacOS/FileSystem/FileSystemServiceImpl.swift`, `Sources/MCGuiMacOS/Resources/{en,es,pt-BR,pt-PT}.lproj/Localizable.strings`

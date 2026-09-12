@@ -8,6 +8,7 @@
 "fileSystemError.insufficientDiskSpace" = "Espacio en disco insuficiente para completar la operación.";
 "fileSystemError.volumeDisconnected" = "El volumen de “%1$@” se desconectó.";
 "fileSystemError.pathTooLong" = "La ruta de destino “%1$@” es demasiado larga.";
+"fileSystemError.zipFailed" = "No se pudo crear el archivo zip: %1$@";
 
 /* FileSystemServiceImpl.swift, TrashServiceImpl.swift: OperationResult.errorMessage batch summaries (T24 sweep gap) */
 "operationResult.error.copyFailed" = "Algunos elementos no se pudieron copiar";

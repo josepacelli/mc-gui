@@ -71,6 +71,15 @@ struct FileSystemServiceErrorLocalizationTests {
         "es": "La ruta de destino “\(path)” es demasiado larga.",
     ]
 
+    private static let zipReason = "exit code 1"
+
+    private static let zipFailedExpected: [String: String] = [
+        "en": "Could not create the zip archive: \(zipReason)",
+        "pt-BR": "Não foi possível criar o arquivo zip: \(zipReason)",
+        "pt-PT": "Não foi possível criar o ficheiro zip: \(zipReason)",
+        "es": "No se pudo crear el archivo zip: \(zipReason)",
+    ]
+
     @Test(".permissionDenied exact text per locale", arguments: languages)
     func permissionDenied(language: String) {
         let actual = Self.message("fileSystemError.permissionDenied", language: language, Self.url.path)
@@ -108,6 +117,13 @@ struct FileSystemServiceErrorLocalizationTests {
     }
 
 
+    @Test(".zipFailed exact text per locale", arguments: languages)
+    func zipFailed(language: String) {
+        let actual = Self.message("fileSystemError.zipFailed", language: language, Self.zipReason)
+        #expect(actual == Self.zipFailedExpected[language])
+    }
+
+
     @Test("errorDescription wires each case to the correct key and formats the URL argument")
     func errorDescriptionWiring() {
         #expect(FileSystemServiceError.permissionDenied(Self.url).errorDescription == Self.permissionDeniedExpected["en"])
@@ -116,5 +132,6 @@ struct FileSystemServiceErrorLocalizationTests {
         #expect(FileSystemServiceError.insufficientDiskSpace.errorDescription == Self.insufficientDiskSpaceExpected["en"])
         #expect(FileSystemServiceError.volumeDisconnected(Self.url).errorDescription == Self.volumeDisconnectedExpected["en"])
         #expect(FileSystemServiceError.pathTooLong(Self.url).errorDescription == Self.pathTooLongExpected["en"])
+        #expect(FileSystemServiceError.zipFailed(reason: Self.zipReason).errorDescription == Self.zipFailedExpected["en"])
     }
 }

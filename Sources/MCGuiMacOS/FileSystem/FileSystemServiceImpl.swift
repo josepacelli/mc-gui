@@ -8,6 +8,7 @@ public enum FileSystemServiceError: Error, Equatable {
     case insufficientDiskSpace
     case volumeDisconnected(URL)
     case pathTooLong(URL)
+    case zipFailed(reason: String)
 }
 
 extension FileSystemServiceError: LocalizedError {
@@ -63,6 +64,15 @@ extension FileSystemServiceError: LocalizedError {
                     comment: "A planned destination path exceeds PATH_MAX. %1$@ is the destination path."
                 ),
                 url.path
+            )
+        case .zipFailed(let reason):
+            return String(
+                format: NSLocalizedString(
+                    "fileSystemError.zipFailed",
+                    bundle: .module,
+                    comment: "zip process exited non-zero. %1$@ is the failure reason (process stderr)."
+                ),
+                reason
             )
         }
     }
