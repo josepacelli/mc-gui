@@ -18,6 +18,10 @@ public struct ProgressDialog: View {
         !viewModel.isCompleted && viewModel.totalFiles == 0
     }
 
+    static func speedText(_ bytesPerSecond: Double) -> String {
+        ByteCountFormatter.string(fromByteCount: Int64(bytesPerSecond), countStyle: .file) + "/s"
+    }
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(String(localized: "progress.title.copying", bundle: .module, comment: "Progress dialog title (always shown, even for move - pre-existing limitation)"))
@@ -66,6 +70,10 @@ public struct ProgressDialog: View {
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
+
+                Text(Self.speedText(viewModel.speed))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             HStack {
