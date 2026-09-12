@@ -98,20 +98,20 @@ Copying between the two panels today requires marking items and pressing F5. Mid
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| DND-01 | P1: Drag a single file/folder | Tasks | Implementing |
-| DND-02 | P1: Drag a single file/folder | Tasks | Implementing |
-| DND-03 | P1: Drag a single file/folder | Tasks | Implementing |
-| DND-04 | P1: Drag a single file/folder | Tasks | Implementing |
-| DND-05 | P1: Drag a single file/folder | Tasks | Implementing |
-| DND-06 | P2: Drag the marked selection | Tasks | Implementing |
-| DND-07 | P2: Drag the marked selection | Tasks | Implementing |
-| DND-08 | P3: Ignore invalid drop targets | Tasks | Implementing |
-| DND-09 | Edge case: operation already running | Tasks | Implementing |
-| DND-10 | Edge case: name conflict at destination | Tasks | Implementing |
-| DND-11 | Edge case: drop outside any panel list | Tasks | Implementing |
-| DND-12 | Edge case: marked set emptied mid-drag | Tasks | Implementing |
+| DND-01 | P1: Drag a single file/folder | Verified | ✅ Verified |
+| DND-02 | P1: Drag a single file/folder | Verified | ✅ Verified (`PanelView.makeDropCopyDialog`, `tests/MCGuiUITests/Views/PanelViewFileOperationsTests.swift:382-397` `makeDropCopyDialogSingleSource`) |
+| DND-03 | P1: Drag a single file/folder | Verified | ✅ Verified |
+| DND-04 | P1: Drag a single file/folder | Verified | ✅ Verified |
+| DND-05 | P1: Drag a single file/folder | Verified | ✅ Verified |
+| DND-06 | P2: Drag the marked selection | Verified | ✅ Verified |
+| DND-07 | P2: Drag the marked selection | Verified | ✅ Verified (`makeDropCopyDialogMarkedSet`, same file:399-414) |
+| DND-08 | P3: Ignore invalid drop targets | Verified | ✅ Verified |
+| DND-09 | Edge case: operation already running | Verified | ✅ Verified |
+| DND-10 | Edge case: name conflict at destination | Verified | ✅ Verified |
+| DND-11 | Edge case: drop outside any panel list | Verified | ⚠️ Not automatable - needs human UAT |
+| DND-12 | Edge case: marked set emptied mid-drag | Verified | ✅ Verified (closed by design - `dragPayload` takes `markedIDs`/`markedEntries` by value and returns an immutable `DraggedFileURLs`; SwiftUI's `.draggable` autoclosure fires once per drag session, so no later mutation can reach an already-returned payload. A test probing this would only assert Swift's own call-by-value semantics, not feature logic - see validation.md's DND-12 rationale) |
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️ (expected at Specify stage; Tasks phase maps these)
+**Coverage:** 12 total. Re-verified independently in iteration 2 (`.specs/features/drag-drop-copy/validation.md`, diff range `597d9f2..0f25e9a`): 11 Verified, 1 not automatable (DND-11). The iteration-1 blocking finding (Verified items' tests missing from the 6 task commits) is confirmed fixed by `9ce11da` (re-checked via `git show <sha>:<path>` and `git ls-files`, not assumed from the commit message). The DND-02/DND-07 gap is confirmed fixed by `0f25e9a`, with a fresh discrimination sensor (2/2 targeted mutations killed) confirming the new tests actually discriminate. Gate: 344 tests passed, 0 failed.
 
 ---
 

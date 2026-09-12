@@ -104,6 +104,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: PanelView.swift:365-370,701-708 (validation.md iteration 2) (swiftui-view-glue)
 - last seen: 2026-09-10T16:19:44Z
 
+### L-016 - Stage and commit new/edited test files in the same commit as the implementation task; verify with 'git show --stat <sha>' before marking a task done, not just a local swift test run.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `process/commit-discipline` · harmful: 0
+- features: drag-drop-copy
+- evidence: commits 6992edc,5464954,cf62f73,9ff1674,e0cf1f4,35522c4 (process/commit-discipline)
+- last seen: 2026-09-12T01:45:58Z
+
+### L-017 - When an async, state-mutating orchestration method (like beginCopyOrMove/handleDrop) composes already-tested pure helpers, extract its own decision output (e.g. dialog params) into one more static testable function rather than leaving the composition itself untestable and unverified.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `MCGuiUI/Views/PanelView` · harmful: 0
+- features: drag-drop-copy
+- evidence: DND-02,DND-07 - PanelView.swift handleDrop (private async) (MCGuiUI/Views/PanelView)
+- last seen: 2026-09-12T01:45:58Z
+
+### L-018 - When a spec's edge case is satisfied by value-type/immutability guarantees rather than explicit branching, still add a test that mutates shared state between capture and use to make the guarantee explicit and regression-proof.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `MCGuiUI/Views/PanelView` · harmful: 1
+- features: drag-drop-copy
+- evidence: DND-12 - dragPayload/PanelView.swift (MCGuiUI/Views/PanelView)
+- last seen: 2026-09-12T01:54:59Z
+
+### L-019 - On a case-insensitive filesystem (default macOS), 'git add Tests/...' silently no-ops when the tracked path is 'tests/...' (lowercase) - no error, nothing staged; after adding new test files, run 'git status' or 'git show --stat <sha>' to confirm the exact tracked casing was staged, not just that swift test passed locally.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `process/git-case-sensitivity` · harmful: 0
+- features: drag-drop-copy
+- evidence: commit 9ce11da message; git ls-files tests/MCGuiUITests/Views/DraggedFileURLsTests.swift (process/git-case-sensitivity) (process/git-case-sensitivity)
+- last seen: 2026-09-12T01:55:07Z
+
+### L-020 - When a spec edge case is already satisfied because a pure static function takes the mutable state as a by-value parameter (Swift value-type copy-on-call), do not add a test that mutates the caller's variable after the call and asserts the earlier result is unaffected - that only proves Swift's own call-by-value semantics, a Check C anti-pattern (testing framework/language behavior, not app logic); the existing input/output test of the pure function is sufficient evidence, and note in validation.md that the edge case is closed by construction.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `MCGuiUI/Views/PanelView` · harmful: 0
+- features: drag-drop-copy
+- evidence: DND-12 iteration 2 - dragPayload/PanelView.swift:621-628 (corrects L-018) (MCGuiUI/Views/PanelView)
+- last seen: 2026-09-12T01:55:15Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

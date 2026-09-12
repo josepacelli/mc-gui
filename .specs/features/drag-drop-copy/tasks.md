@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/drag-drop-copy/design.md`
-**Status**: In Progress (all 6 tasks implemented; feature-level Verifier pending)
+**Status**: Done — Verifier PASS (iteration 2/2 of fix→re-verify). See `.specs/features/drag-drop-copy/validation.md`. Remaining: DND-11 (drop outside either panel, and click/double-click/right-click gesture coexistence) needs manual interactive confirmation - no GUI automation tool available for this native app.
 
 ---
 
