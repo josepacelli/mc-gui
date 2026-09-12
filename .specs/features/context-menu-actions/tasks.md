@@ -185,7 +185,7 @@ T9 -> T10
 
 ---
 
-### T6: Create `InfoDialogViewModel`
+### T6: Create `InfoDialogViewModel` ✅ Done
 
 **What**: `@MainActor @Observable` class holding `entry`'s static fields plus `totalSize`/`itemCount` (`nil` until computed for a folder, set immediately from `entry.size` for a file); `startSizeCalculationIfNeeded()` recurses via `fileSystemService.listDirectory`, accumulating size and count, supporting `Task` cancellation.
 **Where**: `Sources/MCGuiUI/ViewModels/InfoDialogViewModel.swift` (new file)
