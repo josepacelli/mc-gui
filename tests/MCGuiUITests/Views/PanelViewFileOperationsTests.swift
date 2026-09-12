@@ -377,4 +377,50 @@ struct PanelViewFileOperationsTests {
     func shouldIgnoreDropFalseWhenSafe() {
         #expect(PanelView.shouldIgnoreDrop(sourcePanelID: UUID(), destinationPanelID: UUID(), hasRunningOperation: false) == false)
     }
+
+
+    @Test("makeDropCopyDialog opens a copy dialog with a single source and the destination panel's current path")
+    func makeDropCopyDialogSingleSource() {
+        let destination = URL(fileURLWithPath: "/tmp/dest")
+        let dragged = makeTestEntry(name: "a.txt")
+        let other = makeTestEntry(name: "b.txt")
+
+        let dialog = PanelView.makeDropCopyDialog(
+            droppedPaths: [dragged.path],
+            sourceEntries: [dragged, other],
+            destinationDirectory: destination
+        )
+
+        #expect(dialog?.sources == [dragged])
+        #expect(dialog?.destinationDirectory == destination)
+        #expect(dialog?.mode == .copy)
+    }
+
+    @Test("makeDropCopyDialog opens a copy dialog listing every dropped entry when the marked set was dragged")
+    func makeDropCopyDialogMarkedSet() {
+        let destination = URL(fileURLWithPath: "/tmp/dest")
+        let a = makeTestEntry(name: "a.txt")
+        let b = makeTestEntry(name: "b.txt")
+        let c = makeTestEntry(name: "c.txt")
+
+        let dialog = PanelView.makeDropCopyDialog(
+            droppedPaths: [a.path, b.path],
+            sourceEntries: [a, b, c],
+            destinationDirectory: destination
+        )
+
+        #expect(Set(dialog?.sources.map(\.id) ?? []) == Set([a.id, b.id]))
+        #expect(dialog?.sources.count == 2)
+    }
+
+    @Test("makeDropCopyDialog returns nil when none of the dropped paths resolve to a source entry")
+    func makeDropCopyDialogNoMatchesReturnsNil() {
+        let dialog = PanelView.makeDropCopyDialog(
+            droppedPaths: [URL(fileURLWithPath: "/tmp/deleted.txt")],
+            sourceEntries: [],
+            destinationDirectory: URL(fileURLWithPath: "/tmp/dest")
+        )
+
+        #expect(dialog == nil)
+    }
 }

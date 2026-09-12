@@ -347,12 +347,11 @@ public struct PanelView: View {
 
         guard let parent = payload.paths.first?.deletingLastPathComponent() else { return }
         let sourceEntries = (try? await fileSystemService.listDirectory(parent)) ?? []
-        let resolved = Self.resolveDroppedEntries(paths: payload.paths, in: sourceEntries)
 
         operationErrorMessage = nil
-        copyMoveViewModel = Self.makeCopyMoveDialog(
-            selection: resolved,
-            mode: .copy,
+        copyMoveViewModel = Self.makeDropCopyDialog(
+            droppedPaths: payload.paths,
+            sourceEntries: sourceEntries,
             destinationDirectory: viewModel.currentPath
         )
     }
@@ -608,6 +607,15 @@ public struct PanelView: View {
 
     static func shouldIgnoreDrop(sourcePanelID: UUID, destinationPanelID: UUID, hasRunningOperation: Bool) -> Bool {
         sourcePanelID == destinationPanelID || hasRunningOperation
+    }
+
+    static func makeDropCopyDialog(
+        droppedPaths: [URL],
+        sourceEntries: [FileEntry],
+        destinationDirectory: URL
+    ) -> CopyMoveDialogViewModel? {
+        let resolved = resolveDroppedEntries(paths: droppedPaths, in: sourceEntries)
+        return makeCopyMoveDialog(selection: resolved, mode: .copy, destinationDirectory: destinationDirectory)
     }
 
     static func dragPayload(
