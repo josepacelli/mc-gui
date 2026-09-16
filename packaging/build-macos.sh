@@ -77,18 +77,14 @@ case "$BIN_FILE" in
 esac
 
 SIGN_IDENTITY="-"
-if security find-identity -v -p codesigning 2>/dev/null | grep -q "mc-gui Local Developer"; then
-    SIGN_IDENTITY="mc-gui Local Developer"
-fi
 
 echo "==> Sign app bundle ($SIGN_IDENTITY)"
 # swift build only ad-hoc-signs the raw binary; re-signing the whole assembled
 # bundle here seals Info.plist + Resources too. Without this, Gatekeeper sees a
 # signed binary inside an unsealed bundle and reports the app as "damaged"
 # instead of showing the normal (bypassable) unidentified-developer prompt.
-# Prefers the local self-signed "mc-gui Local Developer" identity when present
-# (stable identity across rebuilds - avoids the keychain/TCC permission resets
-# ad-hoc signing causes) and falls back to ad-hoc ("-") on any other machine.
+# Always ad-hoc ("-"): the local self-signed "mc-gui Local Developer" identity
+# broke installs on other machines, so it's no longer used here.
 codesign --force --deep --sign "$SIGN_IDENTITY" "$APP_DIR"
 codesign --verify --deep --strict "$APP_DIR"
 
