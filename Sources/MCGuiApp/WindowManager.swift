@@ -42,7 +42,8 @@ public final class WindowManager {
         )
         let window = NSWindow(contentViewController: NSHostingController(rootView: content))
         window.title = "Midnight Commander"
-        window.setContentSize(NSSize(width: 1024, height: 640))
+        window.setContentSize(NSSize(width: 1080, height: 660))
+        window.minSize = NSSize(width: 760, height: 480)
         let autosaveName = "MainWindow"
         if !window.setFrameUsingName(autosaveName) {
             window.center()

@@ -13,7 +13,19 @@ public struct FileIcon: View {
 
     public var body: some View {
         Image(systemName: symbolName)
-            .foregroundStyle(isSymlinkBroken ? AnyShapeStyle(.red) : AnyShapeStyle(.primary))
+            .font(.system(size: 13.5, weight: .medium))
+            .foregroundStyle(iconColor)
+            .frame(width: 18, alignment: .center)
+    }
+
+    private var iconColor: Color {
+        if isSymlinkBroken { return .red }
+        switch type {
+        case .directory: return Color(nsColor: .systemBlue)
+        case .symlink: return .teal
+        case .volume: return .indigo
+        case .file, .unknown: return .secondary
+        }
     }
 
     private var symbolName: String {
@@ -36,7 +48,12 @@ public struct PermissionBadge: View {
 
     public var body: some View {
         Text(text)
-            .font(.system(.caption, design: .monospaced))
+            .font(.system(size: 10.5, weight: .medium, design: .monospaced))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+            .frame(width: 40, alignment: .center)
     }
 
     private var text: String {
@@ -81,13 +98,21 @@ public struct LoadingOverlay: View {
     }
 
     public var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             ProgressView()
+                .controlSize(.regular)
             Text(message)
-                .font(.caption)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
         }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.12), radius: 10, y: 4)
     }
 }
 
@@ -102,10 +127,19 @@ public struct ErrorAlert: View {
     public var body: some View {
         VStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.yellow)
+                .font(.title3)
+                .foregroundStyle(.orange)
             Text(message)
+                .font(.callout)
                 .multilineTextAlignment(.center)
         }
-        .padding()
+        .padding(16)
+        .frame(maxWidth: 320)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Color.orange.opacity(0.25), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.1), radius: 8, y: 3)
     }
 }

@@ -100,6 +100,8 @@ public struct PanelView: View {
         VStack(spacing: 0) {
             header
 
+            Divider()
+
             ZStack {
                 entryList
 
@@ -116,9 +118,20 @@ public struct PanelView: View {
                 }
             }
 
+            Divider()
+
             footer
         }
-        .border(isActive ? Color.accentColor : Color.clear, width: 2)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(
+                    isActive ? Color.accentColor.opacity(0.65) : Color(nsColor: .separatorColor).opacity(0.6),
+                    lineWidth: isActive ? 1.5 : 1
+                )
+        )
+        .padding(5)
         .task {
             await viewModel.load()
         }
@@ -183,6 +196,13 @@ public struct PanelView: View {
     private var entryList: some View {
         List(displayEntries, selection: $selection) { entry in
             FileRow(entry: entry, isMarked: markedIDs.contains(entry.id))
+                .listRowInsets(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+                .listRowSeparator(.hidden)
+                .listRowBackground(
+                    (!selection.contains(entry.id) && markedIDs.contains(entry.id))
+                        ? Color.orange.opacity(0.1)
+                        : nil
+                )
                 .contextMenu {
                     Button(String(localized: "contextMenu.open", bundle: .module, comment: "Context menu: open a file in the viewer or navigate into a directory")) {
                         activate(entry)
@@ -214,6 +234,9 @@ public struct PanelView: View {
                 .background(TableDoubleClickInstaller(entries: displayEntries, onDoubleClick: activate))
                 .draggable(Self.dragPayload(for: entry, markedIDs: markedIDs, markedEntries: markedEntries, sourcePanelID: viewModel.instanceID))
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .environment(\.defaultMinListRowHeight, 24)
         .dropDestination(for: DraggedFileURLs.self) { items, _ in
             guard let payload = items.first else { return false }
             Task { await handleDrop(payload) }
@@ -245,9 +268,18 @@ public struct PanelView: View {
 
 
     private var header: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(isActive ? Color.accentColor : Color.secondary.opacity(0.3))
+                .frame(width: 6, height: 6)
+
+            Image(systemName: "folder.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(isActive ? Color.accentColor : Color.secondary)
+
             Text(viewModel.currentPath.path)
-                .font(.system(.caption, design: .monospaced))
+                .font(.system(size: 11.5, weight: isActive ? .semibold : .medium, design: .monospaced))
+                .foregroundStyle(isActive ? .primary : .secondary)
                 .lineLimit(1)
                 .truncationMode(.head)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -255,14 +287,16 @@ public struct PanelView: View {
                 .onTapGesture(count: 2, perform: beginGoToFolder)
 
             Button(action: beginGoToFolder) {
-                Image(systemName: "arrow.right.square")
+                Image(systemName: "arrow.right.circle")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.borderless)
             .help(String(localized: "goToFolder.title", bundle: .module, comment: "Go to Folder dialog title"))
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 2)
-        .background(isActive ? Color.accentColor.opacity(0.25) : Color.gray.opacity(0.15))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(isActive ? Color.accentColor.opacity(0.11) : Color.primary.opacity(0.03))
     }
 
     private func beginGoToFolder() {
@@ -270,7 +304,7 @@ public struct PanelView: View {
     }
 
     private var footer: some View {
-        HStack {
+        HStack(spacing: 6) {
             if markedIDs.isEmpty {
                 Text(
                     String(
@@ -282,7 +316,11 @@ public struct PanelView: View {
                         viewModel.entries.count
                     )
                 )
+                .foregroundStyle(.secondary)
             } else {
+                Circle()
+                    .fill(Color.orange)
+                    .frame(width: 6, height: 6)
                 Text(
                     String(
                         format: NSLocalizedString(
@@ -293,13 +331,15 @@ public struct PanelView: View {
                         markedIDs.count, viewModel.entries.count
                     )
                 )
+                .foregroundStyle(.orange)
+                .fontWeight(.medium)
             }
             Spacer()
         }
-        .font(.caption2)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 2)
-        .background(Color.gray.opacity(0.1))
+        .font(.system(size: 11).monospacedDigit())
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Color.primary.opacity(0.025))
     }
 
     private func presented<T>(_ binding: Binding<T?>) -> Binding<Bool> {

@@ -52,7 +52,7 @@ public struct EditorWindow: View {
 
 
     private var toolbar: some View {
-        HStack {
+        HStack(spacing: 10) {
             Button { performEditAction("cut:") } label: { Image(systemName: "scissors") }
                 .help(String(localized: "editor.button.cut.help", bundle: .module, comment: "Cut button tooltip"))
             Button { performEditAction("copy:") } label: { Image(systemName: "doc.on.doc") }
@@ -61,6 +61,7 @@ public struct EditorWindow: View {
                 .help(String(localized: "editor.button.paste.help", bundle: .module, comment: "Paste button tooltip"))
 
             Divider()
+                .frame(height: 14)
 
             Button { performEditAction("undo:") } label: { Image(systemName: "arrow.uturn.backward") }
                 .help(String(localized: "editor.button.undo.help", bundle: .module, comment: "Undo button tooltip"))
@@ -96,7 +97,10 @@ public struct EditorWindow: View {
             .keyboardShortcut("f", modifiers: [.command, .option])
             .help(String(localized: "editor.button.findReplace.help", bundle: .module, comment: "Find & Replace button tooltip (⌥⌘F unchanged)"))
         }
-        .padding(8)
+        .buttonStyle(.borderless)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(.bar)
     }
 
     private func performEditAction(_ selectorName: String) {
@@ -105,14 +109,16 @@ public struct EditorWindow: View {
 
 
     private var findReplaceBar: some View {
-        HStack {
+        HStack(spacing: 8) {
             TextField(String(localized: "editor.field.find", bundle: .module, comment: "Find text field placeholder"), text: $findQuery)
+                .textFieldStyle(.roundedBorder)
                 .focused($findFieldFocused)
             Button(String(localized: "editor.button.findNext", bundle: .module, comment: "Find the next match")) { findNext() }
                 .disabled(findQuery.isEmpty)
 
             if showReplaceField {
                 TextField(String(localized: "editor.field.replace", bundle: .module, comment: "Replace text field placeholder"), text: $replaceQuery)
+                    .textFieldStyle(.roundedBorder)
                 Button(String(localized: "editor.button.replaceAll", bundle: .module, comment: "Replace every match")) { replaceAll() }
                     .disabled(findQuery.isEmpty)
             }
@@ -120,8 +126,9 @@ public struct EditorWindow: View {
             Spacer()
             Button(String(localized: "editor.button.done", bundle: .module, comment: "Close the find/replace bar")) { showFindBar = false }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.primary.opacity(0.02))
     }
 
     private func openFindBar(replaceMode: Bool) {
@@ -148,6 +155,7 @@ public struct EditorWindow: View {
                 viewModel.fileURL.lastPathComponent
                     + (viewModel.isDirty ? String(localized: "editor.status.editedSuffix", bundle: .module, comment: "Appended to the file name in the status bar when there are unsaved changes") : "")
             )
+            .fontWeight(.medium)
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .foregroundStyle(.red)
@@ -155,7 +163,9 @@ public struct EditorWindow: View {
             Spacer()
         }
         .font(.caption)
-        .padding(8)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(.bar)
     }
 
 

@@ -75,7 +75,7 @@ public struct TopBar: View {
     private var themeLabel: String { String(localized: "topBar.options.theme", bundle: .module, comment: "Options menu: Theme submenu title") }
 
     public var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 6) {
             Menu(leftMenuTitle) {
                 ForEach(leftVolumes) { volume in
                     Button(volume.name) { onSelectLeftVolume(volume) }
@@ -123,7 +123,11 @@ public struct TopBar: View {
 
             Spacer()
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .menuStyle(.borderlessButton)
+        .fixedSize(horizontal: false, vertical: true)
+        .font(.system(size: 12.5, weight: .medium))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(.bar)
     }
 }

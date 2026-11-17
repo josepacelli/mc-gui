@@ -51,8 +51,11 @@ public struct HelpWindow: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Midnight Commander").font(.largeTitle.bold())
-                    Text(Self.subtitle).foregroundStyle(.secondary)
+                    Text("Midnight Commander")
+                        .font(.title.bold())
+                    Text(Self.subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
 
                 shortcutSection(title: Self.panelShortcutsTitle, shortcuts: Self.panelShortcuts)
@@ -64,17 +67,44 @@ public struct HelpWindow: View {
     }
 
     private func shortcutSection(title: String, shortcuts: [Shortcut]) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title).font(.headline)
-            ForEach(shortcuts.indices, id: \.self) { index in
-                HStack {
-                    Text(shortcuts[index].keys)
-                        .font(.system(.body, design: .monospaced))
-                        .frame(minWidth: 110, alignment: .leading)
-                    Text(shortcuts[index].action)
-                        .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(shortcuts.indices, id: \.self) { index in
+                    HStack(spacing: 12) {
+                        Text(shortcuts[index].keys)
+                            .font(.system(size: 11.5, weight: .semibold, design: .monospaced))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color.primary.opacity(0.07), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                            )
+                            .frame(minWidth: 116, alignment: .leading)
+
+                        Text(shortcuts[index].action)
+                            .font(.callout)
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+
+                    if index < shortcuts.count - 1 {
+                        Divider()
+                            .padding(.leading, 12)
+                    }
                 }
             }
+            .background(Color.primary.opacity(0.03), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            )
         }
     }
 }

@@ -87,6 +87,9 @@ public struct BookmarksView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack {
+                Image(systemName: "bookmark.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.accentColor)
                 Text(String(localized: "bookmarks.header.title", bundle: .module, comment: "Bookmarks popover title"))
                     .font(.headline)
                 Spacer()
@@ -95,31 +98,59 @@ public struct BookmarksView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .buttonStyle(.borderless)
                 .keyboardShortcut("d", modifiers: .command)
                 .help(String(localized: "bookmarks.button.add.help", bundle: .module, comment: "Add-bookmark button tooltip (⌘D unchanged)"))
             }
-            .padding(8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(.bar)
+
+            Divider()
 
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
+                    .font(.caption)
                     .foregroundStyle(.red)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
             }
 
             List(viewModel.bookmarks) { bookmark in
-                HStack {
-                    Button(bookmark.name) { onNavigate(bookmark.path) }
-                        .buttonStyle(.plain)
-                    Spacer()
+                HStack(spacing: 8) {
+                    Image(systemName: "folder.fill")
+                        .font(.caption)
+                        .foregroundStyle(Color(nsColor: .systemBlue))
+                    Button {
+                        onNavigate(bookmark.path)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(bookmark.name)
+                                .font(.callout.weight(.medium))
+                                .lineLimit(1)
+                            Text(bookmark.path.path)
+                                .font(.system(.caption2, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.head)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+
                     Button {
                         Task { await viewModel.remove(id: bookmark.id) }
                     } label: {
                         Image(systemName: "minus.circle")
+                            .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                     .help(String(localized: "bookmarks.button.remove.help", bundle: .module, comment: "Remove-bookmark button tooltip"))
                 }
+                .padding(.vertical, 2)
             }
+            .listStyle(.inset)
         }
         .task { await viewModel.refresh() }
     }

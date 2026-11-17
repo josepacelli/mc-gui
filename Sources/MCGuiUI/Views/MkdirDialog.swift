@@ -16,9 +16,14 @@ public struct MkdirDialog: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "mkdir.title", bundle: .module, comment: "F7 dialog title: New Folder"))
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "folder.badge.plus")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.accentColor)
+                Text(String(localized: "mkdir.title", bundle: .module, comment: "F7 dialog title: New Folder"))
+                    .font(.headline)
+            }
 
             TextField(
                 String(localized: "mkdir.field.name", bundle: .module, comment: "Folder name text field label"),
@@ -39,11 +44,12 @@ public struct MkdirDialog: View {
                 Button(String(localized: "mkdir.button.create", bundle: .module, comment: "Create folder button")) {
                     Task { await viewModel.confirm() }
                 }
+                .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)
                 .disabled(!isNameValid)
             }
         }
-        .padding()
-        .frame(minWidth: 280)
+        .padding(20)
+        .frame(minWidth: 320)
     }
 }

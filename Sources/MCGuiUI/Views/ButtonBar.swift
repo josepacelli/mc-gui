@@ -26,23 +26,19 @@ public struct ButtonBar: View {
     ]
 
     public var body: some View {
-        HStack(spacing: 1) {
+        HStack(spacing: 5) {
             ForEach(Self.labels, id: \.number) { label in
-                Button {
-                    handle(label.number)
-                } label: {
-                    HStack(spacing: 2) {
-                        Text("\(label.number)").font(.caption2.bold())
-                        Text(label.text).font(.caption2)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .disabled(Self.isDisabled(label.number))
+                FunctionKeyButton(
+                    number: label.number,
+                    title: label.text,
+                    isDisabled: Self.isDisabled(label.number),
+                    action: { handle(label.number) }
+                )
             }
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 2)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(.bar)
     }
 
     private func handle(_ number: Int) {
@@ -70,5 +66,48 @@ public struct ButtonBar: View {
 
     nonisolated static func isDisabled(_ number: Int) -> Bool {
         [9].contains(number)
+    }
+}
+
+private struct FunctionKeyButton: View {
+    let number: Int
+    let title: String
+    let isDisabled: Bool
+    let action: () -> Void
+
+    @State private var isHovered = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Text("\(number)")
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .foregroundStyle(isDisabled ? Color.secondary : Color.primary)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(Color.primary.opacity(0.09), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+
+                Text(title)
+                    .font(.system(size: 11, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 4)
+            .background(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(Color(nsColor: .controlColor).opacity(isHovered && !isDisabled ? 0.9 : 0.45))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .stroke(Color.primary.opacity(isHovered && !isDisabled ? 0.18 : 0.08), lineWidth: 1)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.38 : 1)
+        .onHover { isHovered = $0 }
     }
 }

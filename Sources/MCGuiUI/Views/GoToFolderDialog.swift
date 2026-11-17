@@ -12,15 +12,21 @@ public struct GoToFolderDialog: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "goToFolder.title", bundle: .module, comment: "Go to Folder dialog title"))
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "folder.badge.gearshape")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.accentColor)
+                Text(String(localized: "goToFolder.title", bundle: .module, comment: "Go to Folder dialog title"))
+                    .font(.headline)
+            }
 
             TextField(
                 String(localized: "goToFolder.field.path", bundle: .module, comment: "Go to Folder dialog: path text field label"),
                 text: $viewModel.path
             )
             .textFieldStyle(.roundedBorder)
+            .font(.system(.body, design: .monospaced))
             .onSubmit { Task { await viewModel.confirm() } }
 
             if let errorMessage = viewModel.errorMessage {
@@ -35,7 +41,11 @@ public struct GoToFolderDialog: View {
                 }
                 .listStyle(.inset)
                 .frame(minHeight: 260)
-                .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.gray.opacity(0.3)))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                )
                 .task {
                     if let revealed = await viewModel.expandToCurrentPath() {
                         proxy.scrollTo(revealed, anchor: .center)
@@ -50,12 +60,13 @@ public struct GoToFolderDialog: View {
                 Button(String(localized: "goToFolder.button.go", bundle: .module, comment: "Go to folder button")) {
                     Task { await viewModel.confirm() }
                 }
+                .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)
                 .disabled(viewModel.path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
-        .padding()
-        .frame(minWidth: 420, minHeight: 420)
+        .padding(20)
+        .frame(minWidth: 460, minHeight: 440)
     }
 }
 

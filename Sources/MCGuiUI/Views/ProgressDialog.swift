@@ -23,57 +23,75 @@ public struct ProgressDialog: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "progress.title.copying", bundle: .module, comment: "Progress dialog title (always shown, even for move - pre-existing limitation)"))
-                .font(.headline)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.accentColor)
+                Text(String(localized: "progress.title.copying", bundle: .module, comment: "Progress dialog title (always shown, even for move - pre-existing limitation)"))
+                    .font(.headline)
+                Spacer()
+                if !isScanning {
+                    Text(Self.speedText(viewModel.speed))
+                        .font(.system(.caption, design: .monospaced).weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.primary.opacity(0.06), in: Capsule())
+                }
+            }
 
             ProgressView(value: fraction)
+                .progressViewStyle(.linear)
 
             if isScanning {
                 Text(String(localized: "progress.status.scanning", bundle: .module, comment: "Shown while pre-scanning the source tree, before totals are known"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
-                Text(viewModel.currentFile)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(viewModel.currentFile)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
 
-                Text(
-                    String(
-                        format: NSLocalizedString(
-                            "progress.status.fileCount",
-                            bundle: .module,
-                            comment: "Progress dialog: current file index of total. %1$d is the files processed so far, %2$d is the total file count."
-                        ),
-                        viewModel.filesProcessed, viewModel.totalFiles
-                    )
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-                HStack {
-                    Text(ByteCountFormatter.string(fromByteCount: viewModel.bytesTransferred, countStyle: .file))
-                    Text(String(localized: "progress.label.of", bundle: .module, comment: "Separator between transferred and total byte counts, e.g. '10 MB of 100 MB'"))
-                    Text(ByteCountFormatter.string(fromByteCount: viewModel.totalBytes, countStyle: .file))
-                    Spacer()
-                    Text(
-                        String(
-                            format: NSLocalizedString(
-                                "progress.label.etaRemaining",
-                                bundle: .module,
-                                comment: "Estimated time remaining. %1$d is the number of seconds."
-                            ),
-                            Int(viewModel.eta)
+                    HStack {
+                        Text(
+                            String(
+                                format: NSLocalizedString(
+                                    "progress.status.fileCount",
+                                    bundle: .module,
+                                    comment: "Progress dialog: current file index of total. %1$d is the files processed so far, %2$d is the total file count."
+                                ),
+                                viewModel.filesProcessed, viewModel.totalFiles
+                            )
                         )
-                    )
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-                Text(Self.speedText(viewModel.speed))
-                    .font(.caption)
+                        Spacer()
+                        Text(
+                            String(
+                                format: NSLocalizedString(
+                                    "progress.label.etaRemaining",
+                                    bundle: .module,
+                                    comment: "Estimated time remaining. %1$d is the number of seconds."
+                                ),
+                                Int(viewModel.eta)
+                            )
+                        )
+                    }
+                    .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
+
+                    HStack(spacing: 4) {
+                        Text(ByteCountFormatter.string(fromByteCount: viewModel.bytesTransferred, countStyle: .file))
+                        Text(String(localized: "progress.label.of", bundle: .module, comment: "Separator between transferred and total byte counts, e.g. '10 MB of 100 MB'"))
+                        Text(ByteCountFormatter.string(fromByteCount: viewModel.totalBytes, countStyle: .file))
+                    }
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                }
+                .padding(10)
+                .background(Color.primary.opacity(0.035), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
 
             HStack {
@@ -82,7 +100,7 @@ public struct ProgressDialog: View {
                     .keyboardShortcut(.cancelAction)
             }
         }
-        .padding()
-        .frame(minWidth: 320)
+        .padding(20)
+        .frame(minWidth: 380)
     }
 }

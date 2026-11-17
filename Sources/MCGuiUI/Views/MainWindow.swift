@@ -129,5 +129,6 @@ public struct MainWindow: View {
             volumesListViewModel.refresh()
         }
         .preferredColorScheme(themePreference.colorScheme)
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 }

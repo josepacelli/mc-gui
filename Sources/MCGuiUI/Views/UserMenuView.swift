@@ -121,6 +121,9 @@ public struct UserMenuView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
+                Image(systemName: "terminal.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.accentColor)
                 Text(String(localized: "userMenu.header.title", bundle: .module, comment: "User Menu window title"))
                     .font(.headline)
                 Spacer()
@@ -129,23 +132,32 @@ public struct UserMenuView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .buttonStyle(.borderless)
                 .help(String(localized: "userMenu.button.addCommand.help", bundle: .module, comment: "Add-command button tooltip"))
             }
-            .padding(8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(.bar)
+
+            Divider()
 
             if showingAddForm {
                 addForm
+                Divider()
             }
 
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
+                    .font(.caption)
                     .foregroundStyle(.red)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
             }
 
             List(viewModel.items) { item in
                 itemRow(item)
             }
+            .listStyle(.inset)
 
             resultArea
         }
@@ -153,12 +165,15 @@ public struct UserMenuView: View {
     }
 
     private var addForm: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             TextField(String(localized: "userMenu.field.label", bundle: .module, comment: "New item's label text field"), text: $newLabel)
+                .textFieldStyle(.roundedBorder)
             TextField(
                 String(localized: "userMenu.field.commandPlaceholder", bundle: .module, comment: "New item's shell command text field. %f/%d/%D are UserMenuRunner's own literal expansion tokens (current file/dir/other dir), not Swift format specifiers - never substituted, keep them unchanged."),
                 text: $newCommand
             )
+            .textFieldStyle(.roundedBorder)
+            .font(.system(.body, design: .monospaced))
             HStack {
                 Spacer()
                 Button(String(localized: "userMenu.button.cancel", bundle: .module, comment: "Cancel adding a new item")) { cancelAddForm() }
@@ -168,12 +183,13 @@ public struct UserMenuView: View {
                         cancelAddForm()
                     }
                 }
+                .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)
                 .disabled(newLabel.isEmpty || newCommand.isEmpty)
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.bottom, 8)
+        .padding(12)
+        .background(Color.primary.opacity(0.03))
     }
 
     private func cancelAddForm() {
@@ -183,11 +199,12 @@ public struct UserMenuView: View {
     }
 
     private func itemRow(_ item: UserMenuEntry) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(item.label)
+                    .font(.callout.weight(.medium))
                 Text(item.command)
-                    .font(.caption)
+                    .font(.system(.caption, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
@@ -195,45 +212,59 @@ public struct UserMenuView: View {
             Button(String(localized: "userMenu.button.run", bundle: .module, comment: "Run this item's command")) {
                 Task { await viewModel.run(item, context: context) }
             }
+            .controlSize(.small)
             Button {
                 Task { await viewModel.remove(id: item.id) }
             } label: {
                 Image(systemName: "minus.circle")
+                    .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
             .help(String(localized: "userMenu.button.remove.help", bundle: .module, comment: "Remove-item button tooltip"))
         }
+        .padding(.vertical, 2)
     }
 
     @ViewBuilder
     private var resultArea: some View {
         if viewModel.isRunning {
-            ProgressView()
-                .padding(8)
+            Divider()
+            HStack {
+                ProgressView()
+                    .controlSize(.small)
+                Spacer()
+            }
+            .padding(10)
+            .background(.bar)
         } else if let result = viewModel.lastResult {
             Divider()
-            ScrollView {
-                Text(result.output.isEmpty ? String(localized: "userMenu.result.noOutput", bundle: .module, comment: "Shown when the last run produced no output") : result.output)
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(result.exitCode == 0 ? Color.primary : Color.red)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(8)
-            }
-            .frame(maxHeight: 150)
-            Text(
-                String(
-                    format: NSLocalizedString(
-                        "userMenu.result.exitCode",
-                        bundle: .module,
-                        comment: "Exit code of the last run command. %1$d is the exit code."
-                    ),
-                    result.exitCode
+            VStack(alignment: .leading, spacing: 0) {
+                ScrollView {
+                    Text(result.output.isEmpty ? String(localized: "userMenu.result.noOutput", bundle: .module, comment: "Shown when the last run produced no output") : result.output)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(result.exitCode == 0 ? Color.primary : Color.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(10)
+                        .textSelection(.enabled)
+                }
+                .frame(maxHeight: 150)
+                Divider()
+                Text(
+                    String(
+                        format: NSLocalizedString(
+                            "userMenu.result.exitCode",
+                            bundle: .module,
+                            comment: "Exit code of the last run command. %1$d is the exit code."
+                        ),
+                        result.exitCode
+                    )
                 )
-            )
-            .font(.caption2)
-            .foregroundStyle(result.exitCode == 0 ? Color.secondary : Color.red)
-            .padding(.horizontal, 8)
-            .padding(.bottom, 8)
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(result.exitCode == 0 ? Color.secondary : Color.red)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            .background(Color.primary.opacity(0.03))
         }
     }
 }

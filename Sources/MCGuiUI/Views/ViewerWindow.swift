@@ -66,10 +66,13 @@ public struct ViewerWindow: View {
             } label: {
                 Image(systemName: "magnifyingglass")
             }
+            .buttonStyle(.borderless)
             .keyboardShortcut("f", modifiers: .command)
             .help(String(localized: "viewer.button.find.help", bundle: .module, comment: "Find button tooltip (⌘F unchanged)"))
         }
-        .padding(8)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(.bar)
     }
 
     private var modeBinding: Binding<ViewerMode> {
@@ -78,10 +81,12 @@ public struct ViewerWindow: View {
 
 
     private var searchBar: some View {
-        HStack {
+        HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
+                .font(.caption)
                 .foregroundStyle(.secondary)
             TextField(String(localized: "viewer.field.search", bundle: .module, comment: "Search text field placeholder"), text: searchQueryBinding)
+                .textFieldStyle(.plain)
                 .focused($searchFieldFocused)
             if !viewModel.searchMatches.isEmpty {
                 Text(
@@ -94,12 +99,16 @@ public struct ViewerWindow: View {
                         viewModel.searchMatches.count
                     )
                 )
-                .font(.caption)
+                .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.primary.opacity(0.06), in: Capsule())
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.primary.opacity(0.02))
     }
 
     private var searchQueryBinding: Binding<String> {
@@ -181,12 +190,15 @@ public struct ViewerWindow: View {
     private var statusBar: some View {
         HStack {
             Text(initialURL.lastPathComponent)
+                .fontWeight(.medium)
             Spacer()
             Text(Self.modeLabel(viewModel.mode))
                 .foregroundStyle(.secondary)
         }
         .font(.caption)
-        .padding(8)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(.bar)
     }
 
 
