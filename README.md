@@ -52,11 +52,16 @@ Landing page: **[mc.jpmo.dev.br](https://mc.jpmo.dev.br)**
 
 ## Install
 
-Download the latest DMG from [Releases](https://github.com/josepacelli/mc-gui/releases/latest),
-drag the app to `/Applications`.
+Download the latest `.pkg` installer from [Releases](https://github.com/josepacelli/mc-gui/releases/latest)
+and run it to install `Midnight Commander GUI.app` into `/Applications`.
 
-It's an **unsigned development build** — on first launch, right-click the app and choose
-**Open** (instead of double-clicking) to get past Gatekeeper's warning.
+It's an **unsigned development build** — on first launch, right-click the `.pkg` installer
+(or the installed app) and choose **Open** (instead of double-clicking) to get past Gatekeeper's
+warning, or install via Terminal:
+
+```bash
+sudo installer -pkg mc-gui-<version>-arm64.pkg -target /
+```
 
 ## Build from source
 
@@ -70,7 +75,7 @@ swift test              # run the test suite
 swift run MCGuiApp       # run the app directly
 ```
 
-To produce the same release build and installer DMG published under
+To produce the same release build and `.pkg` installer published under
 [Releases](https://github.com/josepacelli/mc-gui/releases) (built locally, see
 [Releases](#releases) below):
 
@@ -80,7 +85,7 @@ To produce the same release build and installer DMG published under
 
 This builds in release mode, assembles `Midnight Commander GUI.app` (bundling every
 target's resources, including all 4 languages' `.lproj` string tables), and produces a
-drag-to-Applications DMG under `artifacts/`.
+macOS `.pkg` installer under `artifacts/`.
 
 ## Project structure
 
@@ -121,19 +126,18 @@ Issues and pull requests welcome.
 
 ## Releases
 
-Releases are built and published locally, not by CI (`build-macos.yml` is disabled — a bad
-build once slipped through it and produced a DMG Gatekeeper reported as "damaged"; building
-and checking the DMG by hand before publishing catches that first):
+Releases are built and published locally, not by CI (`build-macos.yml` is disabled —
+building and verifying locally before publishing catches bundle/signing issues first):
 
 ```bash
-./packaging/build-macos.sh 1.0.4
-# sanity-check the DMG isn't going to show "damaged" before shipping it:
+./packaging/build-macos.sh 1.0.7
+# sanity-check the app bundle isn't going to show "damaged" before shipping the PKG:
 xattr -w com.apple.quarantine "0081;00000000;Safari;" "artifacts/Midnight Commander GUI.app"
 spctl -a -vv "artifacts/Midnight Commander GUI.app"   # expect: rejected (unsigned), never a resources/corruption error
 
-git tag -a v1.0.4 -m "v1.0.4"
-git push origin v1.0.4
-gh release create v1.0.4 artifacts/mc-gui-1.0.4-arm64.dmg --title "mc-gui v1.0.4" --notes "…"
+git tag -a v1.0.7 -m "v1.0.7"
+git push origin v1.0.7
+gh release create v1.0.7 artifacts/mc-gui-1.0.7-arm64.pkg --title "mc-gui v1.0.7" --notes "…"
 ```
 
 ## License

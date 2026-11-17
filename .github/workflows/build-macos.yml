@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  build-dmg:
+  build-pkg:
     runs-on: macos-14
     steps:
       - name: Checkout
@@ -19,30 +19,27 @@ jobs:
       - name: Make packaging scripts executable
         run: chmod +x packaging/*.sh
 
-      - name: Install create-dmg
-        run: brew install create-dmg
-
-      - name: Build DMG
+      - name: Build PKG
         env:
           VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.1.0' }}
         run: |
           VERSION="${VERSION#v}"
           ./packaging/build-macos.sh "$VERSION"
 
-      - name: Upload DMG artifact
+      - name: Upload PKG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mc-gui-dmg
-          path: artifacts/*.dmg
+          name: mc-gui-pkg
+          path: artifacts/*.pkg
           if-no-files-found: error
 
-      - name: Attach DMG to release
+      - name: Attach PKG to release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          DMG="$(ls artifacts/*.dmg | head -1)"
-          gh release create "${{ github.ref_name }}" "$DMG" \
+          PKG="$(ls artifacts/*.pkg | head -1)"
+          gh release create "${{ github.ref_name }}" "$PKG" \
             --repo "${{ github.repository }}" \
             --title "mc-gui ${{ github.ref_name }}" \
             --notes "Automated macOS (arm64) build."

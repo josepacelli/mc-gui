@@ -486,7 +486,7 @@ $RECYCLE.BIN/
 *.swp
 
 # mc-gui macOS packaging
-*.dmg
+*.pkg
 *.app/
 
 # Config/doc do Claude Code — fica só local, não versionado (mesmo tratamento

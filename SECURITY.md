@@ -3,7 +3,7 @@
 ## Supported Versions
 
 Only the latest release is supported. mc-gui is pre-1.0 and moves fast; please
-update to the latest tag/DMG from [Releases](https://github.com/josepacelli/mc-gui/releases/latest)
+update to the latest tag/PKG from [Releases](https://github.com/josepacelli/mc-gui/releases/latest)
 before reporting an issue.
 
 ## Reporting a Vulnerability
@@ -29,9 +29,10 @@ it runs as a process, not about network attackers.
 A few things worth knowing:
 
 - **Unsigned build.** Releases are unsigned development builds; installing
-  requires bypassing Gatekeeper (right-click → Open). Only download the DMG
-  from the official [Releases](https://github.com/josepacelli/mc-gui/releases/latest)
-  page or build it yourself from source.
+  requires bypassing Gatekeeper (right-click → Open on the `.pkg` installer).
+  Only download the PKG from the official
+  [Releases](https://github.com/josepacelli/mc-gui/releases/latest) page or
+  build it yourself from source.
 - **Trash, not delete.** File removal (F8) goes through the system Trash
   (`TrashService`), not a permanent unlink, so accidental/malicious deletions
   via the UI are recoverable the same way Finder deletions are.

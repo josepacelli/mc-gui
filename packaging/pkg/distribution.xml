@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <title>Midnight Commander __VERSION__</title>
+    <options customize="never" require-scripts="false" hostArchitectures="arm64"/>
+    <allowed-os-versions>
+        <os-version min="14.0"/>
+    </allowed-os-versions>
+    <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
+    <welcome file="welcome.html" mime-type="text/html"/>
+    <license file="LICENSE" mime-type="text/plain"/>
+    <conclusion file="conclusion.html" mime-type="text/html"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="mcgui.jpmo.dev.br.pkg"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="mcgui.jpmo.dev.br.pkg" visible="false">
+        <pkg-ref id="mcgui.jpmo.dev.br.pkg"/>
+    </choice>
+    <pkg-ref id="mcgui.jpmo.dev.br.pkg" version="__VERSION__" onConclusion="none">__COMPONENT_PKG__</pkg-ref>
+</installer-gui-script>

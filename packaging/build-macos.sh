@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Build mc-gui (MCGuiApp, Swift/SwiftUI) for macOS (arm64): swift build -c
-# release, assemble the .app bundle, and create a drag-to-Applications DMG.
+# release, assemble the .app bundle, and create a macOS .pkg installer.
 # Unsigned (development build).
 #
 # Usage: ./packaging/build-macos.sh [VERSION] [--open]
-#   VERSION defaults to 0.1.0; used for CFBundle* and the DMG filename.
-#   --open reveals the built DMG in Finder once done (optional).
+#   VERSION defaults to 1.0.1; used for CFBundle*, pkg version, and the PKG filename.
+#   --open reveals the built PKG in Finder once done (optional).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -23,14 +23,22 @@ ARTIFACTS="$REPO_ROOT/artifacts"
 APP_BUNDLE_NAME="Midnight Commander GUI.app"
 APP_EXECUTABLE_NAME="mc-gui"
 SPM_PRODUCT_NAME="MCGuiApp"
+PKG_IDENTIFIER="mcgui.jpmo.dev.br.pkg"
 APP_DIR="$ARTIFACTS/$APP_BUNDLE_NAME"
-STAGE_DIR="$ARTIFACTS/dmg-stage"
 ICON_SOURCE_DIR="$ARTIFACTS/build"
-DMG_PATH="$ARTIFACTS/mc-gui-$VERSION-arm64.dmg"
+PKG_STAGE_DIR="$ARTIFACTS/pkg-stage"
+PKG_ROOT="$PKG_STAGE_DIR/root"
+PKG_RESOURCES="$PKG_STAGE_DIR/resources"
+COMPONENT_PLIST="$PKG_STAGE_DIR/component.plist"
+COMPONENT_PKG_NAME="mc-gui-component.pkg"
+COMPONENT_PKG="$PKG_STAGE_DIR/$COMPONENT_PKG_NAME"
+DIST_XML="$PKG_STAGE_DIR/distribution.xml"
+PKG_PATH="$ARTIFACTS/mc-gui-$VERSION-arm64.pkg"
 
-for tool in swift hdiutil plutil file create-dmg; do
+for tool in swift plutil file codesign pkgbuild productbuild pkgutil installer; do
     command -v "$tool" >/dev/null 2>&1 || { echo "ERROR: $tool required." >&2; exit 1; }
 done
+test -x /usr/libexec/PlistBuddy || { echo "ERROR: /usr/libexec/PlistBuddy required." >&2; exit 1; }
 
 echo "==> Clean artifacts"
 rm -rf "$ARTIFACTS"
@@ -48,7 +56,6 @@ rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 
 cp "$BIN_PATH/$SPM_PRODUCT_NAME" "$APP_DIR/Contents/MacOS/$APP_EXECUTABLE_NAME"
-
 cp "$ICON_SOURCE_DIR/mc-gui.icns" "$APP_DIR/Contents/Resources/mc-gui.icns"
 
 echo "==> Copy localized resource bundles"
@@ -83,28 +90,55 @@ echo "==> Sign app bundle ($SIGN_IDENTITY)"
 # bundle here seals Info.plist + Resources too. Without this, Gatekeeper sees a
 # signed binary inside an unsealed bundle and reports the app as "damaged"
 # instead of showing the normal (bypassable) unidentified-developer prompt.
-# Always ad-hoc ("-"): the local self-signed "mc-gui Local Developer" identity
-# broke installs on other machines, so it's no longer used here.
 codesign --force --deep --sign "$SIGN_IDENTITY" "$APP_DIR"
 codesign --verify --deep --strict "$APP_DIR"
 
-echo "==> Create DMG"
-VOLNAME="Midnight Commander"
-rm -rf "$STAGE_DIR"
-mkdir -p "$STAGE_DIR"
-cp -R "$APP_DIR" "$STAGE_DIR/"
+echo "==> Stage PKG payload"
+rm -rf "$PKG_STAGE_DIR"
+mkdir -p "$PKG_ROOT/Applications" "$PKG_RESOURCES"
+ditto "$APP_DIR" "$PKG_ROOT/Applications/$APP_BUNDLE_NAME"
+cp "$SCRIPT_DIR/pkg-resources/"* "$PKG_RESOURCES/"
+cp "$REPO_ROOT/LICENSE" "$PKG_RESOURCES/LICENSE"
 
-rm -f "$DMG_PATH"
-create-dmg \
-    --volname "$VOLNAME" \
-    --background "$SCRIPT_DIR/dmg-assets/background.png" \
-    --window-pos 200 120 \
-    --window-size 500 650 \
-    --icon-size 128 \
-    --icon "$APP_BUNDLE_NAME" 250 150 \
-    --app-drop-link 250 500 \
-    --hdiutil-quiet \
-    "$DMG_PATH" \
-    "$STAGE_DIR"
+pkgbuild --analyze --root "$PKG_ROOT" "$COMPONENT_PLIST" >/dev/null
+idx=0
+while /usr/libexec/PlistBuddy -c "Set :${idx}:BundleIsRelocatable false" "$COMPONENT_PLIST" 2>/dev/null; do
+    idx=$((idx + 1))
+done
+[ "$idx" -gt 0 ] || { echo "ERROR: no bundles found in $COMPONENT_PLIST." >&2; exit 1; }
 
-echo "Done: $DMG_PATH"
+echo "==> Build component package"
+pkgbuild \
+    --root "$PKG_ROOT" \
+    --component-plist "$COMPONENT_PLIST" \
+    --identifier "$PKG_IDENTIFIER" \
+    --version "$VERSION" \
+    --install-location "/" \
+    "$COMPONENT_PKG"
+
+echo "==> Build distribution PKG"
+sed -e "s/__VERSION__/$VERSION/g" -e "s/__COMPONENT_PKG__/$COMPONENT_PKG_NAME/g" \
+    "$SCRIPT_DIR/pkg/distribution.xml" > "$DIST_XML"
+
+rm -f "$PKG_PATH"
+productbuild \
+    --distribution "$DIST_XML" \
+    --package-path "$PKG_STAGE_DIR" \
+    --resources "$PKG_RESOURCES" \
+    "$PKG_PATH"
+
+echo "==> Verify PKG"
+test -s "$PKG_PATH" || { echo "ERROR: PKG missing or empty." >&2; exit 1; }
+installer -pkginfo -pkg "$PKG_PATH"
+pkgutil --payload-files "$COMPONENT_PKG" | grep -q "Applications/$APP_BUNDLE_NAME/Contents/MacOS/$APP_EXECUTABLE_NAME" || {
+    echo "ERROR: app executable missing from PKG payload." >&2
+    exit 1
+}
+
+rm -rf "$PKG_STAGE_DIR"
+
+if [ "$OPEN_AFTER_BUILD" -eq 1 ]; then
+    open -R "$PKG_PATH"
+fi
+
+echo "Done: $PKG_PATH"
